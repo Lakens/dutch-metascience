@@ -106,13 +106,30 @@ for i in range(0, len(ids), 50):
 def is_nl(x):
     return (geo.get(x, {}).get("country") or inst_meta.get(x, {}).get("country")) == "NL"
 
+# Research institutes of a medical centre that OpenAlex records only as "related", not as part of it, so the
+# lineage rule below cannot merge them (checked 20 Nov 2026: most of their papers also list the medical centre:
+# Amsterdam Public Health 170 of 196, Amsterdam Neuroscience 28 of 30, Radboud Institute for Health Sciences 40 of 46).
+MERGE_INTO = {
+    "Amsterdam Public Health": "Amsterdam University Medical Centers",
+    "Amsterdam Neuroscience": "Amsterdam University Medical Centers",
+    "Radboud Institute for Health Sciences": "Radboud University Medical Center",
+}
+_name_to_id = {}
+for _i, _g in geo.items():
+    _name_to_id.setdefault(_g.get("name"), _i)
+_missing = [n for pair in MERGE_INTO.items() for n in pair if n not in _name_to_id]
+assert not _missing, f"institutions to merge not found in the data: {_missing}"
+MERGE_IDS = {_name_to_id[a]: _name_to_id[b] for a, b in MERGE_INTO.items()}
+
 def top_level(iid):
     """the highest Dutch parent (e.g. Donders Institute -> Radboud University). A parent in another country is
-    skipped, so a Dutch branch stays itself (Elsevier Amsterdam is not counted as RELX Group, United Kingdom)."""
+    skipped, so a Dutch branch stays itself (Elsevier Amsterdam is not counted as RELX Group, United Kingdom).
+    Institutes in MERGE_INTO are counted under their medical centre."""
     lin = geo.get(iid, {}).get("lineage") or [iid]
     dutch = [x for x in lin if is_nl(x)] or [iid]
     tops = [x for x in dutch if not any(y != x and is_nl(y) for y in geo.get(x, {}).get("lineage") or [x])]
-    return tops[0] if tops else dutch[0]
+    top = tops[0] if tops else dutch[0]
+    return MERGE_IDS.get(top, top)
 
 paper_tops = {wid: sorted({top_level(i) for i in s}) for wid, s in paper_nl_insts.items()}
 for p in papers:
