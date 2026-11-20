@@ -132,6 +132,24 @@ def family(scheme):
             return name
     return "Other"
 
+# metascience-related projects, by open science programme (eight groups, the palette's eight slots; the order is the
+# colour order). Projects in the Open Science family whose scheme matches none of the first six go to the seventh group;
+# metascience-related projects from other schemes (Veni, Open Competition, ...) to the last.
+PROGRAMMES = [("Replication studies", r"replicati"),
+              ("Open Science Fund", r"open science \(os\) fund|open science fund|open science fonds"),
+              ("Research on Open Science", r"research on open science"),
+              ("Recognition and rewards", r"erkennen en waarderen|recognition and reward"),
+              ("Infrastructure, data and software", r"infrastructu|\bdcc|fair|software"),
+              ("Meetings and communities", r"bijeenkomst|communit|citizen science|meeting"),
+              ("Open access publishing and other", None), ("Other NWO schemes", None)]
+def programme(p, fam):
+    if fam != "Open Science":
+        return PROGRAMMES[-1][0]
+    for name, pat in PROGRAMMES[:-2]:
+        if re.search(pat, p.get("funding_scheme") or "", re.I):
+            return name
+    return PROGRAMMES[-2][0]
+
 def org_short(o):
     return (o or "").split("||")[0]
 EMAIL = re.compile(r"([A-Za-z0-9._%+-]+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
@@ -153,10 +171,13 @@ for p in projects:
         seen[key] = dict(id=match.get(m["member_id"]), n=no_email(" ".join(x for x in (m.get("first_name") or m.get("initials") or "",
                                                                               m.get("prefix") or "", m.get("last_name") or "") if x)),
                          r=m["role"], o=org_short(m.get("organisation")))
-    rec = dict(id=p["project_id"], t=p["title"], s=p.get("funding_scheme") or "", f=family(p.get("funding_scheme")),
+    fam = family(p.get("funding_scheme"))
+    rec = dict(id=p["project_id"], t=p["title"], s=p.get("funding_scheme") or "", f=fam,
                b=(p.get("start_date") or "")[:10], e=(p.get("end_date") or "")[:10], a=p.get("award_amount"),
                m=1 if meta else 0, ppl=list(seen.values()),
                sum=no_email((p.get("summary_en") or p.get("summary_nl") or "").strip()[:400]))
+    if meta:
+        rec["g"] = programme(p, fam)
     out_projects.append(rec)
     for x in rec["ppl"]:
         if x["id"]:
@@ -165,6 +186,8 @@ out_projects.sort(key=lambda r: r["b"] or "9999")
 summary = dict(n_projects_nwo=len(projects), n_members_matched=len(match), match_kinds=dict(how), name_only_not_used=name_only,
                n_people_with_grants=len(people_funding), n_projects=len(out_projects),
                n_meta=sum(r["m"] for r in out_projects), families=[f for f, _ in FAMILIES] + ["Other"],
+               programmes=[g for g, _ in PROGRAMMES],
+               n_per_programme={g: sum(1 for r in out_projects if r.get("g") == g) for g, _ in PROGRAMMES},
                api="https://nwopen-api.nwo.nl/NWOpen-API/api/Projects", licence="CC0 1.0")
 json.dump(dict(summary=summary, projects=out_projects, people={k: sorted(set(v)) for k, v in people_funding.items()}),
           open(os.path.join(data_dir, "funding.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))

@@ -49,10 +49,11 @@
 
   <section class="card">
     <h2>NWO funding over time</h2>
-    <p class="sub">Projects by the year they started, coloured by funding scheme. The last year is not complete.
-    Amounts are known for only part of the projects (mostly recent ones), so the amount view underestimates older years.</p>
+    <p class="sub">Projects by the year they started, coloured by funding scheme (all grants) or by open science programme
+    (metascience-related projects). The last year is not complete. Amounts are known for only part of the projects
+    (mostly recent ones), so the amount view underestimates older years.</p>
     <div class="controls">
-      <div class="seg" id="scope"><button aria-pressed="true" data-v="meta">Metascience-related projects</button><button aria-pressed="false" data-v="all">All grants of these researchers</button></div>
+      <div class="seg" id="scope"><button aria-pressed="true" data-v="all">All grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
       <div class="seg" id="measure"><button aria-pressed="true" data-v="n">Number of projects</button><button aria-pressed="false" data-v="a">Amount awarded</button></div>
     </div>
     <div class="legend" id="famlegend"></div>
@@ -64,7 +65,7 @@
     <p class="sub">Every bar is a project, from its start to its end; scroll sideways and down. Hover for details,
     click for the summary. A faded bar has no end date in the NWO data (shown as one year).</p>
     <div class="controls">
-      <div class="seg" id="tlscope"><button aria-pressed="true" data-v="meta">Metascience-related projects</button><button aria-pressed="false" data-v="all">All grants of these researchers</button></div>
+      <div class="seg" id="tlscope"><button aria-pressed="true" data-v="all">All grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
       <input type="search" id="tlq" placeholder="Filter by title or person…" style="min-width:240px">
       <span class="muted small" id="tlcount"></span>
     </div>
@@ -98,7 +99,11 @@
       a PhD candidate or postdoc employed on the project).</li>
       <li><b>Metascience-related</b> means: a project in NWO's open science programmes (Open Science Fund, Open Science NL,
       Replication Studies, but not the funds that only pay open-access publishing costs), or a project whose title is
-      about research on research (replication, reproducibility, research integrity, peer review, research assessment …).</li>
+      about research on research (replication, reproducibility, research integrity, peer review, research assessment …).
+      These projects are grouped by programme from the name of the funding scheme: Replication Studies (the three
+      original rounds and the 2025 round of Open Science NL), the Open Science Fund, Research on Open Science,
+      Recognition and Rewards, infrastructure, data and software (including the Digital Competence Centres), meetings
+      and communities, open access publishing and other, and other NWO schemes (such as a Veni about peer review).</li>
     </ul>
   </section>
 </main>
@@ -107,8 +112,13 @@
 <script>
 Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) => {
   const byP = Object.fromEntries(people.map((p) => [p.id, p]));
-  const fams = F.summary.families;
+  const fams = F.summary.families, progs = F.summary.programmes || [];
   const famColor = (f) => (f === "Other" ? cssVar("--other") : seriesColor(fams.indexOf(f)));
+  // metascience-related projects are coloured by open science programme; the last group (other NWO schemes) is grey
+  const progColor = (g) => (g === progs[progs.length - 1] ? cssVar("--other") : seriesColor(progs.indexOf(g)));
+  const groups = (sc) => (sc === "meta" ? progs : fams);
+  const groupOf = (p, sc) => (sc === "meta" ? p.g : p.f);
+  const groupColor = (g, sc) => (sc === "meta" ? progColor(g) : famColor(g));
   const projects = F.projects.filter((p) => p.b);
   const year = (s) => +s.slice(0, 4);
   const money = (a) => (a >= 1e6 ? `€${(a / 1e6).toFixed(1)} million` : `€${fmt(Math.round(a / 1000))} thousand`);
@@ -132,17 +142,16 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
     `${fmt(F.summary.name_only_not_used)} matches on name alone were not used.`;
 
   // ---- funding over time ----
-  let scope = "meta", measure = "n", tlscope = "meta";
-  const legendHtml = () => fams.map((f) =>
-    `<span class="item"><span class="swatch" style="background:${famColor(f)}"></span>${esc(f)}</span>`).join("");
-  document.getElementById("famlegend").innerHTML = legendHtml();
-  document.getElementById("tllegend").innerHTML = legendHtml();
+  let scope = "all", measure = "n", tlscope = "all";
+  const legendHtml = (sc) => groups(sc).map((f) =>
+    `<span class="item"><span class="swatch" style="background:${groupColor(f, sc)}"></span>${esc(f)}</span>`).join("");
   function drawOverTime() {
+    document.getElementById("famlegend").innerHTML = legendHtml(scope);
     const ps = projects.filter((p) => (scope === "meta" ? p.m : p.ppl.some((x) => x.id)) && year(p.b) >= 2000);
     const yrs = [...new Set(ps.map((p) => year(p.b)))].sort((a, b) => a - b);
-    const traces = fams.map((f) => {
-      const v = yrs.map((y) => ps.filter((p) => p.f === f && year(p.b) === y).reduce((s, p) => s + (measure === "n" ? 1 : (p.a || 0) / 1e6), 0));
-      return { type: "bar", name: f, x: yrs, y: v, marker: { color: famColor(f), line: { color: cssVar("--surface-1"), width: 1 } },
+    const traces = groups(scope).map((f) => {
+      const v = yrs.map((y) => ps.filter((p) => groupOf(p, scope) === f && year(p.b) === y).reduce((s, p) => s + (measure === "n" ? 1 : (p.a || 0) / 1e6), 0));
+      return { type: "bar", name: f, x: yrs, y: v, marker: { color: groupColor(f, scope), line: { color: cssVar("--surface-1"), width: 1 } },
         hovertemplate: `${esc(f)}, %{x}: %{y:${measure === "n" ? ".0f" : ".2f"}}${measure === "n" ? " projects" : " million euro"}<extra></extra>` };
     });
     Plotly.react("overtime", traces, baseLayout({ barmode: "stack", showlegend: false, hovermode: "closest",
@@ -162,6 +171,9 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
     const q = document.getElementById("tlq").value.trim().toLowerCase();
     let ps = projects.filter((p) => (tlscope === "meta" ? p.m : p.ppl.some((x) => x.id)));
     if (tlPerson) ps = projects.filter((p) => p.ppl.some((x) => x.id === tlPerson));
+    // colours: by programme when only metascience-related projects are shown, otherwise by funding scheme
+    const sc = tlscope === "meta" && !tlPerson ? "meta" : "all";
+    document.getElementById("tllegend").innerHTML = legendHtml(sc);
     if (q) ps = ps.filter((p) => textMatches(q, p.t) || p.ppl.some((x) => textMatches(q, x.n || "")));
     ps = ps.map((p) => { const b = parse(p.b), e = p.e ? parse(p.e) : null;
       return Object.assign({}, p, { B: b, E: e && e > b ? e : d3.timeYear.offset(b, 1), noEnd: !e }); })
@@ -189,8 +201,8 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
     chart.append("line").attr("x1", x(now)).attr("x2", x(now)).attr("y1", 0).attr("y2", H).attr("stroke", cssVar("--text-muted")).attr("stroke-dasharray", "4 3");
     const g = chart.append("g").selectAll("g").data(ps).join("g").attr("transform", (p) => `translate(${x(p.B)},${8 + p.lane * RH})`);
     g.append("rect").attr("class", "bar").attr("width", (p) => Math.max(3, x(p.E) - x(p.B))).attr("height", RH - 5).attr("rx", 4)
-      .attr("fill", (p) => famColor(p.f)).attr("opacity", (p) => (p.noEnd ? 0.45 : 0.9))
-      .on("mousemove", (ev, p) => Tip.show(`<b>${esc(p.t)}</b><br>${esc(p.s)}<br>${p.b} – ${p.noEnd ? "end not given" : p.e}${p.a ? " · " + money(p.a) : ""}<br>` +
+      .attr("fill", (p) => groupColor(groupOf(p, sc), sc)).attr("opacity", (p) => (p.noEnd ? 0.45 : 0.9))
+      .on("mousemove", (ev, p) => Tip.show(`<b>${esc(p.t)}</b><br>${esc(p.s)}${p.g ? ` <span class="muted">(${esc(p.g)})</span>` : ""}<br>${p.b} – ${p.noEnd ? "end not given" : p.e}${p.a ? " · " + money(p.a) : ""}<br>` +
         `<span class="muted">${esc(p.ppl.filter((m) => LED.has(m.r)).map((m) => m.n).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4).join(", "))}</span>`, ev))
       .on("mouseleave", () => Tip.hide())
       .on("click", (ev, p) => { chart.selectAll("rect.bar").classed("sel", (d) => d === p); showDetail(p); });
@@ -202,7 +214,7 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
     const roles = {};
     p.ppl.forEach((m) => { const k = m.id || m.n; (roles[k] = roles[k] || { m, r: [] }).r.push(m.r); });
     document.getElementById("detail").innerHTML = `<div class="goal"><h3>${esc(p.t)}</h3>
-      <p class="small muted">${esc(p.s)} · NWO project ${esc(p.id)} · ${p.b} – ${p.e || "end not given"}${p.a ? " · " + money(p.a) : ""}</p>
+      <p class="small muted">${esc(p.s)}${p.g ? ` (${esc(p.g)})` : ""} · NWO project ${esc(p.id)} · ${p.b} – ${p.e || "end not given"}${p.a ? " · " + money(p.a) : ""}</p>
       ${p.sum ? `<p>${esc(p.sum)}${p.sum.length >= 400 ? " …" : ""}</p>` : ""}
       <p class="small">${Object.values(roles).map(({ m, r }) => `${m.id ? personLink(m.id) : esc(m.n)} (${esc([...new Set(r)].join(", ").toLowerCase())}${m.o ? ", " + esc(m.o) : ""})`).join(" · ")}</p></div>`;
   }

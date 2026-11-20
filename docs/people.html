@@ -29,11 +29,9 @@
 </header>
 <main>
   <h1>People</h1>
-  <p class="lede">Pick anyone who wrote a metascience paper at a Dutch institution. "Reviewed list" marks people on our
-  hand-checked list of Dutch metascientists; the others were found as authors and have not been reviewed.</p>
+  <p class="lede">Pick anyone who wrote a metascience paper at a Dutch institution.</p>
   <div class="controls">
     <input type="search" id="search" placeholder="Type part of a name…" aria-label="Find a person">
-    <label><input type="checkbox" id="onlylisted"> reviewed list only (in the search)</label>
   </div>
 
   <section class="card" id="profile"><p class="loading">Loading…</p></section>
@@ -64,7 +62,6 @@
     <p class="sub">The share of each person's metascience papers per theme, for the people with the most papers.
     Darker means a larger share. Click a row to open that profile.</p>
     <div class="controls">
-      <div class="seg" id="heatwho"><button aria-pressed="true" data-v="listed">Reviewed list</button><button aria-pressed="false" data-v="all">Everyone</button></div>
       <label>Show <select id="heatn"><option>30</option><option selected>50</option><option>80</option></select> people</label>
     </div>
     <div id="heat" class="chart" style="min-height:900px"></div>
@@ -80,15 +77,12 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
   const nbr = {}; edges.forEach(([a, b, w]) => { (nbr[a] = nbr[a] || {})[b] = w; (nbr[b] = nbr[b] || {})[a] = w; });
   let current = null;
 
-  const search = nameSearch(document.getElementById("search"),
-    () => document.getElementById("onlylisted").checked ? people.filter((p) => p.l) : people,
-    (p) => { location.hash = encodeURIComponent(p.id); });
-  document.getElementById("onlylisted").addEventListener("change", () => search.update());
+  nameSearch(document.getElementById("search"), () => people, (p) => { location.hash = encodeURIComponent(p.id); });
   window.addEventListener("hashchange", fromHash);
 
   function fromHash() {
     const id = decodeURIComponent(location.hash.slice(1));
-    show(byId[id] || (me && byId[me.id]) || people.find((p) => p.l) || people[0]);
+    show(byId[id] || (me && byId[me.id]) || people[0]);
   }
 
   function show(p) {
@@ -98,7 +92,7 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
     const nco = Object.keys(nbr[p.id] || {}).length;
     const cited = ps.reduce((s, x) => s + (x.c || 0), 0);
     document.getElementById("profile").innerHTML = `
-      <h2>${esc(p.n)} ${p.l ? '<span class="badge listed">reviewed list</span>' : '<span class="badge">found as author</span>'}</h2>
+      <h2>${esc(p.n)}</h2>
       <p class="small muted">${p.ins.map((i) => esc(instName[i] || i)).join(" · ")}
         ${p.o ? ` · <a href="${orcidLink(p.o)}" target="_blank" rel="noopener">ORCID ${esc(p.o)}</a>` : ""}</p>
       <div class="grid tiles">
@@ -154,7 +148,7 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
       .on("mousemove", (e, d) => Tip.show(`<b>${esc(d.p.n)}</b><br>${d.p.k} papers · ${nbr[p.id][d.id] || ""} together`, e))
       .on("mouseleave", () => Tip.hide());
     node.append("circle").attr("r", (d) => (d.id === p.id ? 10 : 4 + Math.sqrt(d.p.k)))
-      .attr("fill", (d) => (d.id === p.id ? cssVar("--series-2") : d.p.l ? cssVar("--series-1") : cssVar("--other")))
+      .attr("fill", (d) => (d.id === p.id ? cssVar("--series-2") : cssVar("--series-1")))
       .attr("stroke", cssVar("--surface-1")).attr("stroke-width", 2);
     const label = node.append("text").text((d) => d.p.n).attr("font-size", 11).attr("dy", -10).attr("text-anchor", "middle")
       .attr("fill", cssVar("--text-secondary"));
@@ -176,10 +170,9 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
         <td class="ai-note">${esc(x.ex)}</td><td class="num">${x.na}</td><td class="num">${fmt(x.c)}</td></tr>`).join("") + "</tbody>";
   }
 
-  let heatWho = "listed";
   function drawHeat() {
     const n = +document.getElementById("heatn").value;
-    const sel = people.filter((p) => heatWho === "all" || p.l).slice(0, n);
+    const sel = people.slice(0, n);   // people.json is sorted by number of papers
     const z = sel.map((p) => CATEGORIES.map((c) => (100 * (p.cats[c] || 0)) / p.k));
     Plotly.react("heat", [{ type: "heatmap", z, x: CATEGORIES.map((c) => CAT_LABEL[c]), y: sel.map((p) => `${p.n} (${p.k})`),
       customdata: sel.map((p) => CATEGORIES.map(() => p.id)), colorscale: seqScale(), zmin: 0, zmax: 100, xgap: 2, ygap: 2,
@@ -191,9 +184,6 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
     el.removeAllListeners && el.removeAllListeners("plotly_click");
     el.on("plotly_click", (d) => { location.hash = encodeURIComponent(d.points[0].customdata); window.scrollTo({ top: 0, behavior: "smooth" }); });
   }
-  document.querySelectorAll("#heatwho button").forEach((b) => b.addEventListener("click", () => {
-    heatWho = b.dataset.v; document.querySelectorAll("#heatwho button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawHeat();
-  }));
   document.getElementById("heatn").addEventListener("change", drawHeat);
   fromHash(); drawHeat();
   onThemeChange(() => { if (current) show(current); drawHeat(); });

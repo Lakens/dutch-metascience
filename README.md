@@ -13,8 +13,8 @@ which themes, at which institutions, and how the literature developed over time.
 - **Themes**: a map of all papers by content (embeddings + UMAP), named clusters, a keyword network,
   institutions × themes.
 - **Over time**: the rise of terms such as preregistration and registered reports, rising keywords, citations.
-- **History**: a timeline per theme, as in a history book: historical events from Wikipedia and the landmark papers
-  that Dutch metascience papers cite.
+- **History**: a timeline per theme, as in a history book: historical events from Wikipedia, the landmark papers
+  that Dutch metascience papers cite, and the most cited papers by Dutch metascientists.
 - **Places**: Dutch institutions on a map over time, collaboration between institutions, partner countries.
 - **Funding**: NWO grants of these researchers and all metascience-related NWO projects, over time and on a scrollable timeline.
 - **Inferences**: who could work together, which themes are rising, and shared questions that could become joint projects.
@@ -48,8 +48,9 @@ which themes, at which institutions, and how the literature developed over time.
    the site by ORCID, or by full name together with a shared organisation (ROR); ZonMw and other funders are not included.
 10. The History page: the reference lists of all papers on the site and details of the works they cite most, from
     OpenAlex (`fetch_references.py`); landmark papers per theme chosen by how many of the theme's papers cite a work
-    and by its field-weighted citation impact, with rules against near-duplicates, software and too many guidelines
-    (`build_history.py`, rules explained at the top of the script); historical events collected from Wikipedia by
+    and by its field-weighted citation impact, with rules against near-duplicates, software and too many guidelines,
+    plus the 5 most cited Dutch papers per theme (`build_history.py`, rules explained at the top of the script;
+    it reads the raw database for the full author lists); historical events collected from Wikipedia by
     Claude agents, each with the article's own words for the date, and kept only when a script finds those words and
     the year in the current article (`check_events.py`, result in `history_events.json`).
 

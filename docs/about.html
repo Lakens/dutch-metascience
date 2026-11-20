@@ -33,9 +33,11 @@
   <section class="card">
     <h2>How it was made</h2>
     <ol>
-      <li><b>A reviewed list of people.</b> We started from a hand-made list of Dutch metascientists and members of
+      <li><b>A starting list of people.</b> We started from a hand-made list of Dutch metascientists and members of
       Dutch open-science networks, kept the academics (PhD candidates, postdocs, researchers, professors), and found
-      their ORCID and OpenAlex records. People on this list carry the label <span class="badge listed">reviewed list</span>.</li>
+      their ORCID and OpenAlex records; when OpenAlex split one of them over several author profiles, the profiles were
+      merged. Most people on the site were found later, as authors of the metascience papers; the site no longer
+      distinguishes between the two.</li>
       <li><b>Their papers</b> came from <a href="https://openalex.org">OpenAlex</a> (all papers on their author
       profiles) and <a href="https://www.crossref.org">Crossref</a> (papers where the publisher recorded their ORCID).
       Only scientific papers were kept: journal articles, reviews, preprints with a DOI, books, chapters, conference
@@ -57,10 +59,11 @@
       keywords and topics, its most cited titles and a random sample of titles. One cluster has no single subject and
       is called "Mixed metascience topics". The names and the reasons are in <code>scripts/cluster_names.json</code>.</li>
       <li><b>Who is on the site</b>: everyone with a Dutch institution on at least one of these metascience papers,
-      plus the people on the reviewed list. Co-authorship lines use only papers with at most 30 authors.</li>
+      plus the people on the starting list. Co-authorship lines use only papers with at most 30 authors.</li>
       <li><b>History</b>: the reference lists of all papers came from OpenAlex. Landmark papers per theme are works
       that many of the theme's papers cite and that the whole of science cites often for their field and year (see the
-      History page for the rules). Historical events were collected from Wikipedia by Claude agents; each event keeps
+      History page for the rules); at most 20 per theme. Next to them, each theme shows its 5 most cited papers by
+      Dutch metascientists (papers on this site, by total citations). Historical events were collected from Wikipedia by Claude agents; each event keeps
       the article's own words for its date, and a script kept only events whose words and year it found in the
       article.</li>
     </ol>
@@ -94,11 +97,11 @@
       two people with the same name. A person can therefore appear twice, or have someone else's paper.</li>
       <li><b>"Dutch"</b> means: an institution in the Netherlands on that paper. People who moved abroad still appear
       with their Dutch papers; Dutch researchers working abroad do not.</li>
-      <li><b>People found as authors are not reviewed.</b> Writing one paper on a metascience topic does not make
-      someone a metascientist; the "reviewed list" label marks the people who were checked.</li>
+      <li><b>Everyone with a metascience paper is on the site.</b> Writing one paper on a metascience topic does not
+      make someone a metascientist; the number of papers shows how much of a person's work is metascience.</li>
       <li><b>Missing abstracts</b>: for <span id="noabs">some</span> of the metascience papers OpenAlex has no abstract,
       so the AI saw only the title, and term counts are lower bounds.</li>
-      <li><b>Coverage</b>: papers not in OpenAlex, and papers before 2005 without a reviewed-list author, are missing.</li>
+      <li><b>Coverage</b>: papers not in OpenAlex, and papers before 2005 without an author from the starting list (whose full publication lists were collected), are missing.</li>
     </ul>
   </section>
 

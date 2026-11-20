@@ -237,7 +237,7 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     const cl = document.getElementById("cl").value;
     document.getElementById("cards").innerHTML = clusters.slice().sort((a, b) => b.k - a.k).map((c) => {
       const ps = papers.filter((p) => p.cl === c.id);
-      const cnt = {}; ps.forEach((p) => p.p.forEach((id) => { if (byPerson[id] && byPerson[id].l) cnt[id] = (cnt[id] || 0) + 1; }));
+      const cnt = {}; ps.forEach((p) => p.p.forEach((id) => { if (byPerson[id]) cnt[id] = (cnt[id] || 0) + 1; }));
       const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([id]) => byPerson[id].n);
       const ys = ps.map((p) => p.y).filter(Boolean).sort((a, b) => a - b);
       const nMine = me ? ps.filter((p) => p.p.includes(me.id)).length : 0;

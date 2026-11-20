@@ -34,7 +34,6 @@
   <div class="controls">
     <label>At least <select id="minp"><option>1</option><option selected>2</option><option>3</option><option>5</option><option>10</option></select> papers</label>
     <label>Colour by <select id="colorby">
-      <option value="list">reviewed list or not</option>
       <option value="comm" selected>research community</option>
       <option value="inst">main institution</option></select></label>
     <label><input type="checkbox" id="labels" checked> names</label>
@@ -74,12 +73,10 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
     return `Community around ${members.join(" & ")}`;
   }
   function groupOf(p, by) {
-    if (by === "list") return p.l ? 0 : 1;
     if (by === "comm") { const i = topComms.indexOf(p.cm); return i < 0 ? 8 : i; }
     const i = topInsts.indexOf(p.ins[0]); return i < 0 ? 8 : i;
   }
   function legendItems(by) {
-    if (by === "list") return [[0, "Reviewed list"], [1, "Other Dutch authors"]];
     if (by === "comm") return topComms.map((c, i) => [i, commLabel(c)]).concat([[8, "Other communities"]]);
     return topInsts.map((id, i) => [i, instName[id] || id]).concat([[8, "Other institutions"]]);
   }
@@ -99,7 +96,7 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
 
   function build() {
     const minp = +document.getElementById("minp").value;
-    const keep = new Set(people.filter((p) => p.k >= minp || (p.l && p.k >= 1)).map((p) => p.id));
+    const keep = new Set(people.filter((p) => p.k >= minp).map((p) => p.id));
     const old = Object.fromEntries(nodes.map((n) => [n.id, n]));
     nodes = people.filter((p) => keep.has(p.id)).map((p) => Object.assign(old[p.id] || {}, { id: p.id, p, r: 2 + Math.sqrt(p.k) * 1.7 }));
     const idx = new Set(nodes.map((n) => n.id));
@@ -202,7 +199,7 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
     const ps = (papersOf[p.id] || []).slice().sort((a, b) => (b.y || 0) - (a.y || 0));
     const cats = Object.entries(p.cats).sort((a, b) => b[1] - a[1]);
     document.getElementById("panel").innerHTML = `
-      <h3>${esc(p.n)} ${p.l ? '<span class="badge listed">reviewed list</span>' : ""}</h3>
+      <h3>${esc(p.n)}</h3>
       <p class="small">${p.k} metascience paper${p.k === 1 ? "" : "s"}${p.y0 ? `, ${p.y0}–${p.y1}` : ""}
       ${p.o ? `· <a href="${orcidLink(p.o)}" target="_blank" rel="noopener">ORCID</a>` : ""}
       · <a href="people.html#${encodeURIComponent(p.id)}">full profile</a></p>
@@ -242,7 +239,7 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
     if (n !== hovered) { hovered = n; draw(); }
     if (n) {
       const p = n.p;
-      Tip.show(`<b>${esc(p.n)}</b> ${p.l ? '<span class="badge listed">reviewed list</span>' : ""}<br>${p.k} paper${p.k === 1 ? "" : "s"} · ${(neighborsAll[p.id] || []).length} co-authors<br>
+      Tip.show(`<b>${esc(p.n)}</b><br>${p.k} paper${p.k === 1 ? "" : "s"} · ${(neighborsAll[p.id] || []).length} co-authors<br>
         <span class="muted">${p.ins.slice(0, 2).map((i) => esc(instName[i] || i)).join(" · ")}</span><br>
         <span class="muted">${esc(p.kw.slice(0, 5).join(", "))}</span>`, ev);
       canvas.style.cursor = "pointer";

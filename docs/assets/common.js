@@ -203,7 +203,7 @@ function nameSearch(input, getItems, onPick, max = 10) {
   function close() { list.style.display = "none"; input.setAttribute("aria-expanded", "false"); shown = []; active = -1; }
   function render() {
     list.innerHTML = shown.map((p, i) => `<li role="option" id="${list.id}-${i}" data-i="${i}"${i === active ? ' aria-selected="true"' : ""}>
-      <span class="ns-n">${esc(p.n)}</span>${p.l ? ' <span class="badge listed">reviewed list</span>' : ""}
+      <span class="ns-n">${esc(p.n)}</span>
       <span class="ns-s">${p.k != null ? `${fmt(p.k)} paper${p.k === 1 ? "" : "s"}` : ""}${p.y0 ? ` · ${p.y0}${p.y1 && p.y1 !== p.y0 ? "–" + p.y1 : ""}` : ""}</span></li>`).join("");
     list.style.display = shown.length ? "block" : "none";
     input.setAttribute("aria-expanded", String(shown.length > 0));
