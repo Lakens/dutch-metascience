@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>People in Metascience</title>
+<meta name="description" content="Profiles of Dutch metascience authors: themes, timeline, co-authors and papers.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="assets/common.js"></script>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html">Who works with whom</a>
+    <a href="people.html" aria-current="page">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="places.html">Places</a>
+    <a href="about.html">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>People</h1>
+  <p class="lede">Pick anyone who wrote a metascience paper at a Dutch institution. "Reviewed list" marks people on our
+  hand-checked list of Dutch metascientists; the others were found as authors and have not been reviewed.</p>
+  <div class="controls">
+    <input type="search" id="search" list="names" placeholder="Type a name…">
+    <datalist id="names"></datalist>
+    <label><input type="checkbox" id="onlylisted"> reviewed list only (in the search)</label>
+  </div>
+
+  <section class="card" id="profile"><p class="loading">Loading…</p></section>
+
+  <div class="grid two">
+    <section class="card">
+      <h2>Papers over time</h2>
+      <p class="sub">Each dot is a paper, placed by year and theme; hover for the title, click to open it.</p>
+      <div id="timeline" class="chart"></div>
+    </section>
+    <section class="card">
+      <h2>Co-author network</h2>
+      <p class="sub">This person (centre), their Dutch co-authors, and the links among those co-authors.
+      Click a name to open that profile.</p>
+      <svg id="ego" style="width:100%;height:380px"></svg>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Papers</h2>
+    <p class="sub">The theme and its explanation are <span class="ai-note">AI judgements</span> by a language model
+    from the title and abstract; they can be wrong.</p>
+    <div class="tablewrap"><table class="data" id="ptable"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Who works on what</h2>
+    <p class="sub">The share of each person's metascience papers per theme, for the people with the most papers.
+    Darker means a larger share. Click a row to open that profile.</p>
+    <div class="controls">
+      <div class="seg" id="heatwho"><button aria-pressed="true" data-v="listed">Reviewed list</button><button aria-pressed="false" data-v="all">Everyone</button></div>
+      <label>Show <select id="heatn"><option>30</option><option selected>50</option><option>80</option></select> people</label>
+    </div>
+    <div id="heat" class="chart" style="min-height:900px"></div>
+  </section>
+</main>
+<footer>Data: OpenAlex (CC0). Corrections are welcome; see <a href="about.html">About</a>.</footer>
+
+<script>
+Promise.all([load("people"), load("papers"), load("edges"), load("institutions")]).then(([people, papers, edges, insts]) => {
+  const byId = Object.fromEntries(people.map((p) => [p.id, p]));
+  const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
+  const papersOf = {}; papers.forEach((p) => p.p.forEach((id) => (papersOf[id] = papersOf[id] || []).push(p)));
+  const nbr = {}; edges.forEach(([a, b, w]) => { (nbr[a] = nbr[a] || {})[b] = w; (nbr[b] = nbr[b] || {})[a] = w; });
+  let current = null;
+
+  function fillNames() {
+    const only = document.getElementById("onlylisted").checked;
+    document.getElementById("names").innerHTML = people.filter((p) => !only || p.l).map((p) => `<option value="${esc(p.n)}">`).join("");
+  }
+  fillNames();
+  document.getElementById("onlylisted").addEventListener("change", fillNames);
+  document.getElementById("search").addEventListener("change", (e) => {
+    const p = people.find((x) => x.n.toLowerCase() === e.target.value.toLowerCase());
+    if (p) { location.hash = encodeURIComponent(p.id); }
+  });
+  window.addEventListener("hashchange", fromHash);
+
+  function fromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    show(byId[id] || people.find((p) => p.l) || people[0]);
+  }
+
+  function show(p) {
+    current = p;
+    const ps = (papersOf[p.id] || []).slice().sort((a, b) => (b.y || 0) - (a.y || 0));
+    const cats = Object.entries(p.cats).sort((a, b) => b[1] - a[1]);
+    const nco = Object.keys(nbr[p.id] || {}).length;
+    const cited = ps.reduce((s, x) => s + (x.c || 0), 0);
+    document.getElementById("profile").innerHTML = `
+      <h2>${esc(p.n)} ${p.l ? '<span class="badge listed">reviewed list</span>' : '<span class="badge">found as author</span>'}</h2>
+      <p class="small muted">${p.ins.map((i) => esc(instName[i] || i)).join(" · ")}
+        ${p.o ? ` · <a href="${orcidLink(p.o)}" target="_blank" rel="noopener">ORCID ${esc(p.o)}</a>` : ""}</p>
+      <div class="grid tiles">
+        <div class="tile"><div class="v">${p.k}</div><div class="l">metascience papers</div></div>
+        <div class="tile"><div class="v">${p.y0 ?? "–"}–${p.y1 ?? ""}</div><div class="l">years</div></div>
+        <div class="tile"><div class="v">${nco}</div><div class="l">Dutch co-authors</div></div>
+        <div class="tile"><div class="v">${fmt(cited)}</div><div class="l">citations of these papers</div></div>
+      </div>
+      <h3>Themes</h3>
+      <div>${cats.map(([c, n]) => `<div style="display:flex;align-items:center;gap:8px;margin:3px 0" class="small">
+        <span style="width:220px;flex:none">${esc(CAT_LABEL[c] || c)}</span>
+        <span style="height:12px;border-radius:0 4px 4px 0;background:${catColor(c)};width:${Math.max(4, 260 * n / cats[0][1])}px"></span>
+        <span class="muted">${n}</span></div>`).join("")}</div>
+      <p class="small"><b>Keywords:</b> ${esc(p.kw.join(", ")) || "–"}</p>`;
+    drawTimeline(ps); drawEgo(p); drawTable(ps);
+  }
+
+  function drawTimeline(ps) {
+    const rows = CATEGORIES.slice().reverse();
+    const traces = CATEGORIES.map((c) => {
+      const sel = ps.filter((x) => x.cat === c && x.y);
+      return { type: "scatter", mode: "markers", name: CAT_LABEL[c],
+        x: sel.map((x) => x.y + (Math.random() - 0.5) * 0.5), y: sel.map(() => CAT_LABEL[c]),
+        text: sel.map((x) => `${wrap(x.t)}<br>${x.y} · ${esc(x.v)}`), customdata: sel.map(doiLink),
+        marker: { size: 10, color: catColor(c), line: { width: 2, color: cssVar("--surface-1") } },
+        hovertemplate: "%{text}<extra></extra>" };
+    });
+    Plotly.react("timeline", traces, baseLayout({ showlegend: false, margin: { l: 10, r: 10, t: 10, b: 40 },
+      yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map((c) => CAT_LABEL[c]) }),
+      xaxis: Object.assign(baseLayout().xaxis, { dtick: 2 }) }), PLOT_CONFIG);
+    const el = document.getElementById("timeline");
+    el.removeAllListeners && el.removeAllListeners("plotly_click");
+    el.on("plotly_click", (d) => window.open(d.points[0].customdata, "_blank", "noopener"));
+  }
+
+  function drawEgo(p) {
+    const svg = d3.select("#ego"); svg.selectAll("*").remove();
+    const W = svg.node().clientWidth, H = 380;
+    const co = Object.entries(nbr[p.id] || {}).sort((a, b) => b[1] - a[1]).slice(0, 40).map(([id]) => id);
+    const ids = new Set([p.id, ...co]);
+    const nodes = [...ids].map((id) => ({ id, p: byId[id], fx: id === p.id ? W / 2 : null, fy: id === p.id ? H / 2 : null }));
+    const links = [];
+    for (const a of ids) for (const [b, w] of Object.entries(nbr[a] || {})) if (a < b && ids.has(b)) links.push({ source: a, target: b, w });
+    if (nodes.length === 1) { svg.append("text").attr("x", W / 2).attr("y", H / 2).attr("text-anchor", "middle").attr("fill", cssVar("--text-muted")).text("No Dutch co-authors on papers with ≤ 30 authors"); return; }
+    const sim = d3.forceSimulation(nodes).force("link", d3.forceLink(links).id((d) => d.id).distance((l) => (l.source.id === p.id || l.target.id === p.id ? 120 : 60)))
+      .force("charge", d3.forceManyBody().strength(-120)).force("center", d3.forceCenter(W / 2, H / 2))
+      .force("collide", d3.forceCollide(16));
+    const g = svg.append("g");
+    const line = g.selectAll("line").data(links).join("line").attr("stroke", cssVar("--axis"))
+      .attr("stroke-width", (l) => Math.min(6, 0.8 + l.w * 0.7)).attr("opacity", (l) => (l.source.id === p.id || l.target.id === p.id ? 0.9 : 0.4));
+    const node = g.selectAll("g.n").data(nodes).join("g").attr("class", "n").style("cursor", "pointer")
+      .on("click", (e, d) => { location.hash = encodeURIComponent(d.id); })
+      .on("mousemove", (e, d) => Tip.show(`<b>${esc(d.p.n)}</b><br>${d.p.k} papers · ${nbr[p.id][d.id] || ""} together`, e))
+      .on("mouseleave", () => Tip.hide());
+    node.append("circle").attr("r", (d) => (d.id === p.id ? 10 : 4 + Math.sqrt(d.p.k)))
+      .attr("fill", (d) => (d.id === p.id ? cssVar("--series-2") : d.p.l ? cssVar("--series-1") : cssVar("--other")))
+      .attr("stroke", cssVar("--surface-1")).attr("stroke-width", 2);
+    const label = node.append("text").text((d) => d.p.n).attr("font-size", 11).attr("dy", -10).attr("text-anchor", "middle")
+      .attr("fill", cssVar("--text-secondary"));
+    // names that would overlap a more important name are hidden (the person, then by shared papers); hover shows all
+    const prio = (d) => (d.id === p.id ? 1e9 : (nbr[p.id][d.id] || 0) * 1000 + d.p.k);
+    let ticks = 0;
+    sim.on("tick", () => {
+      nodes.forEach((d) => { d.x = Math.max(40, Math.min(W - 40, d.x)); d.y = Math.max(28, Math.min(H - 10, d.y)); });
+      line.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
+      node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+      if (++ticks % 10 === 0) declutter(label, prio);
+    }).on("end", () => declutter(label, prio));
+  }
+
+  function drawTable(ps) {
+    document.getElementById("ptable").innerHTML = `<thead><tr><th>Year</th><th>Title</th><th>Theme (AI)</th><th>Why (AI)</th><th class="num">Authors</th><th class="num">Cited</th></tr></thead><tbody>` +
+      ps.map((x) => `<tr><td>${x.y || ""}</td><td><a href="${doiLink(x)}" target="_blank" rel="noopener">${esc(x.t)}</a><br><span class="muted small">${esc(x.v)}</span></td>
+        <td><span class="swatch" style="background:${catColor(x.cat)}"></span> ${esc(CAT_LABEL[x.cat] || x.cat)}</td>
+        <td class="ai-note">${esc(x.ex)}</td><td class="num">${x.na}</td><td class="num">${fmt(x.c)}</td></tr>`).join("") + "</tbody>";
+  }
+
+  let heatWho = "listed";
+  function drawHeat() {
+    const n = +document.getElementById("heatn").value;
+    const sel = people.filter((p) => heatWho === "all" || p.l).slice(0, n);
+    const z = sel.map((p) => CATEGORIES.map((c) => (100 * (p.cats[c] || 0)) / p.k));
+    Plotly.react("heat", [{ type: "heatmap", z, x: CATEGORIES.map((c) => CAT_LABEL[c]), y: sel.map((p) => `${p.n} (${p.k})`),
+      customdata: sel.map((p) => CATEGORIES.map(() => p.id)), colorscale: seqScale(), zmin: 0, zmax: 100, xgap: 2, ygap: 2,
+      colorbar: { title: { text: "% of papers", side: "right" }, thickness: 10, outlinewidth: 0, tickfont: { color: cssVar("--text-muted") } },
+      hovertemplate: "%{y}<br>%{x}: %{z:.0f}% of papers<extra></extra>" }],
+      baseLayout({ height: Math.max(500, sel.length * 18 + 140), margin: { l: 10, r: 10, t: 10, b: 120 },
+        yaxis: Object.assign(baseLayout().yaxis, { autorange: "reversed" }), xaxis: Object.assign(baseLayout().xaxis, { side: "bottom", tickangle: -30 }) }), PLOT_CONFIG);
+    const el = document.getElementById("heat");
+    el.removeAllListeners && el.removeAllListeners("plotly_click");
+    el.on("plotly_click", (d) => { location.hash = encodeURIComponent(d.points[0].customdata); window.scrollTo({ top: 0, behavior: "smooth" }); });
+  }
+  document.querySelectorAll("#heatwho button").forEach((b) => b.addEventListener("click", () => {
+    heatWho = b.dataset.v; document.querySelectorAll("#heatwho button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawHeat();
+  }));
+  document.getElementById("heatn").addEventListener("change", drawHeat);
+  fromHash(); drawHeat();
+  onThemeChange(() => { if (current) show(current); drawHeat(); });
+}).catch((e) => failed(document.getElementById("profile"), e));
+</script>
+</body>
+</html>

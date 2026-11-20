@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About This Map</title>
+<meta name="description" content="How the Dutch Metascience Landscape was made, its limitations, and how to correct it.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+<style> main section.card p, main section.card li { max-width: 860px; } </style>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html">Who works with whom</a>
+    <a href="people.html">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="places.html">Places</a>
+    <a href="about.html" aria-current="page">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>About this map</h1>
+  <p class="lede">How the data were collected, what the AI did, and what to keep in mind.</p>
+
+  <section class="card">
+    <h2>How it was made</h2>
+    <ol>
+      <li><b>A reviewed list of people.</b> We started from a hand-made list of Dutch metascientists and members of
+      Dutch open-science networks, kept the academics (PhD candidates, postdocs, researchers, professors), and found
+      their ORCID and OpenAlex records. People on this list carry the label <span class="badge listed">reviewed list</span>.</li>
+      <li><b>Their papers</b> came from <a href="https://openalex.org">OpenAlex</a> (all papers on their author
+      profiles) and <a href="https://www.crossref.org">Crossref</a> (papers where the publisher recorded their ORCID).
+      Only scientific papers were kept: journal articles, reviews, preprints with a DOI, books, chapters, conference
+      papers, editorials and letters; not blog posts, OSF project pages, datasets or peer reviews.</li>
+      <li><b>A search of OpenAlex</b> added every paper since 2005 with an author at a Dutch institution whose title or
+      abstract uses metascience terms (such as replicability, preregistration, publication bias, research integrity,
+      Bayes factor, scientometrics, research assessment).</li>
+      <li><b>An AI judged every paper</b> (about 50,000 titles and abstracts): is it metascience, and if so, which
+      of eight themes? Papers it called metascience were then checked a second time with stricter instructions, and
+      every remaining paper was then checked once more by reading it (see below); <span id="npapers">about 6,300</span> remain. The model was gpt-oss:20b, run in Ollama on a GPU of SURF Research
+      Cloud, with written instructions that say what counts (for example: a replication of a published finding, a
+      study of peer review, a method for better statistical inference) and what does not (a study that merely shares its
+      data, a meta-analysis of a drug, the reproducibility of a lab measurement, DNA replication).</li>
+      <li><b>The map of themes</b>: each metascience paper's title and abstract were turned into a numeric fingerprint
+      with the bge-m3 model, placed on a 2-D map with UMAP, and grouped into 20 clusters (k-means); the AI named each
+      cluster from the 20 titles nearest its centre.</li>
+      <li><b>Who is on the site</b>: everyone with a Dutch institution on at least one of these metascience papers,
+      plus the people on the reviewed list. Co-authorship lines use only papers with at most 30 authors.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>How good are the judgements?</h2>
+    <p><b>Two automatic checks.</b> The language model first flagged 10,598 papers as metascience; a spot check
+    showed that about one in six of these were not (for example data infrastructure for one field, or ordinary
+    systematic reviews of a medical question), so a second, stricter check removed 2,301 of them. A random sample
+    showed that this second check was still not good enough, and that it also removed about one in five papers
+    that were metascience after all (mostly bibliometric and general statistics papers; these are missing).</p>
+    <p><b>A check of every paper by reading it.</b> All papers that remained and have a Dutch author were then judged
+    one by one from title and abstract, following written rules (<code>scripts/hand_check_rules.md</code>). This was
+    done by Claude, an AI assistant, working as 14 separate reviewers, and not by human experts. To measure its
+    quality, each reviewer also judged 15 papers whose answer had been decided beforehand (agreement 93%; it never
+    called a paper "not metascience" when the decided answer was "metascience"), and 100 papers were judged by two
+    reviewers (same verdict for 92; never "metascience" against "not metascience"). A sample of 40 removals was
+    checked again: 39 were right. In total <span id="nexcl">571</span> papers were removed; the list, with a reason for
+    each, is <code>scripts/excluded_by_hand.csv</code>.</p>
+    <p><b>What remains.</b> Papers judged "unclear" (about one in eight, for example a replication of a genetic
+    association, or a critique of one specific meta-analysis) stay on the site. From the checks above, we expect that
+    roughly 1 to 2% of the papers shown are clearly not metascience. The theme of each paper and its explanation
+    were written by the language model and were not checked by hand.</p>
+  </section>
+
+  <section class="card">
+    <h2>Known limitations</h2>
+    <ul>
+      <li><b>Author identities</b> come from OpenAlex, which sometimes splits one person over several profiles or merges
+      two people with the same name. A person can therefore appear twice, or have someone else's paper.</li>
+      <li><b>"Dutch"</b> means: an institution in the Netherlands on that paper. People who moved abroad still appear
+      with their Dutch papers; Dutch researchers working abroad do not.</li>
+      <li><b>People found as authors are not reviewed.</b> Writing one paper on a metascience topic does not make
+      someone a metascientist; the "reviewed list" label marks the people who were checked.</li>
+      <li><b>Missing abstracts</b>: for <span id="noabs">some</span> of the metascience papers OpenAlex has no abstract,
+      so the AI saw only the title, and term counts are lower bounds.</li>
+      <li><b>Coverage</b>: papers not in OpenAlex, and papers before 2005 without a reviewed-list author, are missing.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Privacy</h2>
+    <p>The site shows only public bibliographic information (names as they appear on papers, ORCID identifiers,
+    institutions on papers, titles, years, DOIs, co-authorships, citation counts) and the AI judgements. It contains no
+    email addresses, job titles or memberships. If you want to be removed or corrected, open an issue in the
+    <a href="https://github.com/Lakens/dutch-metascience-landscape/issues">GitHub repository</a>.</p>
+  </section>
+
+  <section class="card">
+    <h2>Data and code</h2>
+    <p>All scripts are in the <a href="https://github.com/Lakens/dutch-metascience-landscape">repository</a>; the
+    data files behind every chart are in <code>docs/data/</code>. OpenAlex data are CC0. Built in <span id="built"></span>.</p>
+  </section>
+</main>
+<footer>Dutch Metascience Landscape</footer>
+<script>
+load("meta").then((m) => {
+  document.getElementById("built").textContent = m.built || "November 2026";
+  if (m.n_papers) document.getElementById("npapers").textContent = fmt(m.n_papers);
+  if (m.n_excluded_by_hand != null) document.getElementById("nexcl").textContent = fmt(m.n_excluded_by_hand);
+  if (m.n_no_abstract != null) document.getElementById("noabs").textContent =
+    `${fmt(m.n_no_abstract)} of the ${fmt(m.n_papers)} (${Math.round(100 * m.n_no_abstract / m.n_papers)}%)`;
+}).catch(() => {});
+</script>
+</body>
+</html>

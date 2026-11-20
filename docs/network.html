@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Co-authorship Network</title>
+<meta name="description" content="Who works with whom in Dutch metascience: an explorable co-authorship network.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="assets/common.js"></script>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html" aria-current="page">Who works with whom</a>
+    <a href="people.html">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="places.html">Places</a>
+    <a href="about.html">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>Who works with whom</h1>
+  <p class="lede">Every dot is a Dutch author of metascience papers; a line means they wrote at least one paper together
+  (papers with more than <span id="maxauth">30</span> authors are left out, so one large project does not tie hundreds of
+  people together). Scroll to zoom, drag to move, hover for details, click a person to see their co-authors and papers.</p>
+  <div class="controls">
+    <label>At least <select id="minp"><option>1</option><option selected>2</option><option>3</option><option>5</option><option>10</option></select> papers</label>
+    <label>Colour by <select id="colorby">
+      <option value="list">reviewed list or not</option>
+      <option value="comm" selected>research community</option>
+      <option value="inst">main institution</option></select></label>
+    <label><input type="checkbox" id="labels" checked> names</label>
+    <input type="search" id="search" list="names" placeholder="Find a person…">
+    <datalist id="names"></datalist>
+    <span class="muted small" id="count"></span>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="split">
+    <div class="card" style="margin:0;padding:8px"><canvas class="net" id="net"></canvas></div>
+    <aside class="card panel" style="margin:0" id="panel">
+      <h3>Click a person</h3>
+      <p class="muted small">Their co-authors light up in the network, and their details and papers appear here.</p>
+      <p class="muted small">Communities are groups that write together more than with others (Louvain method on the
+      co-authorship links). They are not formal groups.</p>
+    </aside>
+  </div>
+</main>
+<footer>Data: OpenAlex (CC0). Author identities come from OpenAlex and can merge or split people; see <a href="about.html">About</a>.</footer>
+
+<script>
+Promise.all([load("people"), load("edges"), load("papers"), load("institutions"), load("meta")]).then(([people, edges, papers, insts, meta]) => {
+  document.getElementById("maxauth").textContent = meta.max_authors_for_links;
+  const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
+  const byId = Object.fromEntries(people.map((p) => [p.id, p]));
+  const papersOf = {}; papers.forEach((p) => p.p.forEach((id) => (papersOf[id] = papersOf[id] || []).push(p)));
+  const neighborsAll = {}; edges.forEach(([a, b, w]) => {
+    (neighborsAll[a] = neighborsAll[a] || []).push([b, w]); (neighborsAll[b] = neighborsAll[b] || []).push([a, w]);
+  });
+  document.getElementById("names").innerHTML = people.map((p) => `<option value="${esc(p.n)}">`).join("");
+
+  // colour groups: top 7 communities / institutions get a colour, the rest is "other"
+  const commSize = {}; people.forEach((p) => (commSize[p.cm] = (commSize[p.cm] || 0) + 1));
+  const topComms = Object.keys(commSize).map(Number).filter((c) => c >= 0).sort((a, b) => commSize[b] - commSize[a]).slice(0, 7);
+  const instSize = {}; people.forEach((p) => p.ins[0] && (instSize[p.ins[0]] = (instSize[p.ins[0]] || 0) + 1));
+  const topInsts = Object.keys(instSize).sort((a, b) => instSize[b] - instSize[a]).slice(0, 7);
+  function commLabel(c) {
+    const members = people.filter((p) => p.cm === c).sort((a, b) => b.k - a.k).slice(0, 2).map((p) => p.n);
+    return `Community around ${members.join(" & ")}`;
+  }
+  function groupOf(p, by) {
+    if (by === "list") return p.l ? 0 : 1;
+    if (by === "comm") { const i = topComms.indexOf(p.cm); return i < 0 ? 8 : i; }
+    const i = topInsts.indexOf(p.ins[0]); return i < 0 ? 8 : i;
+  }
+  function legendItems(by) {
+    if (by === "list") return [[0, "Reviewed list"], [1, "Other Dutch authors"]];
+    if (by === "comm") return topComms.map((c, i) => [i, commLabel(c)]).concat([[8, "Other communities"]]);
+    return topInsts.map((id, i) => [i, instName[id] || id]).concat([[8, "Other institutions"]]);
+  }
+
+  const canvas = document.getElementById("net"), ctx = canvas.getContext("2d");
+  let W, H, dpr, nodes = [], links = [], sim, transform = d3.zoomIdentity, selected = null, hovered = null;
+  let userMoved = false;   // until the reader zooms or drags, the view keeps the whole network in the frame
+  function size() {
+    dpr = window.devicePixelRatio || 1; W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+  }
+  size();
+
+  function build() {
+    const minp = +document.getElementById("minp").value;
+    const keep = new Set(people.filter((p) => p.k >= minp || (p.l && p.k >= 1)).map((p) => p.id));
+    const old = Object.fromEntries(nodes.map((n) => [n.id, n]));
+    nodes = people.filter((p) => keep.has(p.id)).map((p) => Object.assign(old[p.id] || {}, { id: p.id, p, r: 2 + Math.sqrt(p.k) * 1.7 }));
+    const idx = new Set(nodes.map((n) => n.id));
+    links = edges.filter(([a, b]) => idx.has(a) && idx.has(b)).map(([a, b, w]) => ({ source: a, target: b, w }));
+    document.getElementById("count").textContent = `${fmt(nodes.length)} people, ${fmt(links.length)} links`;
+    if (sim) sim.stop();
+    sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id((d) => d.id).distance(34).strength((l) => Math.min(1, 0.15 + 0.1 * l.w)))
+      .force("charge", d3.forceManyBody().strength(-48).distanceMax(500))
+      .force("collide", d3.forceCollide((d) => d.r + 2))
+      .force("x", d3.forceX(0).strength(0.06)).force("y", d3.forceY(0).strength(0.06))
+      .alphaDecay(nodes.length > 3000 ? 0.04 : 0.022)
+      .on("tick", () => { ticks++; if (!userMoved && ticks % 15 === 0) fit(); draw(); })
+      .on("end", () => { if (!userMoved) fit(); });
+    let ticks = 0;
+    if (!userMoved) fit();
+  }
+
+  function fit() {
+    // keep 98% of the dots in view (a few far-away pairs should not shrink the whole network)
+    if (!nodes.length || nodes[0].x == null) return;
+    const xs = nodes.map((n) => n.x).sort((a, b) => a - b), ys = nodes.map((n) => n.y).sort((a, b) => a - b);
+    const q = (arr, f) => arr[Math.min(arr.length - 1, Math.max(0, Math.round(f * (arr.length - 1))))];
+    const x0 = q(xs, 0.01), x1 = q(xs, 0.99), y0 = q(ys, 0.01), y1 = q(ys, 0.99);
+    const k = Math.min(4, 0.9 * Math.min(W / Math.max(1, x1 - x0), H / Math.max(1, y1 - y0)));
+    transform = d3.zoomIdentity.translate(W / 2 - k * (x0 + x1) / 2, H / 2 - k * (y0 + y1) / 2).scale(k);
+    d3.select(canvas).call(zoom.transform, transform);
+  }
+
+  function draw() {
+    const by = document.getElementById("colorby").value;
+    const colors = [...Array(9).keys()].map((i) => (i === 8 ? cssVar("--other") : seriesColor(i)));
+    const nb = selected ? new Set((neighborsAll[selected.id] || []).map(([id]) => id)) : null;
+    ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    ctx.translate(transform.x, transform.y); ctx.scale(transform.k, transform.k);
+    ctx.lineWidth = 0.6 / Math.sqrt(transform.k);
+    ctx.strokeStyle = cssVar("--axis");
+    ctx.globalAlpha = selected ? 0.12 : 0.5;
+    ctx.beginPath();
+    for (const l of links) { ctx.moveTo(l.source.x, l.source.y); ctx.lineTo(l.target.x, l.target.y); }
+    ctx.stroke();
+    if (selected) {
+      ctx.globalAlpha = 0.9; ctx.strokeStyle = cssVar("--text-secondary"); ctx.lineWidth = 1.2 / Math.sqrt(transform.k);
+      ctx.beginPath();
+      for (const l of links) if (l.source.id === selected.id || l.target.id === selected.id) { ctx.moveTo(l.source.x, l.source.y); ctx.lineTo(l.target.x, l.target.y); }
+      ctx.stroke();
+    }
+    const ring = cssVar("--surface-1");
+    for (const n of nodes) {
+      const dim = selected && n !== selected && !nb.has(n.id);
+      ctx.globalAlpha = dim ? 0.15 : 1;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 2 * Math.PI);
+      ctx.fillStyle = colors[groupOf(n.p, by)]; ctx.fill();
+      ctx.lineWidth = 1 / transform.k; ctx.strokeStyle = n === selected || n === hovered ? cssVar("--text-primary") : ring; ctx.stroke();
+    }
+    ctx.restore();
+    if (document.getElementById("labels").checked) {
+      // names in screen pixels; a name is drawn only where it does not overlap a name already drawn,
+      // in order: selected, hovered, co-authors of the selected person, then by number of papers
+      ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.font = "11px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      const cand = nodes.filter((n) => n === selected || n === hovered || (nb ? nb.has(n.id) : n.p.k >= 2));
+      const rank = (n) => (n === selected ? 3e9 : n === hovered ? 2e9 : nb && nb.has(n.id) ? 1e9 + n.p.k : n.p.k);
+      cand.sort((a, b) => rank(b) - rank(a));
+      const placed = [];
+      for (const n of cand.slice(0, 1500)) {
+        const sx = transform.applyX(n.x), sy = transform.applyY(n.y) - n.r * transform.k - 3;
+        if (sx < -50 || sx > W + 50 || sy < 0 || sy > H + 20) continue;
+        const w = ctx.measureText(n.p.n).width, box = [sx - w / 2 - 2, sy - 13, sx + w / 2 + 2, sy + 1];
+        const forced = n === selected || n === hovered;
+        if (!forced && placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
+        placed.push(box);
+        ctx.globalAlpha = 0.85; ctx.fillStyle = cssVar("--surface-1"); ctx.fillRect(box[0], box[1], box[2] - box[0], box[3] - box[1]);
+        ctx.globalAlpha = 1; ctx.fillStyle = cssVar("--text-primary"); ctx.fillText(n.p.n, sx, sy);
+        if (placed.length >= 160 && !forced) break;
+      }
+      ctx.restore();
+    }
+  }
+
+  function legend() {
+    const by = document.getElementById("colorby").value, el = document.getElementById("legend");
+    el.innerHTML = legendItems(by).map(([i, lab]) =>
+      `<span class="item"><span class="swatch" style="background:${i === 8 ? cssVar("--other") : seriesColor(i)}"></span>${esc(lab)}</span>`).join("");
+  }
+
+  function showPanel(p) {
+    const nbrs = (neighborsAll[p.id] || []).slice().sort((a, b) => b[1] - a[1]);
+    const ps = (papersOf[p.id] || []).slice().sort((a, b) => (b.y || 0) - (a.y || 0));
+    const cats = Object.entries(p.cats).sort((a, b) => b[1] - a[1]);
+    document.getElementById("panel").innerHTML = `
+      <h3>${esc(p.n)} ${p.l ? '<span class="badge listed">reviewed list</span>' : ""}</h3>
+      <p class="small">${p.k} metascience paper${p.k === 1 ? "" : "s"}${p.y0 ? `, ${p.y0}–${p.y1}` : ""}
+      ${p.o ? `· <a href="${orcidLink(p.o)}" target="_blank" rel="noopener">ORCID</a>` : ""}
+      · <a href="people.html#${encodeURIComponent(p.id)}">full profile</a></p>
+      <p class="small muted">${p.ins.map((i) => esc(instName[i] || i)).join(" · ")}</p>
+      <p class="small">${cats.map(([c, n]) => `<span class="swatch" style="background:${catColor(c)}"></span> ${esc(CAT_LABEL[c] || c)} (${n})`).join("<br>")}</p>
+      <h3>Co-authors (${nbrs.length})</h3>
+      <ul>${nbrs.slice(0, 40).map(([id, w]) => `<li><a href="#" data-id="${esc(id)}">${esc(byId[id] ? byId[id].n : id)}</a> <span class="muted">(${w})</span></li>`).join("")}</ul>
+      <h3>Papers</h3>
+      <ul>${ps.slice(0, 60).map((x) => `<li>${x.y || ""} · <a href="${doiLink(x)}" target="_blank" rel="noopener">${esc(x.t)}</a></li>`).join("")}</ul>`;
+    document.querySelectorAll("#panel a[data-id]").forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault(); select(a.dataset.id, true);
+    }));
+  }
+  function select(id, center) {
+    let n = nodes.find((x) => x.id === id);
+    if (!n && byId[id]) { document.getElementById("minp").value = 1; build(); n = nodes.find((x) => x.id === id); }
+    selected = n || null;
+    if (n) {
+      showPanel(n.p);
+      if (center && n.x != null) {
+        userMoved = true;
+        const k = Math.max(transform.k, 1.4);
+        d3.select(canvas).transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(W / 2 - n.x * k, H / 2 - n.y * k).scale(k));
+      }
+    }
+    draw();
+  }
+
+  const zoom = d3.zoom().scaleExtent([0.05, 8]).on("zoom", (e) => { if (e.sourceEvent) userMoved = true; transform = e.transform; draw(); });
+  d3.select(canvas).call(zoom).on("dblclick.zoom", null);
+  function nodeAt(ev) {
+    const [mx, my] = d3.pointer(ev, canvas); const [x, y] = transform.invert([mx, my]);
+    return sim ? sim.find(x, y, 12 / transform.k) : null;
+  }
+  canvas.addEventListener("mousemove", (ev) => {
+    const n = nodeAt(ev);
+    if (n !== hovered) { hovered = n; draw(); }
+    if (n) {
+      const p = n.p;
+      Tip.show(`<b>${esc(p.n)}</b> ${p.l ? '<span class="badge listed">reviewed list</span>' : ""}<br>${p.k} paper${p.k === 1 ? "" : "s"} · ${(neighborsAll[p.id] || []).length} co-authors<br>
+        <span class="muted">${p.ins.slice(0, 2).map((i) => esc(instName[i] || i)).join(" · ")}</span><br>
+        <span class="muted">${esc(p.kw.slice(0, 5).join(", "))}</span>`, ev);
+      canvas.style.cursor = "pointer";
+    } else { Tip.hide(); canvas.style.cursor = "grab"; }
+  });
+  canvas.addEventListener("mouseleave", () => { Tip.hide(); hovered = null; draw(); });
+  canvas.addEventListener("click", (ev) => { const n = nodeAt(ev); select(n ? n.id : null, false); });
+  document.getElementById("search").addEventListener("change", (e) => {
+    const p = people.find((x) => x.n.toLowerCase() === e.target.value.toLowerCase());
+    if (p) select(p.id, true);
+  });
+  document.getElementById("minp").addEventListener("change", () => { build(); });
+  document.getElementById("colorby").addEventListener("change", () => { legend(); draw(); });
+  document.getElementById("labels").addEventListener("change", draw);
+  window.addEventListener("resize", () => { size(); draw(); });
+  onThemeChange(() => { legend(); draw(); });
+  legend(); build();
+}).catch((e) => failed(document.getElementById("panel"), e));
+</script>
+</body>
+</html>

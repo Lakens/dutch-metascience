@@ -1,0 +1,15 @@
+# never publish: source spreadsheets (contain email addresses), databases, caches, logs, keys
+*.xlsx
+*.xls
+*.csv.bak
+*.sqlite
+*.sqlite*
+*.db
+api_cache.json
+*_log*.txt
+tunnel_log.txt
+data_work/
+__pycache__/
+.Renviron
+.env
+scripts/world_countries.json

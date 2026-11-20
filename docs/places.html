@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metascience Places</title>
+<meta name="description" content="Dutch metascience institutions on a map, their collaborations, and partner countries.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="assets/common.js"></script>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html">Who works with whom</a>
+    <a href="people.html">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="places.html" aria-current="page">Places</a>
+    <a href="about.html">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>Places</h1>
+  <p class="lede">Where Dutch metascience is done, which institutions write together, and which countries they work with.
+  Institutes are counted under their parent organisation (the Donders Institute under Radboud University, for example).</p>
+
+  <div class="grid two">
+    <section class="card">
+      <h2>Institutions on the map</h2>
+      <p class="sub">Bubble size: metascience papers up to the chosen year. Press play to watch the field grow.</p>
+      <div class="controls">
+        <button id="play" type="button" class="seg" style="padding:6px 12px;background:var(--surface-1);color:var(--text-secondary);cursor:pointer">Play</button>
+        <input type="range" id="yr" style="flex:1;min-width:140px">
+        <span id="yrlab" class="small"></span>
+      </div>
+      <div id="nlmap" class="chart" style="min-height:560px"></div>
+    </section>
+    <section class="card">
+      <h2>Who writes with whom, between institutions</h2>
+      <p class="sub">The 16 Dutch institutions with the most papers. A ribbon's width is the number of papers the two
+      share. Hover an institution to show only its ribbons.</p>
+      <svg id="chord" style="width:100%;height:600px"></svg>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Partner countries</h2>
+    <p class="sub">Countries of co-authors on Dutch metascience papers: the number of papers with at least one co-author
+    from that country.</p>
+    <div id="world" class="chart" style="min-height:480px"></div>
+  </section>
+
+  <section class="card">
+    <h2>All institutions</h2>
+    <p class="small muted" id="itable-note">Every Dutch institution on a metascience paper; scroll the table to see all.</p>
+    <div class="tablewrap"><table class="data" id="itable"></table></div>
+  </section>
+</main>
+<footer>Data: OpenAlex (CC0); institution locations from OpenAlex/ROR.</footer>
+
+<script>
+Promise.all([load("institutions"), load("countries"), load("meta")]).then(([insts, countries, meta]) => {
+  const geo = insts.list.filter((i) => i.lat != null && i.lon != null);
+  const years = []; for (let y = 2005; y <= meta.years[1]; y++) years.push(y);
+  const slider = document.getElementById("yr");
+  slider.min = years[0]; slider.max = years[years.length - 1]; slider.value = slider.max;
+  const maxK = d3.max(geo, (i) => i.k) || 1;
+
+  function drawMap() {
+    const Y = +slider.value; document.getElementById("yrlab").textContent = `up to ${Y}`;
+    const k = geo.map((i) => Object.entries(i.years).reduce((s, [y, n]) => s + (+y <= Y ? n : 0), 0));
+    const show = geo.map((i, j) => [i, k[j]]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
+    Plotly.react("nlmap", [{ type: "scattergeo", lon: show.map(([i]) => i.lon), lat: show.map(([i]) => i.lat),
+      text: show.map(([i, n]) => `<b>${esc(i.n)}</b><br>${esc(i.city || "")}<br>${n} papers up to ${Y}`),
+      hovertemplate: "%{text}<extra></extra>",
+      marker: { size: show.map(([, n]) => 4 + 40 * Math.sqrt(n / maxK)), color: cssVar("--series-1"), opacity: 0.7,
+        line: { width: 1, color: cssVar("--surface-1") } } }],
+      baseLayout({ margin: { l: 0, r: 0, t: 0, b: 0 }, geo: {
+        projection: { type: "mercator" }, lonaxis: { range: [3.2, 7.4] }, lataxis: { range: [50.7, 53.65] },
+        showland: true, landcolor: cssVar("--surface-2"), showocean: true, oceancolor: cssVar("--surface-1"),
+        showcountries: true, countrycolor: cssVar("--axis"), showcoastlines: true, coastlinecolor: cssVar("--axis"),
+        showlakes: true, lakecolor: cssVar("--surface-1"), bgcolor: "rgba(0,0,0,0)", resolution: 50 } }), PLOT_CONFIG);
+  }
+  slider.addEventListener("input", drawMap);
+  let timer = null;
+  document.getElementById("play").addEventListener("click", (e) => {
+    if (timer) { clearInterval(timer); timer = null; e.target.textContent = "Play"; return; }
+    e.target.textContent = "Pause"; slider.value = slider.min; drawMap();
+    timer = setInterval(() => {
+      if (+slider.value >= +slider.max) { clearInterval(timer); timer = null; e.target.textContent = "Play"; return; }
+      slider.value = +slider.value + 1; drawMap();
+    }, 700);
+  });
+
+  // shorter names for the chord labels (the full name shows on hover)
+  function shortName(n) {
+    return n.replace("Amsterdam University Medical Centers", "Amsterdam UMC").replace("University Medical Center", "UMC")
+      .replace("Erasmus University Rotterdam", "Erasmus Univ. Rotterdam").replace("Vrije Universiteit Amsterdam", "VU Amsterdam")
+      .replace("Radboud University Medical Center", "Radboud UMC").replace("Leiden University Medical Center", "Leiden UMC")
+      .replace("Delft University of Technology", "TU Delft").replace("Eindhoven University of Technology", "TU Eindhoven")
+      .replace("Radboud University Nijmegen", "Radboud University");
+  }
+  function drawChord() {
+    const svg = d3.select("#chord"); svg.selectAll("*").remove();
+    const W = svg.node().clientWidth, H = 600, small = W < 600, R = Math.max(60, Math.min(W, H) / 2 - (small ? 85 : 150));
+    const names = insts.chord_ids.map((id) => (insts.list.find((i) => i.id === id) || {}).n || id);
+    const chord = d3.chord().padAngle(0.03).sortSubgroups(d3.descending)(insts.chord);
+    const g = svg.append("g").attr("transform", `translate(${W / 2},${H / 2})`);
+    const arc = d3.arc().innerRadius(R).outerRadius(R + 12);
+    const ribbon = d3.ribbon().radius(R - 2);
+    const rib = g.append("g").selectAll("path").data(chord).join("path").attr("d", ribbon)
+      .attr("fill", cssVar("--series-1")).attr("fill-opacity", 0.22).attr("stroke", cssVar("--surface-1")).attr("stroke-width", 0.5)
+      .on("mousemove", (e, d) => Tip.show(`<b>${esc(names[d.source.index])}</b> & <b>${esc(names[d.target.index])}</b><br>${d.source.value} shared papers`, e))
+      .on("mouseleave", () => Tip.hide());
+    const grp = g.append("g").selectAll("g").data(chord.groups).join("g");
+    grp.append("path").attr("d", arc).attr("fill", cssVar("--series-1")).attr("stroke", cssVar("--surface-1"))
+      .on("mouseenter", (e, d) => rib.attr("fill-opacity", (r) => (r.source.index === d.index || r.target.index === d.index ? 0.7 : 0.04)))
+      .on("mouseleave", () => rib.attr("fill-opacity", 0.22));
+    grp.append("text").each((d) => (d.angle = (d.startAngle + d.endAngle) / 2))
+      .attr("dy", "0.35em").attr("font-size", small ? 9 : 11).attr("fill", cssVar("--text-secondary"))
+      .attr("transform", (d) => `rotate(${(d.angle * 180) / Math.PI - 90}) translate(${R + 18})${d.angle > Math.PI ? " rotate(180)" : ""}`)
+      .attr("text-anchor", (d) => (d.angle > Math.PI ? "end" : null))
+      .text((d) => { const n = shortName(names[d.index]); const m = small ? 15 : 24; return n.length > m ? n.slice(0, m - 2) + "…" : n; })
+      .append("title").text((d) => names[d.index]);
+  }
+
+  function drawWorld() {
+    const c = countries.filter((x) => x.iso3);
+    Plotly.react("world", [{ type: "choropleth", locations: c.map((x) => x.iso3), z: c.map((x) => Math.log10(x.k)),
+      text: c.map((x) => `${esc(x.n)}: ${fmt(x.k)} papers`), hovertemplate: "%{text}<extra></extra>",
+      colorscale: seqScale(), marker: { line: { color: cssVar("--surface-1"), width: 0.5 } },
+      colorbar: { title: { text: "papers", side: "right" }, thickness: 10, outlinewidth: 0, tickvals: [0, 1, 2, 3],
+        ticktext: ["1", "10", "100", "1000"], tickfont: { color: cssVar("--text-muted") } } }],
+      baseLayout({ margin: { l: 0, r: 0, t: 0, b: 0 }, geo: { projection: { type: "natural earth" }, showframe: false,
+        showcoastlines: false, showland: true, landcolor: cssVar("--surface-2"), bgcolor: "rgba(0,0,0,0)",
+        showcountries: true, countrycolor: cssVar("--surface-1") } }), PLOT_CONFIG);
+  }
+
+  document.getElementById("itable").innerHTML = "<thead><tr><th>Institution</th><th>City</th><th>Type</th><th class='num'>Papers</th><th>Main theme</th></tr></thead><tbody>" +
+    insts.list.map((i) => { const top = Object.entries(i.cats).sort((a, b) => b[1] - a[1])[0];
+      return `<tr><td>${esc(i.n)}</td><td>${esc(i.city || "")}</td><td>${esc(i.ty || "")}</td><td class="num">${i.k}</td><td>${top ? esc(CAT_LABEL[top[0]] || top[0]) : ""}</td></tr>`; }).join("") + "</tbody>";
+
+  const all = () => { drawMap(); drawChord(); drawWorld(); };
+  all(); onThemeChange(all);
+}).catch((e) => failed(document.getElementById("nlmap"), e));
+</script>
+</body>
+</html>
