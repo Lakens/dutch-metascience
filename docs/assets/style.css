@@ -147,3 +147,15 @@ label { max-width: 100%; }
 .cards.landmarks ol { margin: 8px 0 0; padding-left: 18px; font-size: 0.86rem; }
 .cards.landmarks li { margin-bottom: 8px; }
 .cards.landmarks li .small { display: block; margin-top: 2px; }
+
+/* phone menu: one slim header row; the page links fold out below it */
+.menu-toggle { display: none; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+  border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 0.9rem; cursor: pointer; }
+@media (max-width: 760px) {
+  header.site { gap: 8px; padding: 8px 16px; }
+  header.site .brand { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .menu-toggle { display: inline-block; }
+  header.site nav { display: none; order: 10; flex: 0 0 100%; flex-direction: column; gap: 2px; padding: 4px 0 6px; }
+  header.site.open nav { display: flex; }
+  header.site nav a { padding: 12px 10px; font-size: 1rem; }
+}

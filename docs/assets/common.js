@@ -139,3 +139,18 @@ function declutter(texts, priority, eligible = () => true) {
     } else placed.push(box);
   }
 }
+
+// ---- phone menu: on narrow screens the page links fold away behind a "Menu" button ----
+document.addEventListener("DOMContentLoaded", () => {
+  const header = document.querySelector("header.site"), nav = header && header.querySelector("nav");
+  if (!header || !nav) return;
+  nav.id = nav.id || "site-nav";
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "menu-toggle"; btn.textContent = "Menu";
+  btn.setAttribute("aria-controls", nav.id); btn.setAttribute("aria-expanded", "false");
+  header.insertBefore(btn, nav);
+  const setOpen = (open) => { header.classList.toggle("open", open); btn.setAttribute("aria-expanded", String(open)); btn.textContent = open ? "Close" : "Menu"; };
+  btn.addEventListener("click", () => setOpen(!header.classList.contains("open")));
+  nav.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+});
