@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metascience Funding</title>
+<meta name="description" content="NWO grants of Dutch metascientists and all metascience-related NWO projects: who got which grants, funding over time, and a timeline of funded projects.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="assets/common.js"></script>
+<style>
+  .tl-wrap { position: relative; overflow: auto; max-height: 560px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-1); }
+  .tl-axis { position: sticky; top: 0; z-index: 2; background: var(--surface-1); display: block; }
+  .tl-chart { display: block; }
+  .tl-chart rect.bar { cursor: pointer; }
+  .tl-chart rect.bar:hover, .tl-chart rect.bar.sel { stroke: var(--text-primary); stroke-width: 2; }
+  #detail { margin-top: 12px; }
+  #detail .goal { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; background: var(--surface-1); }
+  table.data th.sortable { cursor: pointer; white-space: nowrap; }
+  table.data th.sortable:hover { color: var(--text-primary); }
+  .badge.fam { color: #fff; border: none; }
+  .tiny { font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html">Who works with whom</a>
+    <a href="people.html">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="places.html">Places</a>
+    <a href="funding.html" aria-current="page">Funding</a>
+    <a href="inferences.html">Inferences</a>
+    <a href="about.html">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>Funding</h1>
+  <p class="lede">Grants from NWO, the Dutch Research Council, from its open project data (NWOpen, CC0). Two kinds of
+  projects are shown: all NWO grants of the researchers on this site, on any topic, and all NWO projects about research
+  on research, such as the Open Science funds and the Replication Studies programme, whoever received them.</p>
+  <div class="grid tiles" id="tiles"></div>
+
+  <section class="card">
+    <h2>NWO funding over time</h2>
+    <p class="sub">Projects by the year they started, coloured by funding scheme. The last year is not complete.
+    Amounts are known for only part of the projects (mostly recent ones), so the amount view underestimates older years.</p>
+    <div class="controls">
+      <div class="seg" id="scope"><button aria-pressed="true" data-v="meta">Metascience-related projects</button><button aria-pressed="false" data-v="all">All grants of these researchers</button></div>
+      <div class="seg" id="measure"><button aria-pressed="true" data-v="n">Number of projects</button><button aria-pressed="false" data-v="a">Amount awarded</button></div>
+    </div>
+    <div class="legend" id="famlegend"></div>
+    <div id="overtime" class="chart" style="min-height:420px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Timeline of funded projects</h2>
+    <p class="sub">Every bar is a project, from its start to its end; scroll sideways and down. Hover for details,
+    click for the summary. A faded bar has no end date in the NWO data (shown as one year).</p>
+    <div class="controls">
+      <div class="seg" id="tlscope"><button aria-pressed="true" data-v="meta">Metascience-related projects</button><button aria-pressed="false" data-v="all">All grants of these researchers</button></div>
+      <input type="search" id="tlq" placeholder="Filter by title or person…" style="min-width:240px">
+      <span class="muted small" id="tlcount"></span>
+    </div>
+    <div class="legend" id="tllegend"></div>
+    <div class="tl-wrap" id="tlwrap"><svg class="tl-axis" id="tlaxis"></svg><svg class="tl-chart" id="tlchart"></svg></div>
+    <div id="detail"></div>
+  </section>
+
+  <section class="card">
+    <h2>Who got which grants</h2>
+    <p class="sub">NWO grants of researchers on this site. "Led" counts projects where the person is main applicant or
+    project leader; the amount is the total of those projects where NWO gives one. Click a column to sort; click
+    "timeline" to show a person's projects above. Researchers with only one metascience paper on this site are hidden
+    by default: many of them are large grant holders in other fields.</p>
+    <div class="controls"><input type="search" id="pq" placeholder="Find a person…" style="min-width:240px">
+      <label><input type="checkbox" id="ponly" checked> only researchers with at least 2 metascience papers</label>
+      <span class="muted small" id="pcount"></span></div>
+    <div class="tablewrap" style="max-height:560px"><table class="data" id="ptable"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>How the grants were matched</h2>
+    <p id="matchtext"></p>
+    <ul>
+      <li><b>Only NWO.</b> Grants from ZonMw (the health research council), the European Research Council, Horizon Europe,
+      universities or foundations are not included, so researchers funded mainly by these have few or no grants here.</li>
+      <li><b>Matching is by ORCID where NWO has one</b>, otherwise by full name together with an organisation in common
+      (the grant's organisation is one of the institutions on the person's papers). Name matches without a shared
+      organisation are left out, so some grants are missed; a person with a common name who moved can be missed too.</li>
+      <li><b>Roles</b> are as NWO records them: main applicant, project leader, co-applicant, or researcher (for example
+      a PhD candidate or postdoc employed on the project).</li>
+      <li><b>Metascience-related</b> means: a project in NWO's open science programmes (Open Science Fund, Open Science NL,
+      Replication Studies, but not the funds that only pay open-access publishing costs), or a project whose title is
+      about research on research (replication, reproducibility, research integrity, peer review, research assessment …).</li>
+    </ul>
+  </section>
+</main>
+<footer>Data: <a href="https://www.nwo.nl/en/nwopen">NWOpen</a> (NWO, CC0) and OpenAlex (CC0). See <a href="about.html">About</a>.</footer>
+
+<script>
+Promise.all([load("funding"), load("people")]).then(([F, people]) => {
+  const byP = Object.fromEntries(people.map((p) => [p.id, p]));
+  const fams = F.summary.families;
+  const famColor = (f) => (f === "Other" ? cssVar("--other") : seriesColor(fams.indexOf(f)));
+  const projects = F.projects.filter((p) => p.b);
+  const year = (s) => +s.slice(0, 4);
+  const money = (a) => (a >= 1e6 ? `€${(a / 1e6).toFixed(1)} million` : `€${fmt(Math.round(a / 1000))} thousand`);
+  const LED = new Set(["Main Applicant", "Project leader"]);
+  const personLink = (id) => (byP[id] ? `<a href="people.html#${encodeURIComponent(id)}">${esc(byP[id].n)}</a>` : "");
+
+  // ---- tiles ----
+  const meta = projects.filter((p) => p.m);
+  const metaAmount = meta.reduce((s, p) => s + (p.a || 0), 0);
+  document.getElementById("tiles").innerHTML = [
+    [fmt(F.summary.n_people_with_grants), "researchers on this site with an NWO grant"],
+    [fmt(projects.filter((p) => p.ppl.some((x) => x.id)).length), "NWO projects of these researchers"],
+    [fmt(meta.length), "metascience-related NWO projects"],
+    [money(metaAmount), "awarded to them (where known)"],
+  ].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  document.getElementById("matchtext").textContent =
+    `NWO's open data list ${fmt(F.summary.n_projects_nwo)} projects. ${fmt(F.summary.n_members_matched)} NWO project members were linked to ` +
+    `${fmt(F.summary.n_people_with_grants)} researchers on this site: ${fmt(F.summary.match_kinds.ORCID || 0)} by ORCID, ` +
+    `${fmt(F.summary.match_kinds["name and organisation"] || 0)} by full name and a shared organisation, and ` +
+    `${fmt(F.summary.match_kinds["initial, last name and organisation"] || 0)} by initial, last name and a shared organisation. ` +
+    `${fmt(F.summary.name_only_not_used)} matches on name alone were not used.`;
+
+  // ---- funding over time ----
+  let scope = "meta", measure = "n", tlscope = "meta";
+  const legendHtml = () => fams.map((f) =>
+    `<span class="item"><span class="swatch" style="background:${famColor(f)}"></span>${esc(f)}</span>`).join("");
+  document.getElementById("famlegend").innerHTML = legendHtml();
+  document.getElementById("tllegend").innerHTML = legendHtml();
+  function drawOverTime() {
+    const ps = projects.filter((p) => (scope === "meta" ? p.m : p.ppl.some((x) => x.id)) && year(p.b) >= 2000);
+    const yrs = [...new Set(ps.map((p) => year(p.b)))].sort((a, b) => a - b);
+    const traces = fams.map((f) => {
+      const v = yrs.map((y) => ps.filter((p) => p.f === f && year(p.b) === y).reduce((s, p) => s + (measure === "n" ? 1 : (p.a || 0) / 1e6), 0));
+      return { type: "bar", name: f, x: yrs, y: v, marker: { color: famColor(f), line: { color: cssVar("--surface-1"), width: 1 } },
+        hovertemplate: `${esc(f)}, %{x}: %{y:${measure === "n" ? ".0f" : ".2f"}}${measure === "n" ? " projects" : " million euro"}<extra></extra>` };
+    });
+    Plotly.react("overtime", traces, baseLayout({ barmode: "stack", showlegend: false, hovermode: "closest",
+      yaxis: Object.assign(baseLayout().yaxis, { title: measure === "n" ? "projects started" : "million euro (where known)" }) }), PLOT_CONFIG);
+  }
+  const seg = (id, set) => document.querySelectorAll(`#${id} button`).forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(`#${id} button`).forEach((x) => x.setAttribute("aria-pressed", x === b)); set(b.dataset.v);
+  }));
+  seg("scope", (v) => { scope = v; drawOverTime(); });
+  seg("measure", (v) => { measure = v; drawOverTime(); });
+
+  // ---- timeline ----
+  const wrap = document.getElementById("tlwrap"), axisSvg = d3.select("#tlaxis"), chart = d3.select("#tlchart");
+  let tlPerson = null;
+  const parse = d3.timeParse("%Y-%m-%d");
+  function drawTimeline(keepScroll) {
+    const q = document.getElementById("tlq").value.trim().toLowerCase();
+    let ps = projects.filter((p) => (tlscope === "meta" ? p.m : p.ppl.some((x) => x.id)));
+    if (tlPerson) ps = projects.filter((p) => p.ppl.some((x) => x.id === tlPerson));
+    if (q) ps = ps.filter((p) => p.t.toLowerCase().includes(q) || p.ppl.some((x) => (x.n || "").toLowerCase().includes(q)));
+    ps = ps.map((p) => { const b = parse(p.b), e = p.e ? parse(p.e) : null;
+      return Object.assign({}, p, { B: b, E: e && e > b ? e : d3.timeYear.offset(b, 1), noEnd: !e }); })
+      .filter((p) => p.B).sort((a, b) => a.B - b.B);
+    document.getElementById("tlcount").textContent = `${fmt(ps.length)} projects` + (tlPerson ? ` of ${byP[tlPerson].n} (clear the filter box to see all)` : "");
+    // pack projects into rows: a project goes into the first row that is free at its start
+    const lanes = [];
+    ps.forEach((p) => {
+      let i = lanes.findIndex((end) => end < d3.timeDay.offset(p.B, -20));
+      if (i < 0) { i = lanes.length; lanes.push(null); }
+      lanes[i] = p.E; p.lane = i;
+    });
+    const lo = d3.timeYear.floor(d3.min(ps, (p) => p.B) || new Date(2000, 0, 1));
+    const hi = d3.timeYear.ceil(d3.max(ps, (p) => p.E) || new Date());
+    const PX = window.innerWidth < 700 ? 90 : 130;   // pixels per year
+    const W = Math.max(wrap.clientWidth, d3.timeYear.count(lo, hi) * PX + 40), RH = 22, H = lanes.length * RH + 16;
+    const x = d3.scaleTime().domain([lo, hi]).range([20, W - 20]);
+    axisSvg.attr("width", W).attr("height", 28).selectAll("*").remove();
+    axisSvg.append("g").attr("transform", "translate(0,22)").call(d3.axisTop(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")).tickSizeOuter(0))
+      .call((g) => g.selectAll("text").attr("fill", cssVar("--text-secondary"))).call((g) => g.selectAll("line,path").attr("stroke", cssVar("--axis")));
+    chart.attr("width", W).attr("height", H).selectAll("*").remove();
+    chart.append("g").selectAll("line").data(x.ticks(d3.timeYear.every(1))).join("line")
+      .attr("x1", (d) => x(d)).attr("x2", (d) => x(d)).attr("y1", 0).attr("y2", H).attr("stroke", cssVar("--grid"));
+    const now = new Date();
+    chart.append("line").attr("x1", x(now)).attr("x2", x(now)).attr("y1", 0).attr("y2", H).attr("stroke", cssVar("--text-muted")).attr("stroke-dasharray", "4 3");
+    const g = chart.append("g").selectAll("g").data(ps).join("g").attr("transform", (p) => `translate(${x(p.B)},${8 + p.lane * RH})`);
+    g.append("rect").attr("class", "bar").attr("width", (p) => Math.max(3, x(p.E) - x(p.B))).attr("height", RH - 5).attr("rx", 4)
+      .attr("fill", (p) => famColor(p.f)).attr("opacity", (p) => (p.noEnd ? 0.45 : 0.9))
+      .on("mousemove", (ev, p) => Tip.show(`<b>${esc(p.t)}</b><br>${esc(p.s)}<br>${p.b} – ${p.noEnd ? "end not given" : p.e}${p.a ? " · " + money(p.a) : ""}<br>` +
+        `<span class="muted">${esc(p.ppl.filter((m) => LED.has(m.r)).map((m) => m.n).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4).join(", "))}</span>`, ev))
+      .on("mouseleave", () => Tip.hide())
+      .on("click", (ev, p) => { chart.selectAll("rect.bar").classed("sel", (d) => d === p); showDetail(p); });
+    g.append("text").attr("x", 6).attr("y", RH / 2 + 1).attr("font-size", 11).attr("fill", "#fff").style("pointer-events", "none")
+      .text((p) => { const w = x(p.E) - x(p.B) - 10, n = Math.floor(w / 6.2); return n < 6 ? "" : (p.t.length > n ? p.t.slice(0, n - 1) + "…" : p.t); });
+    if (!keepScroll) wrap.scrollLeft = Math.max(0, x(now) - wrap.clientWidth + 160);
+  }
+  function showDetail(p) {
+    const roles = {};
+    p.ppl.forEach((m) => { const k = m.id || m.n; (roles[k] = roles[k] || { m, r: [] }).r.push(m.r); });
+    document.getElementById("detail").innerHTML = `<div class="goal"><h3>${esc(p.t)}</h3>
+      <p class="small muted">${esc(p.s)} · NWO project ${esc(p.id)} · ${p.b} – ${p.e || "end not given"}${p.a ? " · " + money(p.a) : ""}</p>
+      ${p.sum ? `<p>${esc(p.sum)}${p.sum.length >= 400 ? " …" : ""}</p>` : ""}
+      <p class="small">${Object.values(roles).map(({ m, r }) => `${m.id ? personLink(m.id) : esc(m.n)} (${esc([...new Set(r)].join(", ").toLowerCase())}${m.o ? ", " + esc(m.o) : ""})`).join(" · ")}</p></div>`;
+  }
+  seg("tlscope", (v) => { tlscope = v; tlPerson = null; drawTimeline(); });
+  document.getElementById("tlq").addEventListener("input", () => { tlPerson = null; drawTimeline(true); });
+
+  // ---- who got which grants ----
+  const rows = Object.entries(F.people).filter(([id]) => byP[id]).map(([id, pids]) => {
+    const ps = pids.map((i) => F.projects.find((p) => p.id === i)).filter(Boolean);
+    const roleOf = (p) => new Set(p.ppl.filter((m) => m.id === id).map((m) => m.r));
+    const led = ps.filter((p) => [...roleOf(p)].some((r) => LED.has(r)));
+    const co = ps.filter((p) => !led.includes(p) && roleOf(p).has("Co-applicant"));
+    const res = ps.filter((p) => !led.includes(p) && !co.includes(p));
+    const tal = ["Veni", "Vidi", "Vici"].map((f) => [f, led.filter((p) => p.f === f).length]).filter(([, n]) => n);
+    return { id, n: byP[id].n, led: led.length, co: co.length, res: res.length, meta: ps.filter((p) => p.m).length,
+      amt: led.reduce((s, p) => s + (p.a || 0), 0), tal, first: d3.min(ps, (p) => year(p.b)) };
+  });
+  let sortKey = "meta", sortDir = -1;
+  const cols = [["n", "Researcher"], ["led", "Led"], ["co", "Co-applicant"], ["res", "Researcher on"], ["meta", "Metascience-related"], ["amt", "Amount led"], ["first", "First grant"]];
+  function drawTable() {
+    const q = document.getElementById("pq").value.trim().toLowerCase(), only = document.getElementById("ponly").checked;
+    const rs = rows.filter((r) => (!q || r.n.toLowerCase().includes(q)) && (!only || byP[r.id].k >= 2))
+      .sort((a, b) => (typeof a[sortKey] === "string" ? a[sortKey].localeCompare(b[sortKey]) : a[sortKey] - b[sortKey]) * sortDir || b.led - a.led);
+    document.getElementById("pcount").textContent = `${fmt(rs.length)} researchers`;
+    document.getElementById("ptable").innerHTML = `<thead><tr>${cols.map(([k, l]) => `<th class="sortable${k === "n" ? "" : " num"}" data-k="${k}">${l}${k === sortKey ? (sortDir < 0 ? " ▼" : " ▲") : ""}</th>`).join("")}<th></th></tr></thead><tbody>` +
+      rs.map((r) => `<tr><td>${personLink(r.id)} ${r.tal.map(([f, n]) => `<span class="badge fam" style="background:${famColor(f)}">${f}${n > 1 ? " ×" + n : ""}</span>`).join(" ")}</td>
+        <td class="num">${r.led}</td><td class="num">${r.co}</td><td class="num">${r.res}</td><td class="num">${r.meta}</td>
+        <td class="num">${r.amt ? money(r.amt) : ""}</td><td class="num">${r.first || ""}</td>
+        <td><button type="button" class="overlay-btn tiny" style="position:static" data-id="${r.id}">timeline</button></td></tr>`).join("") + "</tbody>";
+    document.querySelectorAll("#ptable th.sortable").forEach((th) => th.addEventListener("click", () => {
+      const k = th.dataset.k; sortDir = k === sortKey ? -sortDir : (k === "n" ? 1 : -1); sortKey = k; drawTable();
+    }));
+    document.querySelectorAll("#ptable button[data-id]").forEach((b) => b.addEventListener("click", () => {
+      tlPerson = b.dataset.id; document.getElementById("tlq").value = ""; drawTimeline();
+      document.getElementById("tlwrap").scrollIntoView({ behavior: "smooth", block: "center" });
+    }));
+  }
+  document.getElementById("pq").addEventListener("input", drawTable);
+  document.getElementById("ponly").addEventListener("change", drawTable);
+
+  const all = () => { drawOverTime(); drawTimeline(true); drawTable(); };
+  drawOverTime(); drawTimeline(); drawTable();
+  onThemeChange(all);
+  window.addEventListener("resize", () => drawTimeline(true));
+}).catch((e) => failed(document.getElementById("tiles"), e));
+</script>
+</body>
+</html>

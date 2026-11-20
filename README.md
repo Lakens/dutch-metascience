@@ -14,6 +14,7 @@ which themes, at which institutions, and how the literature developed over time.
   institutions × themes.
 - **Over time**: the rise of terms such as preregistration and registered reports, rising keywords, citations.
 - **Places**: Dutch institutions on a map over time, collaboration between institutions, partner countries.
+- **Funding**: NWO grants of these researchers and all metascience-related NWO projects, over time and on a scrollable timeline.
 - **Inferences**: who could work together, which themes are rising, and shared questions that could become joint projects.
 
 ## How the data were made
@@ -36,6 +37,8 @@ which themes, at which institutions, and how the literature developed over time.
 8. The Inferences page (`build_inferences.py`): collaboration suggestions from the paper embeddings, rising themes
    from each cluster's share per year, and shared questions and goals (`goals.json`, written by Claude after reading
    all 2025-2026 titles and abstracts; every statement cites the papers it rests on).
+9. NWO grants (`fetch_nwo.py`, `build_funding.py`): all projects from NWO's open API NWOpen (CC0), linked to people on
+   the site by ORCID, or by full name together with a shared organisation (ROR); ZonMw and other funders are not included.
 
 The scripts read API keys from environment variables (`OPENALEX_API_KEY`, `SRC_API_KEY`, and `SURF_GPU_*` for the
 GPU workspace). The script that built the initial people list is not included, because its input contains
@@ -53,4 +56,4 @@ To be removed or corrected, please open an issue.
 
 ## Data sources
 
-OpenAlex (CC0) and Crossref.
+OpenAlex (CC0), Crossref, and NWOpen (NWO project data, CC0).
