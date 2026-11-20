@@ -41,8 +41,10 @@ which themes, at which institutions, and how the literature developed over time.
    were then revised by hand after reading each cluster's keywords and titles (`cluster_names.json`, applied by
    `build_site_data.py`).
 7. The JSON files for the website (`build_site_data.py`, output in `docs/data/`).
-8. The Inferences page (`build_inferences.py`): collaboration suggestions from the paper embeddings, rising themes
-   from each cluster's share per year, and shared questions and goals (`goals.json`, written by Claude after reading
+8. The Inferences page (`build_inferences.py`): collaboration suggestions from the paper embeddings; rising themes
+   from a multinomial logistic regression of each paper's cluster on year (natural spline, chosen by QAIC, intervals
+   widened for extra year-to-year variation; `share_model.py`); new authors entering each theme, with intervals from
+   resampling papers; and shared questions and goals (`goals.json`, written by Claude after reading
    all 2025-2026 titles and abstracts; every statement cites the papers it rests on).
 9. NWO grants (`fetch_nwo.py`, `build_funding.py`): all projects from NWO's open API NWOpen (CC0), linked to people on
    the site by ORCID, or by full name together with a shared organisation (ROR); ZonMw and other funders are not included.

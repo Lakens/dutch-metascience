@@ -77,19 +77,35 @@
 
   <section class="card">
     <h2>Which themes are rising?</h2>
-    <p class="sub">The change in each cluster's share of all Dutch metascience papers: <span id="wrec"></span> against
-    <span id="wearly"></span>. A rising share means a theme gets relatively more attention, whatever the growth of
-    the field as a whole.</p>
+    <p class="sub">The yearly change in each theme's share of all Dutch metascience papers over the last four years
+    (<span class="chg"></span>), with a 95% interval. A theme is called rising or declining only when the whole interval
+    lies above or below zero; otherwise the data cannot tell a change from year-to-year variation. A rising share means
+    a theme gets relatively more attention, whatever the growth of the field as a whole. How this is estimated is
+    explained <a href="#trendmethod">below</a>.</p>
+    <div class="legend" id="statuskey"></div>
     <div id="growth" class="chart" style="min-height:620px"></div>
   </section>
 
   <section class="card">
-    <h2>Where the trend points</h2>
-    <p class="sub">A cluster's share per year, with a straight line through 2016 to <span class="ly"></span>,
-    continued two years further (dashed). This continues the past trend; it is not a forecast, and a single new
-    project or a change in funding can change it. <span class="ly"></span> is not complete yet.</p>
-    <div class="controls"><label>Cluster <select id="tcl"></select></label></div>
-    <div id="trendchart" class="chart" style="min-height:420px"></div>
+    <h2>Which themes attract new people?</h2>
+    <p class="sub">The number of Dutch authors who wrote their first paper in a theme in <span class="nrec"></span>,
+    divided by the number in <span class="nearly"></span>, with a 95% interval. A person can be new to metascience or
+    come from another theme. The whole field grew, so the dashed line shows the ratio for all themes together: a theme
+    to its right attracts new people faster than the field as a whole. Papers with more than
+    <span class="maxa"></span> authors are not counted, as for the co-author network.</p>
+    <div class="legend" id="entrykey"></div>
+    <div id="entrychart" class="chart" style="min-height:620px"></div>
+  </section>
+
+  <section class="card">
+    <h2>How each theme developed</h2>
+    <p class="sub">Dots: the theme's share of all papers in each year (larger dots: more papers that year). Line and
+    band: the estimated share with its 95% band. Below: the people who wrote their first paper in the theme each year.
+    <span class="ly"></span> is not complete yet.</p>
+    <div class="controls"><label>Theme <select id="tcl"></select></label></div>
+    <div id="trendchart" class="chart" style="min-height:400px"></div>
+    <p class="small" id="entrytext" style="margin:10px 0 0"></p>
+    <div id="entrybars" class="chart" style="min-height:300px"></div>
   </section>
 
   <section class="card">
@@ -97,6 +113,11 @@
     <p class="sub">Keywords whose share of the papers grew most from <span class="wearly"></span> to
     <span class="wrec"></span> (at least 10 recent papers). Keywords marked "new" first appeared in 2023 or later.</p>
     <div id="kwchart" class="chart" style="min-height:520px"></div>
+  </section>
+
+  <section class="card" id="trendmethod">
+    <h2>How the trends were estimated</h2>
+    <p class="sub" id="trendmethodtext"></p>
   </section>
 
   <section class="card">
@@ -122,8 +143,6 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
   document.getElementById("rule").textContent = inf.active_rule;
   document.getElementById("nactive").textContent = fmt(inf.n_active);
   const w = inf.windows, wtxt = (a) => `${a[0]}–${a[1]}`;
-  ["wrec"].forEach((id) => (document.getElementById(id).textContent = wtxt(w.recent)));
-  document.getElementById("wearly").textContent = wtxt(w.early);
   document.querySelectorAll(".wrec").forEach((e) => (e.textContent = wtxt(w.recent)));
   document.querySelectorAll(".wearly").forEach((e) => (e.textContent = wtxt(w.early)));
   document.querySelectorAll(".ly").forEach((e) => (e.textContent = inf.last_year));
@@ -178,37 +197,101 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
         ${esc(clab(d.b))} (${esc(comm[d.b].topics.slice(0, 2).join(", "))}): content similarity ${d.sim.toFixed(2)}, ${d.links} co-author link${d.links === 1 ? "" : "s"} between them.</li>`).join("") + "</ul>";
   }
 
-  // ---- rising themes ----
+  // ---- rising themes: model-based change in share, new authors per theme ----
+  const TM = inf.trend_model, G = TM.grid;
+  const mark = (d) => (me && me.field.includes(d.id) ? "▶ " : "");
+  // on narrow screens the theme names are shortened (the full name shows on hover) and the left margin is smaller
+  const narrow = () => window.innerWidth < 700;
+  const short = (s) => (narrow() && s.length > 20 ? s.slice(0, 19) + "…" : s);
+  const leftM = () => (narrow() ? 140 : 250);
+  const span = (a) => `${a[0]}–${a[1]}`;
+  document.querySelectorAll(".chg").forEach((e) => (e.textContent = `${TM.change_from} to ${TM.change_to}`));
+  document.querySelectorAll(".nrec").forEach((e) => (e.textContent = span(TM.new_recent)));
+  document.querySelectorAll(".nearly").forEach((e) => (e.textContent = span(TM.new_early)));
+  document.querySelectorAll(".maxa").forEach((e) => (e.textContent = TM.max_authors));
+  const STATUS = [["rising", "--series-1"], ["no clear change", "--other"], ["declining", "--series-2"]];
+  const statusColor = (st) => cssVar(STATUS.find((x) => x[0] === st)[1]);
+  const pts = (v) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2)}`;
   function drawGrowth() {
-    const t = inf.trend.slice().sort((a, b) => (a.recent - a.early) - (b.recent - b.early));
-    const up = cssVar("--series-1"), down = cssVar("--other");
-    Plotly.react("growth", [{ type: "bar", orientation: "h", y: t.map((d) => (me && me.field.includes(d.id) ? "▶ " : "") + d.name), x: t.map((d) => +(d.recent - d.early).toFixed(2)),
-      marker: { color: t.map((d) => (d.recent >= d.early ? up : down)) },
-      text: t.map((d) => `${d.early.toFixed(1)}% → ${d.recent.toFixed(1)}%`), textposition: "outside", cliponaxis: false,
-      hovertemplate: "<b>%{y}</b><br>%{text} of all papers<extra></extra>" }],
-      baseLayout({ showlegend: false, margin: { l: 250, r: 90, t: 10, b: 40 },
-        xaxis: Object.assign(baseLayout().xaxis, { title: "change in share (percentage points)", zeroline: true }) }), PLOT_CONFIG);
+    document.getElementById("statuskey").innerHTML = STATUS.map(([st]) =>
+      `<span class="item"><span class="swatch" style="background:${statusColor(st)}"></span>${st} (${inf.trend.filter((d) => d.status === st).length})</span>`).join("");
+    const t = inf.trend.slice().sort((a, b) => a.change.est - b.change.est);
+    Plotly.react("growth", [{ type: "scatter", mode: "markers", y: t.map((d) => short(mark(d) + d.name)), x: t.map((d) => d.change.est), text: t.map((d) => d.name),
+      error_x: { type: "data", symmetric: false, array: t.map((d) => d.change.hi - d.change.est), arrayminus: t.map((d) => d.change.est - d.change.lo),
+        color: cssVar("--text-muted"), thickness: 1.5, width: 0 },
+      marker: { size: 10, color: t.map((d) => statusColor(d.status)), line: { color: cssVar("--surface-1"), width: 2 } },
+      customdata: t.map((d) => [d.change.start, d.change.end, pts(d.change.lo), pts(d.change.hi), d.status]),
+      hovertemplate: `<b>%{text}</b><br>%{customdata[4]}<br>share ${TM.change_from}: %{customdata[0]:.1f}% → ${TM.change_to}: %{customdata[1]:.1f}%<br>` +
+        "change per year: %{x:+.2f} points (95% interval %{customdata[2]} to %{customdata[3]})<extra></extra>" }],
+      baseLayout({ showlegend: false, hovermode: "closest", margin: { l: leftM(), r: 20, t: 10, b: 40 },
+        xaxis: Object.assign(baseLayout().xaxis, { title: narrow() ? "change per year (points)" : "change in share per year (percentage points)", zeroline: true, zerolinecolor: cssVar("--axis") }) }), PLOT_CONFIG);
+  }
+  function drawEntries() {
+    const t = inf.trend.filter((d) => d.entry_change.ratio).sort((a, b) => a.entry_change.ratio - b.entry_change.ratio);
+    const fr = TM.field_entries.ratio;
+    Plotly.react("entrychart", [{ type: "scatter", mode: "markers", y: t.map((d) => short(mark(d) + d.name)), x: t.map((d) => d.entry_change.ratio), text: t.map((d) => d.name),
+      error_x: { type: "data", symmetric: false, array: t.map((d) => d.entry_change.hi - d.entry_change.ratio),
+        arrayminus: t.map((d) => d.entry_change.ratio - d.entry_change.lo), color: cssVar("--text-muted"), thickness: 1.5, width: 0 },
+      marker: { size: 10, color: t.map((d) => (d.entry_change.lo > fr ? cssVar("--series-1") : d.entry_change.hi < fr ? cssVar("--series-2") : cssVar("--other"))),
+        line: { color: cssVar("--surface-1"), width: 2 } },
+      customdata: t.map((d) => [d.entry_change.early, d.entry_change.rec, d.entry_change.lo, d.entry_change.hi]),
+      hovertemplate: `<b>%{text}</b><br>${span(TM.new_early)}: %{customdata[0]} people · ${span(TM.new_recent)}: %{customdata[1]} people<br>` +
+        "ratio %{x:.2f} (95% interval %{customdata[2]:.2f} to %{customdata[3]:.2f})<extra></extra>" }],
+      baseLayout({ showlegend: false, hovermode: "closest", margin: { l: leftM(), r: 20, t: 24, b: 40 },
+        shapes: [{ type: "line", x0: fr, x1: fr, yref: "paper", y0: 0, y1: 1, line: { color: cssVar("--text-muted"), dash: "dash", width: 1.5 } },
+                 { type: "line", x0: 1, x1: 1, yref: "paper", y0: 0, y1: 1, line: { color: cssVar("--axis"), width: 1 } }],
+        annotations: [{ x: Math.log10(fr), xref: "x", y: 1, yref: "paper", yanchor: "bottom", showarrow: false,
+          text: `all themes: ${fr.toFixed(2)}`, font: { size: 11, color: cssVar("--text-muted") } }],
+        xaxis: Object.assign(baseLayout().xaxis, { type: "log", title: narrow() ? "ratio (log scale)" : `people entering ${span(TM.new_recent)} ÷ ${span(TM.new_early)} (log scale)`,
+          tickvals: [0.25, 0.33, 0.5, 0.67, 1, 1.5, 2, 3, 4], ticktext: ["¼", "⅓", "½", "⅔", "1", "1.5", "2", "3", "4"] }) }), PLOT_CONFIG);
+    document.getElementById("entrykey").innerHTML = [["--series-1", "faster than all themes together"], ["--other", "cannot tell"],
+      ["--series-2", "slower than all themes together"]].map(([c, l]) => `<span class="item"><span class="swatch" style="background:${cssVar(c)}"></span>${l}</span>`).join("");
   }
   const tsel = document.getElementById("tcl");
-  const byGrowth = inf.trend.slice().sort((a, b) => (b.recent - b.early) - (a.recent - a.early));
-  tsel.innerHTML = byGrowth.map((d) => `<option value="${d.id}"${me && me.field[0] === d.id ? " selected" : ""}>${esc(d.name)} (${d.recent >= d.early ? "+" : ""}${(d.recent - d.early).toFixed(1)} points)</option>`).join("");
+  const byGrowth = inf.trend.slice().sort((a, b) => b.change.est - a.change.est);
+  tsel.innerHTML = byGrowth.map((d) => `<option value="${d.id}"${me && me.field[0] === d.id ? " selected" : ""}>${esc(d.name)} (${d.status})</option>`).join("");
   function drawTrend() {
     const d = inf.trend.find((x) => String(x.id) === tsel.value);
-    const yrs = Object.keys(d.share).map(Number).filter((y) => y >= 2010);
-    const fitYears = yrs.filter((y) => y >= 2016), proj = Object.keys(d.proj).map(Number);
-    const at = (y) => d.slope * y + (d.proj[proj[0]] - d.slope * proj[0]);
+    const yrs = Object.keys(d.share).map(Number);
+    const c = statusColor(d.status) === cssVar("--other") ? cssVar("--series-1") : statusColor(d.status);
     Plotly.react("trendchart", [
-      { type: "scatter", mode: "lines+markers", name: "share per year", x: yrs, y: yrs.map((y) => d.share[y]),
-        line: { color: cssVar("--series-1"), width: 2 }, marker: { size: 7 },
-        text: yrs.map((y) => `${d.n[y]} papers`), hovertemplate: "%{x}: %{y:.1f}% (%{text})<extra></extra>" },
-      { type: "scatter", mode: "lines", name: "straight-line trend", x: fitYears, y: fitYears.map((y) => Math.max(0, at(y))),
-        line: { color: cssVar("--text-muted"), width: 1.5 }, hoverinfo: "skip" },
-      { type: "scatter", mode: "lines", name: "trend continued", x: proj, y: proj.map((y) => d.proj[y]),
-        line: { color: cssVar("--text-muted"), width: 2, dash: "dash" }, hovertemplate: "%{x}: %{y:.1f}% if the trend continues<extra></extra>" }],
+      { type: "scatter", mode: "lines", x: G, y: d.fit.map((f) => f[2]), line: { width: 0 }, hoverinfo: "skip", showlegend: false },
+      { type: "scatter", mode: "lines", name: "95% band", x: G, y: d.fit.map((f) => f[0]), fill: "tonexty", fillcolor: c + "33", line: { width: 0 }, hoverinfo: "skip" },
+      { type: "scatter", mode: "lines", name: "estimated share", x: G, y: d.fit.map((f) => f[1]), line: { color: c, width: 2.5 },
+        customdata: d.fit.map((f) => [f[0], f[2]]), hovertemplate: "%{x:.0f}: estimated %{y:.1f}% (95% band %{customdata[0]:.1f}–%{customdata[1]:.1f}%)<extra></extra>" },
+      { type: "scatter", mode: "markers", name: "share per year", x: yrs, y: yrs.map((y) => d.share[y]),
+        marker: { color: cssVar("--text-secondary"), size: yrs.map((y) => 4 + 1.6 * Math.sqrt(d.n[y])), opacity: 0.75, line: { color: cssVar("--surface-1"), width: 1 } },
+        text: yrs.map((y) => `${d.n[y]} papers`), hovertemplate: "%{x}: %{y:.1f}% of all papers (%{text})<extra></extra>" }],
       baseLayout({ hovermode: "closest", yaxis: Object.assign(baseLayout().yaxis, { title: "% of all metascience papers", rangemode: "tozero" }),
         legend: { orientation: "h", y: -0.2 } }), PLOT_CONFIG);
+    // people entering the theme
+    const ey = yrs.filter((y) => y >= 2005);
+    const e = (y, i) => (d.entries[y] ? d.entries[y][i] : 0);
+    const ec = d.entry_change;
+    document.getElementById("entrytext").innerHTML = `<b>People entering this theme:</b> ${ec.rec} in ${span(TM.new_recent)} against ${ec.early} in
+      ${span(TM.new_early)}${ec.ratio ? ` (ratio ${ec.ratio.toFixed(2)}, 95% interval ${ec.lo.toFixed(2)} to ${ec.hi.toFixed(2)}; all themes together: ${TM.field_entries.ratio.toFixed(2)})` : ""}.`;
+    Plotly.react("entrybars", [
+      { type: "bar", name: "new to metascience", x: ey, y: ey.map((y) => e(y, 0)), marker: { color: cssVar("--series-1"), opacity: ey.map((y) => (y === inf.last_year ? 0.5 : 1)) },
+        hovertemplate: "%{x}: %{y} new to metascience<extra></extra>" },
+      { type: "bar", name: "from another theme", x: ey, y: ey.map((y) => e(y, 1)), marker: { color: cssVar("--series-3"), opacity: ey.map((y) => (y === inf.last_year ? 0.5 : 1)) },
+        hovertemplate: "%{x}: %{y} from another theme<extra></extra>" }],
+      baseLayout({ barmode: "stack", hovermode: "closest", legend: { orientation: "h", y: -0.25 },
+        yaxis: Object.assign(baseLayout().yaxis, { title: "people entering" }) }), PLOT_CONFIG);
   }
   tsel.addEventListener("change", drawTrend);
+  document.getElementById("trendmethodtext").innerHTML = `Each paper from ${TM.fit_from} on (${fmt(TM.n_papers)} papers) belongs to one of
+    the 20 themes. A multinomial logistic regression estimates, for every year, the probability that a paper belongs to
+    each theme; together these shares add up to 100%. Year enters as a natural cubic spline, so a theme can rise and
+    level off; its flexibility (${TM.df} degrees of freedom) was chosen by QAIC, an information criterion that guards
+    against following noise. Years with more papers weigh more, and the estimated shares stay between 0 and 100%.
+    The shares vary more from year to year than chance alone would give (${TM.dispersion} times as much, probably because
+    one project often brings several papers on a theme in the same year), so all intervals were widened by that factor
+    (quasi-likelihood). The 95% bands and intervals come from 4,000 draws of the model's coefficients from their
+    estimated distribution. The change per year is the estimated share in ${TM.change_to} minus that in ${TM.change_from},
+    divided by ${TM.change_to - TM.change_from}. The model describes the past; it does not forecast.
+    <br><br>For new people, a person enters a theme in the year of their first paper in it. The intervals for the ratios
+    come from resampling the papers through which people entered (2,000 times), because one paper can bring several
+    people at once. ${TM.new_recent[1] + 1} is left out of the ratios because it is not complete.`;
   function drawKw() {
     const r = inf.rising.slice(0, 18).reverse();
     const ne = new Set(inf.new_keywords.map((d) => d.k));
@@ -241,7 +324,7 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
       ${q.people && q.people.length ? `<p class="small"><b>People:</b> ${q.people.map(esc).join(", ")}</p>` : ""}${refs(q.papers || [])}</div>`).join("")}</details>`).join("");
   }
 
-  const all = () => { drawComm(); drawGrowth(); drawTrend(); drawKw(); };
+  const all = () => { drawComm(); drawGrowth(); drawEntries(); drawTrend(); drawKw(); };
   all(); drawGoals(); onThemeChange(all);
 }).catch((e) => failed(document.getElementById("suggest"), e));
 </script>
