@@ -50,6 +50,11 @@ rows = db.execute("""
   JOIN oa_institutions i ON i.institution_id = ai.institution_id
   WHERE m.prompt_version = ? AND m.is_metascience = 1 AND i.country_code = 'NL' AND a.author_id <> ''
   GROUP BY a.author_id, w.work_id""", (version,)).fetchall()
+# papers that the hand check found not to be metascience are left out (same list as the website)
+import csv
+EXCLUDED = {r["work_id"] for r in csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                   "excluded_by_hand.csv"), encoding="utf-8"))}
+rows = [r for r in rows if r[3] not in EXCLUDED]
 print("authorships with a Dutch institution on metascience papers:", len(rows))
 
 # co-authors on our list, per work
@@ -62,7 +67,7 @@ work_list_authors = collections.defaultdict(set)
 for wid, aid in db.execute("""SELECT a.work_id, a.author_id FROM oa_authorships a
                               JOIN metascience_final m ON m.work_id = a.work_id
                               WHERE m.prompt_version = ? AND m.is_metascience = 1""", (version,)):
-    if aid in list_people:
+    if aid in list_people and wid not in EXCLUDED:
         work_list_authors[wid].add(list_people[aid])
 
 cand = {}

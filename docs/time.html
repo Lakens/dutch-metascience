@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Metascience Over Time</title>
-<meta name="description" content="How Dutch metascience developed: the rise of terms, rising keywords and the most cited papers.">
+<meta name="description" content="How Dutch metascience developed: the rise of terms, rising keywords, citations and landmark papers per topic.">
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
 <script src="assets/common.js"></script>
@@ -56,14 +56,22 @@
     to open the paper. Recent papers have had less time to be cited.</p>
     <div class="controls"><label>Theme <select id="ccat"><option value="">all themes</option></select></label></div>
     <div id="cites" class="chart" style="min-height:520px"></div>
-    <details><summary>The 25 most cited papers (table)</summary><div class="tablewrap"><table class="data" id="topcited"></table></div></details>
+  </section>
+
+  <section class="card">
+    <h2>Landmark papers in each cluster</h2>
+    <p class="sub">The three most cited papers in each of the 20 clusters of similar papers (see Themes), so that every
+    topic shows its own landmark papers instead of one list dominated by the most cited fields. Ranked by citations per
+    year since publication, so that old papers do not win only by being old.</p>
+    <div class="controls"><div class="seg" id="lmode"><button aria-pressed="true" data-v="peryear">Citations per year</button><button aria-pressed="false" data-v="total">Total citations</button></div></div>
+    <div class="cards landmarks" id="landmarks"></div>
   </section>
 </main>
 <footer>Data: OpenAlex (CC0). Citation counts as in OpenAlex at download time.</footer>
 
 <script>
 let tmode = "count";
-Promise.all([load("terms"), load("keywords"), load("papers"), load("people")]).then(([terms, kw, papers, people]) => {
+Promise.all([load("terms"), load("keywords"), load("papers"), load("people"), load("clusters")]).then(([terms, kw, papers, people, clusters]) => {
   const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
   function drawTerms() {
     const from = +document.getElementById("from").value;
@@ -124,12 +132,29 @@ Promise.all([load("terms"), load("keywords"), load("papers"), load("people")]).t
     Plotly.react("cites", [mk(bg, cssVar("--other"), 4, 0.4), mk(hl, c ? catColor(c) : cssVar("--series-1"), 6, 0.75)],
       baseLayout({ showlegend: false, hovermode: "closest",
         yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "citations + 1", dtick: 1 }) }), PLOT_CONFIG);
-    const top = hl.slice().sort((a, b) => b.c - a.c).slice(0, 25);
-    document.getElementById("topcited").innerHTML = "<thead><tr><th>Year</th><th>Title</th><th class='num'>Citations</th></tr></thead><tbody>" +
-      top.map((p) => `<tr><td>${p.y}</td><td><a href="${doiLink(p)}" target="_blank" rel="noopener">${esc(p.t)}</a></td><td class="num">${fmt(p.c)}</td></tr>`).join("") + "</tbody>";
   }
+
+  // ---- landmark papers: the 3 most cited papers per cluster ----
+  let lmode = "peryear";
+  const lastYear = Math.max(...papers.map((p) => p.y || 0));
+  const perYear = (p) => (p.c || 0) / Math.max(1, lastYear - p.y + 1);
+  function drawLandmarks() {
+    const score = lmode === "peryear" ? perYear : (p) => p.c || 0;
+    document.getElementById("landmarks").innerHTML = clusters.slice().sort((a, b) => b.k - a.k).map((cl) => {
+      const top = papers.filter((p) => p.cl === cl.id && p.y).sort((a, b) => score(b) - score(a)).slice(0, 3);
+      return `<div class="c"><h3>${esc(cl.name)}</h3><ol>` + top.map((p) => {
+        const names = p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean);
+        return `<li><a href="${doiLink(p)}" target="_blank" rel="noopener">${esc(p.t)}</a>
+          <span class="muted small">${p.y} · ${fmt(p.c || 0)} citations (${fmt(Math.round(perYear(p)))} per year)` +
+          `${names.length ? " · " + esc(names.slice(0, 3).join(", ")) + (names.length > 3 ? " et al." : "") : ""}</span></li>`;
+      }).join("") + "</ol></div>";
+    }).join("");
+  }
+  document.querySelectorAll("#lmode button").forEach((b) => b.addEventListener("click", () => {
+    lmode = b.dataset.v; document.querySelectorAll("#lmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawLandmarks();
+  }));
   csel.addEventListener("change", drawCites);
-  const all = () => { drawTerms(); drawBump(); drawCites(); };
+  const all = () => { drawTerms(); drawBump(); drawCites(); drawLandmarks(); };
   all(); onThemeChange(all);
   document.getElementById("cites").on("plotly_click", (d) => window.open(d.points[0].customdata, "_blank", "noopener"));
 }).catch((e) => failed(document.getElementById("mult"), e));

@@ -103,11 +103,16 @@ for i in range(0, len(ids), 50):
                                    lineage=[short(x) for x in r.get("lineage") or []],
                                    lat=g.get("latitude"), lon=g.get("longitude"), city=g.get("city"))
 
+def is_nl(x):
+    return (geo.get(x, {}).get("country") or inst_meta.get(x, {}).get("country")) == "NL"
+
 def top_level(iid):
-    """the parent institution with no parent of its own (e.g. Donders Institute -> Radboud University)"""
+    """the highest Dutch parent (e.g. Donders Institute -> Radboud University). A parent in another country is
+    skipped, so a Dutch branch stays itself (Elsevier Amsterdam is not counted as RELX Group, United Kingdom)."""
     lin = geo.get(iid, {}).get("lineage") or [iid]
-    roots = [x for x in lin if geo.get(x, {}).get("lineage") in ([x], [])]
-    return roots[0] if roots else iid
+    dutch = [x for x in lin if is_nl(x)] or [iid]
+    tops = [x for x in dutch if not any(y != x and is_nl(y) for y in geo.get(x, {}).get("lineage") or [x])]
+    return tops[0] if tops else dutch[0]
 
 paper_tops = {wid: sorted({top_level(i) for i in s}) for wid, s in paper_nl_insts.items()}
 for p in papers:
@@ -165,6 +170,17 @@ for t, plist in inst_papers.items():
                           years=dict(collections.Counter(str(p["y"]) for p in plist if p["y"])),
                           cats=dict(collections.Counter(p["cat"] for p in plist))))
 insts_out.sort(key=lambda r: -r["k"])
+# the 14 Dutch universities (for the flow diagram "which institution works on what")
+DUTCH_UNIVERSITIES = ["University of Amsterdam", "Leiden University", "Utrecht University", "Vrije Universiteit Amsterdam",
+                      "University of Groningen", "Maastricht University", "Radboud University Nijmegen",
+                      "Tilburg University", "Erasmus University Rotterdam", "Delft University of Technology",
+                      "Eindhoven University of Technology", "University of Twente", "Wageningen University & Research",
+                      "Open University of the Netherlands"]
+uni_ids = [r["id"] for r in insts_out if r["n"] in DUTCH_UNIVERSITIES]
+missing = set(DUTCH_UNIVERSITIES) - {r["n"] for r in insts_out}
+assert not missing, f"universities not found in the data: {missing}"
+foreign = [r["n"] for r in insts_out if not is_nl(r["id"])]
+print("institutions:", len(insts_out), "| not in the Netherlands (should be none):", foreign[:5], flush=True)
 top_inst = [r["id"] for r in insts_out[:16]]
 chord = [[0] * len(top_inst) for _ in top_inst]
 for p in papers:
@@ -236,7 +252,7 @@ dump("meta.json", meta)
 dump("papers.json", papers)
 dump("people.json", people_out)
 dump("edges.json", edges_out)
-dump("institutions.json", dict(list=insts_out, chord_ids=top_inst, chord=chord))
+dump("institutions.json", dict(list=insts_out, chord_ids=top_inst, chord=chord, universities=uni_ids))
 dump("countries.json", countries_out)
 dump("terms.json", dict(terms=terms_json, totals={str(y): c for y, c in sorted(year_total.items())}))
 dump("keywords.json", keywords_out)

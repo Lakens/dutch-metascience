@@ -39,9 +39,13 @@
       <span class="muted small" id="mapcount"></span>
     </div>
     <div class="legend" id="legend"></div>
-    <div id="map" class="chart" style="min-height:680px"></div>
-    <p class="muted small">Hover for the title; click a dot to open the paper. The positions only mean "similar to
-    nearby papers"; the axes have no meaning.</p>
+    <div class="card" style="margin:0;padding:8px;position:relative">
+      <canvas class="net" id="map"></canvas>
+      <button type="button" class="overlay-btn" id="mapreset">Reset view</button>
+    </div>
+    <p class="muted small">Scroll to zoom, drag to move, hover for the title, click a dot to open the paper. As you zoom
+    in, the titles of the most cited papers appear. The positions only mean "similar to nearby papers"; the axes have
+    no meaning.</p>
   </section>
 
   <section class="card">
@@ -55,14 +59,14 @@
     <section class="card">
       <h2>Keywords that go together</h2>
       <p class="sub">The 150 most frequent OpenAlex keywords; a line joins keywords that appear together in at least
-      three papers. Colour: the theme in which the keyword is most common. Hover a keyword to see its neighbours; drag to rearrange.</p>
+      three papers. Colour: the theme in which the keyword is most common. Scroll to zoom (more keywords get a name), drag the background to move, hover a keyword to see its neighbours, drag a keyword to rearrange.</p>
       <svg id="kw" style="width:100%;height:620px"></svg>
     </section>
     <section class="card">
       <h2>Which institution works on what</h2>
-      <p class="sub">Papers from the ten Dutch institutions with the most metascience papers, flowing to the theme
-      the AI assigned. Hover a flow for the number of papers.</p>
-      <div id="sankey" class="chart" style="min-height:620px"></div>
+      <p class="sub">Metascience papers from the 14 Dutch universities, flowing to the theme the AI assigned (university
+      medical centres are separate organisations; see Places). Hover a flow for the number of papers.</p>
+      <div id="sankey" class="chart" style="min-height:700px"></div>
     </section>
   </div>
 </main>
@@ -81,59 +85,134 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
   document.getElementById("cl").innerHTML += clusters.slice().sort((a, b) => a.name.localeCompare(b.name))
     .map((c) => `<option value="${c.id}">${esc(c.name)} (${c.k})</option>`).join("");
 
+  // ---- the map: a canvas with the same zoom and drag as the co-author network ----
+  const canvas = document.getElementById("map"), ctx = canvas.getContext("2d");
+  let W, H, dpr, transform = d3.zoomIdentity, hovered = null, qt = null, shownPts = [];
+  const X0 = d3.min(mapped, (p) => p.x), X1 = d3.max(mapped, (p) => p.x);
+  const Y0 = d3.min(mapped, (p) => p.yy), Y1 = d3.max(mapped, (p) => p.yy);
+  const clusterCenter = {};
+  function size() {
+    dpr = window.devicePixelRatio || 1; W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    // map units -> canvas pixels at zoom 1 (all papers fit, y upwards)
+    const s = 0.94 * Math.min(W / (X1 - X0), H / (Y1 - Y0));
+    const ox = W / 2 - s * (X0 + X1) / 2, oy = H / 2 + s * (Y0 + Y1) / 2;
+    mapped.forEach((p) => { p.px = ox + s * p.x; p.py = oy - s * p.yy; });
+    const med = (arr) => { const v = arr.slice().sort((x, y) => x - y); return v[Math.floor(v.length / 2)]; };
+    clusters.forEach((c) => {
+      const pts = mapped.filter((p) => p.cl === c.id);
+      if (pts.length) clusterCenter[c.id] = [med(pts.map((p) => p.px)), med(pts.map((p) => p.py))];
+    });
+  }
+  let focus = () => true, filtering = false;
   function drawMap() {
     categoryLegend(document.getElementById("legend"), active, drawMap);
     const q = document.getElementById("q").value.trim().toLowerCase();
     const cl = document.getElementById("cl").value;
     const a = +y0s.value, b = +y1s.value;
     const inRange = (p) => !p.y || (p.y >= a && p.y <= b);
-    const focus = (p) => inRange(p) && (!cl || String(p.cl) === cl) && (!q || (p.t || "").toLowerCase().includes(q));
-    const bg = mapped.filter((p) => !focus(p) || !active.has(p.cat));
-    const traces = [{ type: "scattergl", mode: "markers", x: bg.map((p) => p.x), y: bg.map((p) => p.yy), hoverinfo: "skip",
-      marker: { size: 4, color: cssVar("--other"), opacity: 0.35 }, showlegend: false }];
-    let shown = 0;
-    for (const c of CATEGORIES) {
-      if (!active.has(c)) continue;
-      const sel = mapped.filter((p) => p.cat === c && focus(p)); shown += sel.length;
-      traces.push({ type: "scattergl", mode: "markers", name: CAT_LABEL[c], x: sel.map((p) => p.x), y: sel.map((p) => p.yy),
-        text: sel.map((p) => `<b>${wrap(p.t)}</b><br>${p.y || ""} · ${esc(p.v)}<br>${esc(CAT_LABEL[p.cat])} · ${esc(cname[p.cl] || "")}<br>` +
-          `${esc(p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean).slice(0, 6).join(", "))}`),
-        customdata: sel.map(doiLink), hovertemplate: "%{text}<extra></extra>",
-        marker: { size: q || cl ? 8 : 6, color: catColor(c), opacity: 0.85, line: { width: 0.5, color: cssVar("--surface-1") } } });
+    focus = (p) => active.has(p.cat) && inRange(p) && (!cl || String(p.cl) === cl) && (!q || (p.t || "").toLowerCase().includes(q));
+    filtering = !!(q || cl);
+    shownPts = mapped.filter(focus);
+    qt = d3.quadtree(shownPts, (p) => p.px, (p) => p.py);
+    document.getElementById("mapcount").textContent = `${fmt(shownPts.length)} of ${fmt(mapped.length)} papers highlighted`;
+    draw();
+  }
+  function draw() {
+    const k = transform.k;
+    ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    // filtered-out papers in grey, then the highlighted ones in their theme colour
+    ctx.fillStyle = cssVar("--other"); ctx.globalAlpha = 0.3;
+    const rBg = Math.min(4, 1.6 + 0.35 * k);
+    for (const p of mapped) {
+      if (focus(p)) continue;
+      const x = transform.applyX(p.px), y = transform.applyY(p.py);
+      if (x < -5 || x > W + 5 || y < -5 || y > H + 5) continue;
+      ctx.fillRect(x - rBg / 2, y - rBg / 2, rBg, rBg);
     }
-    document.getElementById("mapcount").textContent = `${fmt(shown)} of ${fmt(mapped.length)} papers highlighted`;
-    // cluster names at the median position of each cluster
-    const ann = clusters.map((c) => {
-      const pts = mapped.filter((p) => p.cl === c.id); if (!pts.length) return null;
-      const med = (arr) => { const s = arr.slice().sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
-      return { x: med(pts.map((p) => p.x)), y: med(pts.map((p) => p.yy)), text: esc(c.name), showarrow: false,
-        font: { size: String(c.id) === cl ? 14 : 11, color: cssVar("--text-primary") },
-        bgcolor: cssVar("--surface-1"), opacity: 0.85, borderpad: 2 };
-    }).filter(Boolean);
-    // move cluster names up or down when they would overlap a larger cluster's name (estimate in screen pixels)
-    {
-      const el = document.getElementById("map"), wpx = el.clientWidth || 800, hpx = el.clientHeight || 600;
-      const xs = mapped.map((p) => p.x), ys = mapped.map((p) => p.yy);
-      const dx = Math.max(...xs) - Math.min(...xs) || 1, dy = Math.max(...ys) - Math.min(...ys) || 1;
-      const s = Math.min(wpx / dx, hpx / dy);   // pixels per map unit (equal on both axes)
-      const size = Object.fromEntries(clusters.map((c) => [esc(c.name), c.k || 0]));
-      const order = ann.slice().sort((a, b) => (size[b.text] || 0) - (size[a.text] || 0));
-      const placed = [];
-      for (const a of order) {
-        const w = (a.text.length * a.font.size * 0.58 + 6) / s, h = (a.font.size + 6) / s;
-        for (const shift of [0, 1, -1, 2, -2, 3, -3]) {
-          const y = a.y + shift * h;
-          const box = [a.x - w / 2, y - h / 2, a.x + w / 2, y + h / 2];
-          if (!placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]) || shift === -3) {
-            a.y = y; placed.push(box); break;
-          }
-        }
+    ctx.globalAlpha = 0.9;
+    const r = Math.min(7, (filtering ? 3.2 : 2.4) + 0.45 * Math.sqrt(k));
+    const ring = cssVar("--surface-1");
+    const colors = Object.fromEntries(CATEGORIES.map((c) => [c, catColor(c)]));
+    for (const p of shownPts) {
+      const x = transform.applyX(p.px), y = transform.applyY(p.py);
+      if (x < -8 || x > W + 8 || y < -8 || y > H + 8) continue;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = colors[p.cat]; ctx.fill();
+      if (k > 2.5) { ctx.lineWidth = 0.8; ctx.strokeStyle = ring; ctx.stroke(); }
+    }
+    if (hovered) {
+      const x = transform.applyX(hovered.px), y = transform.applyY(hovered.py);
+      ctx.globalAlpha = 1; ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 2 * Math.PI);
+      ctx.lineWidth = 2; ctx.strokeStyle = cssVar("--text-primary"); ctx.stroke();
+    }
+    // names: cluster names first (the chosen cluster, then larger clusters), then, when zoomed in, titles of the
+    // most cited papers; a name is drawn only where it does not overlap one already drawn
+    const placed = [];
+    const put = (text, x, y, font, strong) => {
+      ctx.font = font; const w = ctx.measureText(text).width;
+      const box = [x - w / 2 - 3, y - 9, x + w / 2 + 3, y + 7];
+      if (box[2] < 0 || box[0] > W || box[3] < 0 || box[1] > H) return false;
+      if (placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) return false;
+      placed.push(box);
+      ctx.globalAlpha = strong ? 0.9 : 0.8; ctx.fillStyle = ring; ctx.fillRect(box[0], box[1], box[2] - box[0], box[3] - box[1]);
+      ctx.globalAlpha = 1; ctx.fillStyle = cssVar(strong ? "--text-primary" : "--text-secondary");
+      ctx.fillText(text, x, y); return true;
+    };
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const cl = document.getElementById("cl").value;
+    clusters.slice().sort((a, b) => (String(b.id) === cl) - (String(a.id) === cl) || b.k - a.k).forEach((c) => {
+      const cc = clusterCenter[c.id]; if (!cc) return;
+      put(c.name, transform.applyX(cc[0]), transform.applyY(cc[1]), `${String(c.id) === cl ? 600 : 500} 12px system-ui, sans-serif`, true);
+    });
+    if (k >= 2 || hovered) {
+      const inView = shownPts.filter((p) => { const x = transform.applyX(p.px), y = transform.applyY(p.py); return x > 0 && x < W && y > 0 && y < H; });
+      inView.sort((a, b) => (b === hovered) - (a === hovered) || (b.c || 0) - (a.c || 0));
+      let n = 0;
+      for (const p of inView) {
+        if (n >= (k >= 2 ? 40 : 1)) break;
+        const t = p.t.length > 60 ? p.t.slice(0, 58) + "…" : p.t;
+        if (put(t, transform.applyX(p.px), transform.applyY(p.py) - r - 9, "11px system-ui, sans-serif", false)) n++;
       }
     }
-    const L = baseLayout({ showlegend: false, hovermode: "closest", margin: { l: 10, r: 10, t: 10, b: 10 }, annotations: ann, dragmode: "pan" });
-    L.xaxis = { visible: false }; L.yaxis = { visible: false, scaleanchor: "x" };
-    Plotly.react("map", traces, L, Object.assign({ scrollZoom: true }, PLOT_CONFIG));
+    ctx.restore();
   }
+  const zoom = d3.zoom().scaleExtent([0.8, 60]).on("zoom", (e) => {
+    if (!e.sourceEvent) { hovered = null; Tip.hide(); }
+    transform = e.transform; draw();
+  });
+  d3.select(canvas).call(zoom).on("dblclick.zoom", null);
+  function pointAt(ev) {
+    if (!qt) return null;
+    const [mx, my] = d3.pointer(ev, canvas), [x, y] = transform.invert([mx, my]);
+    return qt.find(x, y, 8 / transform.k) || null;
+  }
+  canvas.addEventListener("mousemove", (ev) => {
+    const p = pointAt(ev);
+    if (p !== hovered) { hovered = p; draw(); }
+    if (p) {
+      Tip.show(`<b>${esc(p.t)}</b><br>${p.y || ""} · ${esc(p.v)}<br>${esc(CAT_LABEL[p.cat])} · ${esc(cname[p.cl] || "")}<br>` +
+        `<span class="muted">${esc(p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean).slice(0, 6).join(", "))}</span>`, ev);
+      canvas.style.cursor = "pointer";
+    } else { Tip.hide(); canvas.style.cursor = "grab"; }
+  });
+  canvas.addEventListener("mouseleave", () => { Tip.hide(); if (hovered) { hovered = null; draw(); } });
+  canvas.addEventListener("click", (ev) => { const p = pointAt(ev); if (p) window.open(doiLink(p), "_blank", "noopener"); });
+  function zoomToCluster(id) {
+    const pts = mapped.filter((p) => String(p.cl) === String(id));
+    if (!id || !pts.length) { d3.select(canvas).transition().duration(600).call(zoom.transform, d3.zoomIdentity); return; }
+    const xs = pts.map((p) => p.px).sort((a, b) => a - b), ys = pts.map((p) => p.py).sort((a, b) => a - b);
+    const q = (arr, f) => arr[Math.round(f * (arr.length - 1))];
+    const x0 = q(xs, 0.05), x1 = q(xs, 0.95), y0 = q(ys, 0.05), y1 = q(ys, 0.95);
+    const k = Math.min(12, 0.8 * Math.min(W / Math.max(1, x1 - x0), H / Math.max(1, y1 - y0)));
+    d3.select(canvas).transition().duration(700)
+      .call(zoom.transform, d3.zoomIdentity.translate(W / 2 - k * (x0 + x1) / 2, H / 2 - k * (y0 + y1) / 2).scale(k));
+  }
+  document.getElementById("mapreset").addEventListener("click", () =>
+    d3.select(canvas).transition().duration(600).call(zoom.transform, d3.zoomIdentity));
+  document.getElementById("cl").addEventListener("change", (e) => zoomToCluster(e.target.value));
+  window.addEventListener("resize", () => { size(); drawMap(); });
+  size();
+
   ["q", "cl"].forEach((id) => document.getElementById(id).addEventListener("input", drawMap));
   [y0s, y1s].forEach((s) => s.addEventListener("change", drawMap));
 
@@ -150,7 +229,7 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     }).join("");
     document.querySelectorAll("#cards .c").forEach((el) => el.addEventListener("click", () => {
       const s = document.getElementById("cl"); s.value = s.value === el.dataset.id ? "" : el.dataset.id;
-      drawMap(); drawCards(); document.getElementById("map").scrollIntoView({ behavior: "smooth", block: "center" });
+      drawMap(); drawCards(); zoomToCluster(s.value); document.getElementById("map").scrollIntoView({ behavior: "smooth", block: "center" });
     }));
   }
   document.getElementById("cl").addEventListener("change", drawCards);
@@ -169,25 +248,39 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     const sim = d3.forceSimulation(nodes).force("link", d3.forceLink(links).id((d) => d.id).distance(60).strength((l) => 0.05 + 0.4 * l.n / maxL))
       .force("charge", d3.forceManyBody().strength(-130)).force("center", d3.forceCenter(W / 2, H / 2))
       .force("collide", d3.forceCollide((d) => r(d.n) + 2)).force("x", d3.forceX(W / 2).strength(0.05)).force("y", d3.forceY(H / 2).strength(0.07));
-    const line = svg.append("g").selectAll("line").data(links).join("line").attr("stroke", cssVar("--axis"))
+    const box = svg.append("g");   // everything that zooms
+    const line = box.append("g").selectAll("line").data(links).join("line").attr("stroke", cssVar("--axis"))
       .attr("stroke-width", (l) => 0.5 + 3 * l.n / maxL).attr("opacity", 0.5);
-    const node = svg.append("g").selectAll("g").data(nodes).join("g").style("cursor", "grab")
+    const node = box.append("g").selectAll("g").data(nodes).join("g").style("cursor", "grab")
       .call(d3.drag().on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
         .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; }).on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
     node.append("circle").attr("r", (d) => r(d.n)).attr("fill", (d) => catColor(d.cat)).attr("stroke", cssVar("--surface-1")).attr("stroke-width", 2);
     // names in their own layer above all dots, with an outline in the background colour
-    const kwText = svg.append("g").style("pointer-events", "none").selectAll("text").data(nodes).join("text")
+    const kwText = box.append("g").style("pointer-events", "none").selectAll("text").data(nodes).join("text")
       .text((d) => d.id).attr("font-size", (d) => (d.n > big ? 12 : 10)).attr("text-anchor", "middle")
       .attr("fill", cssVar("--text-primary")).attr("stroke", cssVar("--surface-1")).attr("stroke-width", 3)
       .attr("stroke-linejoin", "round").style("paint-order", "stroke").attr("opacity", 0);
     // show the names of the 40 most frequent keywords, leaving out those that would overlap a more frequent one;
     // when hovering, the keyword and its neighbours
-    let focus = null;
+    let focus = null, kz = 1;
+    // zoomed out: names of the 40 most frequent keywords; zoomed in: up to all 150
+    const sorted = nodes.map((d) => d.n).sort((a, b) => b - a);
+    const minN = () => sorted[Math.min(sorted.length - 1, kz < 1.5 ? 40 : kz < 2.5 ? 80 : sorted.length - 1)];
     const tidy = () => {
-      const s = focus ? nb[focus.id] || new Set() : null;
+      const s = focus ? nb[focus.id] || new Set() : null, m = minN();
       declutter(kwText, (d) => (focus && d.id === focus.id ? 1e9 : d.n),
-        (d) => (focus ? d.id === focus.id || s.has(d.id) : d.n >= labelled));
+        (d) => (focus ? d.id === focus.id || s.has(d.id) : d.n >= m));
     };
+    const rz = (d) => r(d.n) / Math.sqrt(kz);   // circles grow only slowly when zooming in
+    const placeText = () => kwText.attr("x", (d) => d.x).attr("y", (d) => d.y - rz(d) - 3 / kz)
+      .attr("font-size", (d) => (d.n > big ? 12 : 10) / kz).attr("stroke-width", 3 / kz);
+    let tidyTimer = null;
+    svg.call(d3.zoom().scaleExtent([0.5, 6]).on("zoom", (e) => {
+      kz = e.transform.k; box.attr("transform", e.transform); placeText();
+      node.select("circle").attr("r", rz).attr("stroke-width", 2 / kz);
+      line.attr("stroke-width", (l) => (0.5 + 3 * l.n / maxL) / kz);
+      clearTimeout(tidyTimer); tidyTimer = setTimeout(tidy, 60);
+    })).on("dblclick.zoom", null);
     let kwTicks = 0;
     sim.on("tick.declutter", () => { if (++kwTicks % 15 === 0) tidy(); }).on("end.declutter", tidy);
     node.on("mouseenter", (e, d) => {
@@ -203,13 +296,14 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     sim.on("tick", () => {
       nodes.forEach((d) => { d.x = Math.max(55, Math.min(W - 55, d.x)); d.y = Math.max(20, Math.min(H - 10, d.y)); });
       line.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
-      kwText.attr("x", (d) => d.x).attr("y", (d) => d.y - r(d.n) - 3);
+      placeText();
       node.attr("transform", (d) => `translate(${d.x},${d.y})`);
     });
   }
 
   function drawSankey() {
-    const top = insts.list.slice(0, 10);
+    const byInst = Object.fromEntries(insts.list.map((i) => [i.id, i]));
+    const top = (insts.universities || []).map((id) => byInst[id]).filter(Boolean);
     const labels = top.map((i) => i.n).concat(CATEGORIES.map((c) => CAT_LABEL[c]));
     const src = [], tgt = [], val = [], col = [];
     top.forEach((i, a) => CATEGORIES.forEach((c, b) => {
@@ -227,7 +321,6 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
 
   const all = () => { drawMap(); drawCards(); drawKeywords(); drawSankey(); };
   all(); onThemeChange(all);
-  document.getElementById("map").on("plotly_click", (d) => { const u = d.points[0].customdata; if (u) window.open(u, "_blank", "noopener"); });
 }).catch((e) => failed(document.getElementById("map"), e));
 </script>
 </body>

@@ -136,3 +136,14 @@ footer { max-width: 1280px; margin: 24px auto 40px; padding: 0 24px; color: var(
 /* dropdowns never wider than the screen (long cluster names) */
 select { max-width: 100%; }
 label { max-width: 100%; }
+
+/* small button on top of a chart (e.g. "Reset view") */
+.overlay-btn { position: absolute; top: 16px; right: 16px; font: inherit; font-size: 0.85rem; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--axis); background: var(--surface-1); color: var(--text-primary); cursor: pointer; }
+.overlay-btn:hover { background: var(--surface-2); }
+
+/* landmark papers per cluster (Over time page): reading cards, not clickable as a whole */
+.cards.landmarks .c { cursor: default; }
+.cards.landmarks ol { margin: 8px 0 0; padding-left: 18px; font-size: 0.86rem; }
+.cards.landmarks li { margin-bottom: 8px; }
+.cards.landmarks li .small { display: block; margin-top: 2px; }
