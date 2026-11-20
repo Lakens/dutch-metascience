@@ -84,6 +84,7 @@
       <span><i style="border-color:var(--series-3)"></i>Event (Wikipedia)</span>
       <span><i style="border-color:var(--series-1)"></i>Landmark paper</span>
       <span><span class="nl" style="margin:0">NL</span>Dutch event, or paper with a Dutch author</span>
+      <span id="youkey"></span>
       <span class="muted">Scroll sideways; click an item for details. Years with more events and papers take more room, so the spacing of years varies.</span>
     </div>
     <p class="sub" id="note" style="margin:0 0 8px"></p>
@@ -101,8 +102,13 @@
 against the article text. Papers and reference lists: OpenAlex (CC0). Event texts written by Claude (Anthropic).</footer>
 
 <script>
-load("history").then((H) => {
+Promise.all([load("history"), Me.ready])
+.then(([H, me]) => Promise.all([H, me, me ? load("history_people").catch(() => null) : null]))
+.then(([H, me, HP]) => {
   const W = H.works;
+  // personal view: the landmark papers this person cites, marked "you cite"
+  const myCites = new Set(me && HP ? (HP.people[me.id] || []).map((i) => HP.works[i]) : []);
+  const citeTag = (id) => (myCites.has(id) ? '<span class="you">you cite</span>' : "");
   const themeSel = document.getElementById("theme"), evSel = document.getElementById("evf");
   themeSel.innerHTML = `<option value="all">All themes combined</option>` +
     H.themes.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join("");
@@ -214,7 +220,7 @@ load("history").then((H) => {
           <div class="t">${esc(d.e.title)}</div></div>`;
       } else {
         html += `<div class="item pa${selected === key ? " on" : ""}" data-key="${esc(key)}" style="left:${left}px;top:${top}px;height:${CH}px">
-          <div class="y">${d.w.y}${d.w.nl ? '<span class="nl">NL</span>' : ""}</div>
+          <div class="y">${d.w.y}${d.w.nl ? '<span class="nl">NL</span>' : ""}${citeTag(d.id)}</div>
           <div class="t" style="-webkit-line-clamp:2">${esc(d.w.t)}</div><div class="a">${esc(firstAuthor(d.w))}</div></div>`;
       }
     }
@@ -250,7 +256,8 @@ load("history").then((H) => {
         <div class="meta">${esc(auth)} · ${w.y}${w.v ? " · " + esc(w.v) : ""}</div>
         <div>Cited by ${fmt(w.k)} metascience papers on this site and ${fmt(w.c)} works in total
         (${w.fwci ? fmt(w.fwci) + " times the average for its field and year" : "field-weighted impact not available"}).
-        ${w.nl ? "A Dutch author is on this paper (it is on this site)." : ""}</div>
+        ${w.nl ? "A Dutch author is on this paper (it is on this site)." : ""}
+        ${myCites.has(d.id) ? `<b>${esc(me.n)} cites this paper.</b>` : ""}</div>
         <ul style="margin:6px 0">${rows}</ul>
         <a href="${w.doi ? "https://doi.org/" + esc(w.doi) : "https://openalex.org/" + d.id}" target="_blank" rel="noopener">Open the paper</a>`;
     }
@@ -259,7 +266,7 @@ load("history").then((H) => {
   function drawList(its) {
     const rows = its.slice().sort((a, b) => a.y - b.y).map((d) => d.kind === "ev"
       ? `<tr><td class="yr">${d.e.year}${d.e.end ? "–" + d.e.end : ""}</td><td>Event</td><td><a href="${esc(d.e.url)}" target="_blank" rel="noopener">${esc(d.e.title)}</a>${d.e.dutch ? '<span class="nl">NL</span>' : ""}<br><span class="muted small">${esc(d.e.text)}</span></td></tr>`
-      : `<tr><td class="yr">${d.w.y}</td><td>Paper</td><td><a href="${d.w.doi ? "https://doi.org/" + esc(d.w.doi) : "https://openalex.org/" + d.id}" target="_blank" rel="noopener">${esc(d.w.t)}</a>${d.w.nl ? '<span class="nl">NL</span>' : ""}<br><span class="muted small">${esc((d.w.a || []).join(", "))}${d.w.na > 3 ? " et al." : ""} · cited by ${fmt(d.w.k)} papers on this site</span></td></tr>`);
+      : `<tr><td class="yr">${d.w.y}</td><td>Paper</td><td><a href="${d.w.doi ? "https://doi.org/" + esc(d.w.doi) : "https://openalex.org/" + d.id}" target="_blank" rel="noopener">${esc(d.w.t)}</a>${d.w.nl ? '<span class="nl">NL</span>' : ""}${citeTag(d.id)}<br><span class="muted small">${esc((d.w.a || []).join(", "))}${d.w.na > 3 ? " et al." : ""} · cited by ${fmt(d.w.k)} papers on this site</span></td></tr>`);
     document.getElementById("list").innerHTML = `<table class="hlist"><thead><tr><th>Year</th><th>Type</th><th>What</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
   }
 
@@ -291,6 +298,8 @@ load("history").then((H) => {
     document.getElementById("wrap").scrollLeft = Math.max(0, first - 120);
   }
   themeSel.addEventListener("change", reset);
+  if (me && me.field.length) themeSel.value = String(me.field[0]);   // personal view: open on the person's main theme
+  if (me) document.getElementById("youkey").innerHTML = `<span class="you" style="margin:0">you cite</span>landmark papers that ${esc(me.n)} cites`;
   evSel.addEventListener("change", () => { draw(); });
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(draw, 150); });
   reset();

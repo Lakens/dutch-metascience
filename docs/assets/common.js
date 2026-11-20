@@ -251,3 +251,80 @@ function nameSearch(input, getItems, onPick, max = 10) {
   input.addEventListener("blur", () => setTimeout(close, 150));
   return { update, close };
 }
+
+// ---- personal view: "view the site as" one person; highlights that person, or their subfield, on every page ----
+// Kept in this browser (localStorage) and in the address (?me=<person id>), so a link shows the same view.
+// Nothing is sent anywhere: the site has no server.
+const Me = {
+  _stored() { try { return JSON.parse(localStorage.getItem("me") || "null"); } catch (e) { return null; } },
+  _save(v) { try { if (v) localStorage.setItem("me", JSON.stringify(v)); else localStorage.removeItem("me"); } catch (e) {} },
+  // the subfield: the clusters holding at least 15% of the person's papers (at least the largest, at most 3)
+  fieldOf(p) {
+    const e = Object.entries(p.cls || {}).map(([c, n]) => [+c, n]).sort((a, b) => b[1] - a[1]);
+    const tot = e.reduce((s, x) => s + x[1], 0) || 1;
+    return e.filter((x, i) => i === 0 || x[1] / tot >= 0.15).slice(0, 3).map((x) => x[0]);
+  },
+  async _make(p, mode) {
+    const clusters = await load("clusters");
+    const field = this.fieldOf(p);
+    const name = Object.fromEntries(clusters.map((c) => [c.id, c.name]));
+    return { id: p.id, n: p.n, field, fieldNames: field.map((c) => name[c]), ins: p.ins || [], kw: p.kw || [], mode: mode || "me" };
+  },
+  async set(p, mode) { const v = await this._make(p, mode || (this._stored() || {}).mode); this._save(v); return v; },
+  clear() { this._save(null); },
+  setMode(m) { const s = this._stored(); if (s) { s.mode = m; this._save(s); } },
+  // resolves to the current person ({id, n, field, fieldNames, ins, kw, mode}) or null
+  ready: null,
+  // does this paper (papers.json record) belong to the highlight?
+  isMine(paper, me) { return !!me && (paper.p || []).includes(me.id); },
+  inField(paper, me) { return !!me && me.field.includes(paper.cl); },
+  hit(paper, me) { return !!me && (me.mode === "field" ? this.inField(paper, me) : this.isMine(paper, me)); },
+};
+Me.ready = (async () => {
+  const url = new URLSearchParams(location.search).get("me");
+  if (url === "") { Me.clear(); return null; }
+  const s = Me._stored();
+  if (url && (!s || s.id !== url)) {
+    const people = await load("people");
+    const p = people.find((x) => x.id === url);
+    if (!p) return s;
+    return Me.set(p, s && s.mode);
+  }
+  return s;
+})().catch(() => null);
+
+function meLinks(me) {
+  // keep ?me= on links between the pages of this site, so the view survives without browser storage and can be shared
+  document.querySelectorAll("a[href]").forEach((a) => {
+    const h = a.getAttribute("href");
+    if (!/^[a-z]+\.html(#.*)?$/.test(h)) return;
+    const [page, hash] = h.split("#");
+    a.setAttribute("href", `${page}?me=${encodeURIComponent(me.id)}${hash ? "#" + hash : ""}`);
+  });
+}
+document.addEventListener("DOMContentLoaded", () => {
+  Me.ready.then((me) => {
+    if (!me) return;
+    const header = document.querySelector("header.site");
+    if (!header) return;
+    const bar = document.createElement("div");
+    bar.className = "me-bar";
+    const field = me.fieldNames.join("; ");
+    bar.innerHTML = `<span>Viewing as <a href="people.html#${encodeURIComponent(me.id)}"><b>${esc(me.n)}</b></a></span>
+      <span class="seg" role="group" aria-label="What to highlight">
+        <button type="button" data-v="me" aria-pressed="${me.mode !== "field"}">Highlight me</button>
+        <button type="button" data-v="field" aria-pressed="${me.mode === "field"}" title="${esc(field)}">Highlight my subfield</button></span>
+      <span class="me-field muted small">${me.mode === "field" ? "Subfield: " + esc(field) : ""}</span>
+      <span class="me-actions"><a href="index.html#find">change person</a> · <a href="#" id="me-stop">stop</a></span>`;
+    header.insertAdjacentElement("afterend", bar);
+    bar.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+      if (b.dataset.v === me.mode) return;
+      Me.setMode(b.dataset.v); location.reload();
+    }));
+    bar.querySelector("#me-stop").addEventListener("click", (e) => {
+      e.preventDefault(); Me.clear();
+      const u = new URL(location.href); u.searchParams.delete("me"); location.href = u.toString();
+    });
+    meLinks(me);
+  });
+});

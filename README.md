@@ -18,6 +18,9 @@ which themes, at which institutions, and how the literature developed over time.
 - **Places**: Dutch institutions on a map over time, collaboration between institutions, partner countries.
 - **Funding**: NWO grants of these researchers and all metascience-related NWO projects, over time and on a scrollable timeline.
 - **Inferences**: who could work together, which themes are rising, and shared questions that could become joint projects.
+- **Personal view**: choose a person on the overview page ("Find yourself"); every page then highlights that person, or
+  their subfield (the clusters with at least 15% of their papers). Kept in the browser and in the address (`?me=`);
+  nothing is sent anywhere.
 
 ## How the data were made
 

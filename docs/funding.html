@@ -105,7 +105,7 @@
 <footer>Data: <a href="https://www.nwo.nl/en/nwopen">NWOpen</a> (NWO, CC0) and OpenAlex (CC0). See <a href="about.html">About</a>.</footer>
 
 <script>
-Promise.all([load("funding"), load("people")]).then(([F, people]) => {
+Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) => {
   const byP = Object.fromEntries(people.map((p) => [p.id, p]));
   const fams = F.summary.families;
   const famColor = (f) => (f === "Other" ? cssVar("--other") : seriesColor(fams.indexOf(f)));
@@ -156,7 +156,7 @@ Promise.all([load("funding"), load("people")]).then(([F, people]) => {
 
   // ---- timeline ----
   const wrap = document.getElementById("tlwrap"), axisSvg = d3.select("#tlaxis"), chart = d3.select("#tlchart");
-  let tlPerson = null;
+  let tlPerson = me && me.mode !== "field" && F.people[me.id] ? me.id : null;   // personal view: start on the person's projects
   const parse = d3.timeParse("%Y-%m-%d");
   function drawTimeline(keepScroll) {
     const q = document.getElementById("tlq").value.trim().toLowerCase();
@@ -225,10 +225,12 @@ Promise.all([load("funding"), load("people")]).then(([F, people]) => {
   function drawTable() {
     const q = document.getElementById("pq").value.trim().toLowerCase(), only = document.getElementById("ponly").checked;
     const rs = rows.filter((r) => textMatches(q, r.n) && (!only || byP[r.id].k >= 2))
-      .sort((a, b) => (typeof a[sortKey] === "string" ? a[sortKey].localeCompare(b[sortKey]) : a[sortKey] - b[sortKey]) * sortDir || b.led - a.led);
-    document.getElementById("pcount").textContent = `${fmt(rs.length)} researchers`;
+      .sort((a, b) => (me ? (b.id === me.id) - (a.id === me.id) : 0) ||
+        (typeof a[sortKey] === "string" ? a[sortKey].localeCompare(b[sortKey]) : a[sortKey] - b[sortKey]) * sortDir || b.led - a.led);
+    document.getElementById("pcount").textContent = `${fmt(rs.length)} researchers` +
+      (me && !F.people[me.id] ? ` · no NWO projects were linked to ${me.n}` : "");
     document.getElementById("ptable").innerHTML = `<thead><tr>${cols.map(([k, l]) => `<th class="sortable${k === "n" ? "" : " num"}" data-k="${k}">${l}${k === sortKey ? (sortDir < 0 ? " ▼" : " ▲") : ""}</th>`).join("")}<th></th></tr></thead><tbody>` +
-      rs.map((r) => `<tr><td>${personLink(r.id)} ${r.tal.map(([f, n]) => `<span class="badge fam" style="background:${famColor(f)}">${f}${n > 1 ? " ×" + n : ""}</span>`).join(" ")}</td>
+      rs.map((r) => `<tr${me && r.id === me.id ? ' class="me-row"' : ""}><td>${personLink(r.id)}${me && r.id === me.id ? '<span class="you">you</span>' : ""} ${r.tal.map(([f, n]) => `<span class="badge fam" style="background:${famColor(f)}">${f}${n > 1 ? " ×" + n : ""}</span>`).join(" ")}</td>
         <td class="num">${r.led}</td><td class="num">${r.co}</td><td class="num">${r.res}</td><td class="num">${r.meta}</td>
         <td class="num">${r.amt ? money(r.amt) : ""}</td><td class="num">${r.first || ""}</td>
         <td><button type="button" class="overlay-btn tiny" style="position:static" data-id="${r.id}">timeline</button></td></tr>`).join("") + "</tbody>";

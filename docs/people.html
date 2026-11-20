@@ -73,7 +73,7 @@
 <footer>Data: OpenAlex (CC0). Corrections are welcome; see <a href="about.html">About</a>.</footer>
 
 <script>
-Promise.all([load("people"), load("papers"), load("edges"), load("institutions")]).then(([people, papers, edges, insts]) => {
+Promise.all([load("people"), load("papers"), load("edges"), load("institutions"), Me.ready]).then(([people, papers, edges, insts, me]) => {
   const byId = Object.fromEntries(people.map((p) => [p.id, p]));
   const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
   const papersOf = {}; papers.forEach((p) => p.p.forEach((id) => (papersOf[id] = papersOf[id] || []).push(p)));
@@ -88,7 +88,7 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
 
   function fromHash() {
     const id = decodeURIComponent(location.hash.slice(1));
-    show(byId[id] || people.find((p) => p.l) || people[0]);
+    show(byId[id] || (me && byId[me.id]) || people.find((p) => p.l) || people[0]);
   }
 
   function show(p) {

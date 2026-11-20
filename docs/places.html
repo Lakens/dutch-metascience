@@ -67,22 +67,24 @@
 <footer>Data: OpenAlex (CC0); institution locations from OpenAlex/ROR.</footer>
 
 <script>
-Promise.all([load("institutions"), load("countries"), load("meta")]).then(([insts, countries, meta]) => {
+Promise.all([load("institutions"), load("countries"), load("meta"), Me.ready]).then(([insts, countries, meta, me]) => {
   const geo = insts.list.filter((i) => i.lat != null && i.lon != null);
   const years = []; for (let y = 2005; y <= meta.years[1]; y++) years.push(y);
   const slider = document.getElementById("yr");
   slider.min = years[0]; slider.max = years[years.length - 1]; slider.value = slider.max;
   const maxK = d3.max(geo, (i) => i.k) || 1;
+  const myIns = new Set(me ? me.ins : []);   // personal view: the person's institutions get a dark ring
 
   function drawMap() {
     const Y = +slider.value; document.getElementById("yrlab").textContent = `up to ${Y}`;
     const k = geo.map((i) => Object.entries(i.years).reduce((s, [y, n]) => s + (+y <= Y ? n : 0), 0));
     const show = geo.map((i, j) => [i, k[j]]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
     Plotly.react("nlmap", [{ type: "scattergeo", lon: show.map(([i]) => i.lon), lat: show.map(([i]) => i.lat),
-      text: show.map(([i, n]) => `<b>${esc(i.n)}</b><br>${esc(i.city || "")}<br>${n} papers up to ${Y}`),
+      text: show.map(([i, n]) => `<b>${esc(i.n)}</b>${myIns.has(i.id) ? " (yours)" : ""}<br>${esc(i.city || "")}<br>${n} papers up to ${Y}`),
       hovertemplate: "%{text}<extra></extra>",
       marker: { size: show.map(([, n]) => 4 + 40 * Math.sqrt(n / maxK)), color: cssVar("--series-1"), opacity: 0.7,
-        line: { width: 1, color: cssVar("--surface-1") } } }],
+        line: { width: show.map(([i]) => (myIns.has(i.id) ? 3 : 1)),
+          color: show.map(([i]) => cssVar(myIns.has(i.id) ? "--text-primary" : "--surface-1")) } } }],
       baseLayout({ margin: { l: 0, r: 0, t: 0, b: 0 }, geo: {
         projection: { type: "mercator" }, lonaxis: { range: [3.2, 7.4] }, lataxis: { range: [50.7, 53.65] },
         showland: true, landcolor: cssVar("--surface-2"), showocean: true, oceancolor: cssVar("--surface-1"),
@@ -121,11 +123,15 @@ Promise.all([load("institutions"), load("countries"), load("meta")]).then(([inst
       .on("mousemove", (e, d) => Tip.show(`<b>${esc(names[d.source.index])}</b> & <b>${esc(names[d.target.index])}</b><br>${d.source.value} shared papers`, e))
       .on("mouseleave", () => Tip.hide());
     const grp = g.append("g").selectAll("g").data(chord.groups).join("g");
-    grp.append("path").attr("d", arc).attr("fill", cssVar("--series-1")).attr("stroke", cssVar("--surface-1"))
+    const mineIdx = new Set(insts.chord_ids.map((id, i) => (myIns.has(id) ? i : -1)).filter((i) => i >= 0));
+    if (mineIdx.size) rib.attr("fill-opacity", (r) => (mineIdx.has(r.source.index) || mineIdx.has(r.target.index) ? 0.55 : 0.08));
+    const restOpacity = (r) => (!mineIdx.size ? 0.22 : mineIdx.has(r.source.index) || mineIdx.has(r.target.index) ? 0.55 : 0.08);
+    grp.append("path").attr("d", arc).attr("fill", (d) => cssVar(mineIdx.has(d.index) ? "--text-primary" : "--series-1")).attr("stroke", cssVar("--surface-1"))
       .on("mouseenter", (e, d) => rib.attr("fill-opacity", (r) => (r.source.index === d.index || r.target.index === d.index ? 0.7 : 0.04)))
-      .on("mouseleave", () => rib.attr("fill-opacity", 0.22));
+      .on("mouseleave", () => rib.attr("fill-opacity", restOpacity));
     grp.append("text").each((d) => (d.angle = (d.startAngle + d.endAngle) / 2))
       .attr("dy", "0.35em").attr("font-size", small ? 9 : 11).attr("fill", cssVar("--text-secondary"))
+      .attr("font-weight", (d) => (mineIdx.has(d.index) ? 700 : null))
       .attr("transform", (d) => `rotate(${(d.angle * 180) / Math.PI - 90}) translate(${R + 18})${d.angle > Math.PI ? " rotate(180)" : ""}`)
       .attr("text-anchor", (d) => (d.angle > Math.PI ? "end" : null))
       .text((d) => { const n = shortName(names[d.index]); const m = small ? 15 : 24; return n.length > m ? n.slice(0, m - 2) + "…" : n; })
@@ -145,8 +151,8 @@ Promise.all([load("institutions"), load("countries"), load("meta")]).then(([inst
   }
 
   document.getElementById("itable").innerHTML = "<thead><tr><th>Institution</th><th>City</th><th>Type</th><th class='num'>Papers</th><th>Main theme</th></tr></thead><tbody>" +
-    insts.list.map((i) => { const top = Object.entries(i.cats).sort((a, b) => b[1] - a[1])[0];
-      return `<tr><td>${esc(i.n)}</td><td>${esc(i.city || "")}</td><td>${esc(i.ty || "")}</td><td class="num">${i.k}</td><td>${top ? esc(CAT_LABEL[top[0]] || top[0]) : ""}</td></tr>`; }).join("") + "</tbody>";
+    insts.list.slice().sort((a, b) => myIns.has(b.id) - myIns.has(a.id)).map((i) => { const top = Object.entries(i.cats).sort((a, b) => b[1] - a[1])[0];
+      return `<tr><td>${esc(i.n)}${myIns.has(i.id) ? '<span class="you">yours</span>' : ""}</td><td>${esc(i.city || "")}</td><td>${esc(i.ty || "")}</td><td class="num">${i.k}</td><td>${top ? esc(CAT_LABEL[top[0]] || top[0]) : ""}</td></tr>`; }).join("") + "</tbody>";
 
   const all = () => { drawMap(); drawChord(); drawWorld(); };
   all(); onThemeChange(all);

@@ -171,3 +171,14 @@ label { max-width: 100%; }
 .ns-list .ns-s { display: block; color: var(--text-muted); font-size: 0.8rem; }
 .ns-list .ns-n { color: var(--text-primary); }
 .ns-list li.ns-none { color: var(--text-muted); cursor: default; }
+
+/* ---- personal view bar ---- */
+.me-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 24px; font-size: 0.9rem;
+  background: var(--surface-2); border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+.me-bar .seg button { padding: 4px 10px; font-size: 0.84rem; }
+.me-bar .me-actions { margin-left: auto; }
+@media (max-width: 760px) { .me-bar { padding: 8px 16px; } .me-bar .me-actions { margin-left: 0; } }
+.me-mark { outline: 2px solid var(--series-2); outline-offset: 1px; }
+.you { display: inline-block; font-size: 0.66rem; font-weight: 700; padding: 0 5px; border-radius: 4px; margin-left: 4px;
+  background: var(--text-primary); color: var(--page); vertical-align: 1px; }
+table.data tr.me-row td { background: var(--surface-2); font-weight: 600; }

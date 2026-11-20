@@ -77,7 +77,7 @@
 
 <script>
 const active = new Set(CATEGORIES);
-Promise.all([load("papers"), load("clusters"), load("keywords"), load("institutions"), load("people")]).then(([papers, clusters, kw, insts, people]) => {
+Promise.all([load("papers"), load("clusters"), load("keywords"), load("institutions"), load("people"), Me.ready]).then(([papers, clusters, kw, insts, people, me]) => {
   const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
   const mapped = papers.filter((p) => p.x != null);
   const yrs = [...new Set(papers.map((p) => p.y).filter(Boolean))].sort((a, b) => a - b);
@@ -94,6 +94,7 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
   const X0 = d3.min(mapped, (p) => p.x), X1 = d3.max(mapped, (p) => p.x);
   const Y0 = d3.min(mapped, (p) => p.yy), Y1 = d3.max(mapped, (p) => p.yy);
   const clusterCenter = {};
+  const mine = me ? mapped.filter((p) => p.p.includes(me.id)) : [];
   function size() {
     dpr = window.devicePixelRatio || 1; W = canvas.clientWidth; H = canvas.clientHeight;
     canvas.width = W * dpr; canvas.height = H * dpr;
@@ -114,11 +115,14 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     const cl = document.getElementById("cl").value;
     const a = +y0s.value, b = +y1s.value;
     const inRange = (p) => !p.y || (p.y >= a && p.y <= b);
-    focus = (p) => active.has(p.cat) && inRange(p) && (!cl || String(p.cl) === cl) && (!q || (p.t || "").toLowerCase().includes(q));
-    filtering = !!(q || cl);
+    const meField = !!me && me.mode === "field";
+    focus = (p) => active.has(p.cat) && inRange(p) && (!cl || String(p.cl) === cl) && (!q || textMatches(q, p.t || "")) &&
+      (!meField || me.field.includes(p.cl));
+    filtering = !!(q || cl || meField);
     shownPts = mapped.filter(focus);
     qt = d3.quadtree(shownPts, (p) => p.px, (p) => p.py);
-    document.getElementById("mapcount").textContent = `${fmt(shownPts.length)} of ${fmt(mapped.length)} papers highlighted`;
+    document.getElementById("mapcount").textContent = `${fmt(shownPts.length)} of ${fmt(mapped.length)} papers highlighted` +
+      (!me ? "" : me.mode === "field" ? " · papers outside your subfield are grey" : ` · your ${fmt(mine.length)} papers have a black ring`);
     draw();
   }
   function draw() {
@@ -142,6 +146,15 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
       if (x < -8 || x > W + 8 || y < -8 || y > H + 8) continue;
       ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = colors[p.cat]; ctx.fill();
       if (k > 2.5) { ctx.lineWidth = 0.8; ctx.strokeStyle = ring; ctx.stroke(); }
+    }
+    if (me && me.mode !== "field") {
+      ctx.globalAlpha = 1;
+      for (const p of mine) {
+        const x = transform.applyX(p.px), y = transform.applyY(p.py);
+        if (x < -10 || x > W + 10 || y < -10 || y > H + 10) continue;
+        ctx.beginPath(); ctx.arc(x, y, r + 1.5, 0, 2 * Math.PI); ctx.fillStyle = colors[p.cat]; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = cssVar("--text-primary"); ctx.stroke();
+      }
     }
     if (hovered) {
       const x = transform.applyX(hovered.px), y = transform.applyY(hovered.py);
@@ -226,7 +239,10 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
       const cnt = {}; ps.forEach((p) => p.p.forEach((id) => { if (byPerson[id] && byPerson[id].l) cnt[id] = (cnt[id] || 0) + 1; }));
       const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([id]) => byPerson[id].n);
       const ys = ps.map((p) => p.y).filter(Boolean).sort((a, b) => a - b);
-      return `<div class="c${String(c.id) === cl ? " on" : ""}" data-id="${c.id}"><h3>${esc(c.name)}</h3><p>${esc(c.desc)}</p>
+      const nMine = me ? ps.filter((p) => p.p.includes(me.id)).length : 0;
+      const youTag = me && me.field.includes(c.id) ? '<span class="you">your subfield</span>' : "";
+      return `<div class="c${String(c.id) === cl ? " on" : ""}" data-id="${c.id}"><h3>${esc(c.name)}${youTag}</h3><p>${esc(c.desc)}</p>
+        ${nMine ? `<p class="small" style="margin-top:6px"><b>${nMine} of your papers</b></p>` : ""}
         <p class="muted" style="margin-top:6px">${c.k} papers${ys.length ? `, median year ${ys[Math.floor(ys.length / 2)]}` : ""}</p>
         <p style="margin-top:4px">${top.length ? "e.g. " + esc(top.join(", ")) : ""}</p></div>`;
     }).join("");
@@ -257,7 +273,9 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     const node = box.append("g").selectAll("g").data(nodes).join("g").style("cursor", "grab")
       .call(d3.drag().on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
         .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; }).on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
-    node.append("circle").attr("r", (d) => r(d.n)).attr("fill", (d) => catColor(d.cat)).attr("stroke", cssVar("--surface-1")).attr("stroke-width", 2);
+    const myKw = new Set(me && me.mode !== "field" ? me.kw : []);
+    node.append("circle").attr("r", (d) => r(d.n)).attr("fill", (d) => catColor(d.cat))
+      .attr("stroke", (d) => cssVar(myKw.has(d.id) ? "--text-primary" : "--surface-1")).attr("stroke-width", (d) => (myKw.has(d.id) ? 3 : 2));
     // names in their own layer above all dots, with an outline in the background colour
     const kwText = box.append("g").style("pointer-events", "none").selectAll("text").data(nodes).join("text")
       .text((d) => d.id).attr("font-size", (d) => (d.n > big ? 12 : 10)).attr("text-anchor", "middle")
@@ -271,8 +289,8 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     const minN = () => sorted[Math.min(sorted.length - 1, kz < 1.5 ? 40 : kz < 2.5 ? 80 : sorted.length - 1)];
     const tidy = () => {
       const s = focus ? nb[focus.id] || new Set() : null, m = minN();
-      declutter(kwText, (d) => (focus && d.id === focus.id ? 1e9 : d.n),
-        (d) => (focus ? d.id === focus.id || s.has(d.id) : d.n >= m));
+      declutter(kwText, (d) => (focus && d.id === focus.id ? 1e9 : myKw.has(d.id) ? 1e8 : d.n),
+        (d) => (focus ? d.id === focus.id || s.has(d.id) : d.n >= m || myKw.has(d.id)));
     };
     const rz = (d) => r(d.n) / Math.sqrt(kz);   // circles grow only slowly when zooming in
     const placeText = () => kwText.attr("x", (d) => d.x).attr("y", (d) => d.y - rz(d) - 3 / kz)
@@ -280,7 +298,7 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     let tidyTimer = null;
     svg.call(d3.zoom().scaleExtent([0.5, 6]).on("zoom", (e) => {
       kz = e.transform.k; box.attr("transform", e.transform); placeText();
-      node.select("circle").attr("r", rz).attr("stroke-width", 2 / kz);
+      node.select("circle").attr("r", rz).attr("stroke-width", (d) => (myKw.has(d.id) ? 3 : 2) / kz);
       line.attr("stroke-width", (l) => (0.5 + 3 * l.n / maxL) / kz);
       clearTimeout(tidyTimer); tidyTimer = setTimeout(tidy, 60);
     })).on("dblclick.zoom", null);
@@ -307,7 +325,7 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
   function drawSankey() {
     const byInst = Object.fromEntries(insts.list.map((i) => [i.id, i]));
     const top = (insts.universities || []).map((id) => byInst[id]).filter(Boolean);
-    const labels = top.map((i) => i.n).concat(CATEGORIES.map((c) => CAT_LABEL[c]));
+    const labels = top.map((i) => (me && me.ins.includes(i.id) ? "▶ " : "") + i.n).concat(CATEGORIES.map((c) => CAT_LABEL[c]));
     const src = [], tgt = [], val = [], col = [];
     top.forEach((i, a) => CATEGORIES.forEach((c, b) => {
       const v = i.cats[c] || 0; if (!v) return;

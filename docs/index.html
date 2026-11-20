@@ -35,6 +35,15 @@
 
   <div class="grid tiles" id="tiles"><div class="tile"><div class="v">…</div><div class="l">loading</div></div></div>
 
+  <section class="card" id="find">
+    <h2>Find yourself</h2>
+    <p class="sub">Work on metascience in the Netherlands? Choose your name to see the whole site from your position: your
+    papers, co-authors, subfield, institutions and grants are highlighted on every page. The choice is kept only in this
+    browser; nothing is sent anywhere. All data on this site are public, so you can also choose anyone else.</p>
+    <div class="controls"><input type="search" id="findme" placeholder="Type part of your name…" aria-label="Find yourself"></div>
+    <div id="mecard"></div>
+  </section>
+
   <section class="card">
     <h2>How the field grew</h2>
     <p class="sub">Metascience papers with a Dutch author per year, by theme. Switch to "share" to see how the mix of
@@ -50,7 +59,8 @@
     <section class="card">
       <h2>Twenty themes, year by year</h2>
       <p class="sub">The papers fall into 20 clusters of similar content (from their abstracts); the colour shows how
-      many papers each cluster had per year. See <a href="themes.html">Themes</a> for the map behind it.</p>
+      many papers each cluster had per year. See <a href="themes.html">Themes</a> for the map behind it.
+      <span id="cl-me"></span></p>
       <div id="clusterheat" class="chart tall"></div>
     </section>
     <section class="card">
@@ -77,7 +87,43 @@ Theme labels are AI judgements and can be wrong; see <a href="about.html">About<
 <script>
 let mode = "count";
 const active = new Set(CATEGORIES);
-Promise.all([load("meta"), load("papers"), load("people"), load("clusters")]).then(([meta, papers, people, clusters]) => {
+Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), load("institutions"), Me.ready]).then(([meta, papers, people, clusters, insts, me]) => {
+  // ---- find yourself ----
+  const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
+  const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
+  function meCard(me) {
+    const el = document.getElementById("mecard");
+    if (!me || !byPerson[me.id]) { el.innerHTML = ""; return; }
+    const p = byPerson[me.id], q = `?me=${encodeURIComponent(me.id)}`;
+    const mine = papers.filter((x) => x.p.includes(me.id));
+    const cites = mine.reduce((s, x) => s + (x.c || 0), 0);
+    const ins = (p.ins || []).map((i) => instName[i]).filter(Boolean);
+    el.innerHTML = `<div class="grid tiles" style="margin-top:10px">
+        <div class="tile"><div class="v">${fmt(p.k)}</div><div class="l">metascience papers</div></div>
+        <div class="tile"><div class="v">${p.y0}–${p.y1}</div><div class="l">years</div></div>
+        <div class="tile"><div class="v">${fmt(p.deg || 0)}</div><div class="l">co-authors on this site</div></div>
+        <div class="tile"><div class="v">${fmt(cites)}</div><div class="l">citations of these papers</div></div></div>
+      <p><b>Your subfield</b> (the clusters with most of your papers): ${me.fieldNames.map(esc).join("; ")}.
+      ${ins.length ? `<br><b>Institutions:</b> ${ins.map(esc).join(" · ")}.` : ""}</p>
+      <p><b>Your view of the site:</b></p>
+      <ul class="small">
+        <li><a href="people.html${q}#${encodeURIComponent(me.id)}">Your profile</a>: themes, timeline, co-authors and papers.</li>
+        <li><a href="network.html${q}">Who works with whom</a>: the network opens on you and your co-authors.</li>
+        <li><a href="themes.html${q}">Themes</a>: your papers (or your subfield) on the map of all papers.</li>
+        <li><a href="time.html${q}">Over time</a>: your papers among all citations.</li>
+        <li><a href="history.html${q}">History</a>: the timeline of your subfield, with the landmark papers you cite.</li>
+        <li><a href="places.html${q}">Places</a>: your institutions.</li>
+        <li><a href="funding.html${q}">Funding</a>: your NWO grants.</li>
+        <li><a href="inferences.html${q}">Inferences</a>: who you could work with.</li>
+      </ul>
+      <p class="small muted">Use the bar at the top of each page to switch between highlighting you and your subfield, or to stop.</p>`;
+  }
+  meCard(me);
+  if (me) document.getElementById("cl-me").textContent = "▶ marks your subfield.";
+  nameSearch(document.getElementById("findme"), () => people, (p) => {
+    Me.set(p).then(() => { location.href = `index.html?me=${encodeURIComponent(p.id)}#find`; });
+  });
+
   const tiles = [
     [fmt(meta.n_papers), "metascience papers"],
     [fmt(meta.n_people), "Dutch authors"],
@@ -115,7 +161,7 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters")]).th
     const order = clusters.slice().sort((a, b) => b.k - a.k);
     const z = order.map((c) => yrs.map((y) => papers.filter((p) => p.cl === c.id && p.y === y).length));
     Plotly.react("clusterheat", [{
-      type: "heatmap", x: yrs, y: order.map((c) => c.name), z, colorscale: seqScale(), xgap: 2, ygap: 2,
+      type: "heatmap", x: yrs, y: order.map((c) => (me && me.field.includes(c.id) ? "▶ " : "") + c.name), z, colorscale: seqScale(), xgap: 2, ygap: 2,
       colorbar: { title: { text: "papers", side: "right" }, thickness: 10, outlinewidth: 0, tickfont: { color: cssVar("--text-muted") } },
       hovertemplate: "%{y}<br>%{x}: %{z} papers<extra></extra>",
     }], baseLayout({ margin: { l: 10, r: 10, t: 10, b: 40 }, yaxis: Object.assign(baseLayout().yaxis, { autorange: "reversed" }) }), PLOT_CONFIG);

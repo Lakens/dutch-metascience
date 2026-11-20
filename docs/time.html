@@ -74,7 +74,7 @@
 
 <script>
 let tmode = "count";
-Promise.all([load("terms"), load("keywords"), load("papers"), load("people"), load("clusters")]).then(([terms, kw, papers, people, clusters]) => {
+Promise.all([load("terms"), load("keywords"), load("papers"), load("people"), load("clusters"), Me.ready]).then(([terms, kw, papers, people, clusters, me]) => {
   const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
   function drawTerms() {
     const from = +document.getElementById("from").value;
@@ -132,8 +132,19 @@ Promise.all([load("terms"), load("keywords"), load("papers"), load("people"), lo
       text: arr.map((p) => `<b>${wrap(p.t)}</b><br>${p.y} · ${fmt(p.c)} citations<br>${esc(CAT_LABEL[p.cat] || "")}<br>` +
         esc(p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean).slice(0, 5).join(", "))),
       customdata: arr.map(doiLink), hovertemplate: "%{text}<extra></extra>", marker: { size, color, opacity: op } });
-    Plotly.react("cites", [mk(bg, cssVar("--other"), 4, 0.4), mk(hl, c ? catColor(c) : cssVar("--series-1"), 6, 0.75)],
-      baseLayout({ showlegend: false, hovermode: "closest",
+    const traces = [mk(bg, cssVar("--other"), 4, 0.4), mk(hl, c ? catColor(c) : cssVar("--series-1"), 6, 0.75)];
+    traces.forEach((t) => (t.showlegend = false));
+    if (me) {
+      // the person's papers (or the subfield's) on top: dark dots with a light ring, named in the legend
+      const mineP = ps.filter((p) => Me.hit(p, me));
+      const t = mk(mineP, cssVar("--text-primary"), me.mode === "field" ? 6 : 10, 0.9);
+      t.marker.line = { color: cssVar("--surface-1"), width: 1.5 };
+      t.name = me.mode === "field" ? `Your subfield (${fmt(mineP.length)} papers)` : `Your papers (${fmt(mineP.length)})`;
+      t.showlegend = true;
+      traces.push(t);
+    }
+    Plotly.react("cites", traces,
+      baseLayout({ showlegend: !!me, legend: { orientation: "h", y: 1.08, x: 0 }, hovermode: "closest",
         yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "citations + 1", dtick: 1 }) }), PLOT_CONFIG);
   }
 
@@ -143,9 +154,11 @@ Promise.all([load("terms"), load("keywords"), load("papers"), load("people"), lo
   const perYear = (p) => (p.c || 0) / Math.max(1, lastYear - p.y + 1);
   function drawLandmarks() {
     const score = lmode === "peryear" ? perYear : (p) => p.c || 0;
-    document.getElementById("landmarks").innerHTML = clusters.slice().sort((a, b) => b.k - a.k).map((cl) => {
+    const mineFirst = (a, b) => (me ? me.field.includes(b.id) - me.field.includes(a.id) : 0) || b.k - a.k;
+    document.getElementById("landmarks").innerHTML = clusters.slice().sort(mineFirst).map((cl) => {
       const top = papers.filter((p) => p.cl === cl.id && p.y).sort((a, b) => score(b) - score(a)).slice(0, 3);
-      return `<div class="c"><h3>${esc(cl.name)}</h3><ol>` + top.map((p) => {
+      const youTag = me && me.field.includes(cl.id) ? '<span class="you">your subfield</span>' : "";
+      return `<div class="c"><h3>${esc(cl.name)}${youTag}</h3><ol>` + top.map((p) => {
         const names = p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean);
         return `<li><a href="${doiLink(p)}" target="_blank" rel="noopener">${esc(p.t)}</a>
           <span class="muted small">${p.y} · ${fmt(p.c || 0)} citations (${fmt(Math.round(perYear(p)))} per year)` +

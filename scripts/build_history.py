@@ -192,6 +192,19 @@ json.dump(dict(themes=themes, combined=[dict(id=k, th=v) for k, v in chosen_all.
                              w_in=W_IN, w_out=W_OUT, min_score=MIN_SCORE,
                              companion_overlap=COMPANION_OVERLAP)),
           open(os.path.join(data_dir, "history.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+# for the personal view: which landmark papers each person on the site cites (in any of their papers on the site);
+# a separate file, loaded only when someone views the site as a person. Works are numbered in sorted order.
+order = sorted(used)
+pos = {k: i for i, k in enumerate(order)}
+cites_of = collections.defaultdict(set)
+for p in papers:
+    hits = {pos[canon[r]] for r in refs.get(p["id"], []) if r in canon and canon[r] in pos}
+    for pid in p["p"]:
+        cites_of[pid] |= hits
+json.dump(dict(works=order, people={pid: sorted(v) for pid, v in cites_of.items() if v}),
+          open(os.path.join(data_dir, "history_people.json"), "w", encoding="utf-8"), separators=(",", ":"))
+print(f"history_people.json: {sum(1 for v in cites_of.values() if v)} people cite at least one landmark paper, "
+      f"{os.path.getsize(os.path.join(data_dir, 'history_people.json')) / 1e6:.2f} MB")
 print("left out as tools:", len(tools), "|", "; ".join(sorted(works[k]["t"][:40] for k in tools)[:40]))
 print(f"history.json: {len(themes)} themes, {len(used)} papers, {len(chosen_all)} on the combined timeline, "
       f"{len(events)} events")

@@ -113,7 +113,7 @@
 <footer>Data: OpenAlex (CC0). Suggestions and trends are computed from titles and abstracts; texts on shared goals were written by an AI. See <a href="about.html">About</a>.</footer>
 
 <script>
-Promise.all([load("inferences"), load("people"), load("papers"), load("clusters")]).then(([inf, people, papers, clusters]) => {
+Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"), Me.ready]).then(([inf, people, papers, clusters, me]) => {
   const byP = Object.fromEntries(people.map((p) => [p.id, p]));
   const byPaper = Object.fromEntries(papers.map((p) => [p.id, p]));
   const cname = Object.fromEntries(clusters.map((c) => [c.id, c.name]));
@@ -145,6 +145,10 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
   }
   const activePeople = active.map((id) => byP[id]);
   nameSearch(document.getElementById("who"), () => activePeople, (p) => showPerson(p.id));
+  if (me) {   // personal view: start with the person's own suggestions
+    if (inf.suggest[me.id]) { document.getElementById("who").value = me.n; showPerson(me.id); }
+    else document.getElementById("whohint").textContent = `No suggestions for ${me.n}: suggestions are made only for people with ${inf.active_rule}.`;
+  }
   document.getElementById("toppairs").innerHTML = inf.top_pairs.map((t) => {
     const [pa, pb] = t.pp;
     return `<div class="c"><h3>${personLink(t.a)} &amp; ${personLink(t.b)}</h3>
@@ -178,7 +182,7 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
   function drawGrowth() {
     const t = inf.trend.slice().sort((a, b) => (a.recent - a.early) - (b.recent - b.early));
     const up = cssVar("--series-1"), down = cssVar("--other");
-    Plotly.react("growth", [{ type: "bar", orientation: "h", y: t.map((d) => d.name), x: t.map((d) => +(d.recent - d.early).toFixed(2)),
+    Plotly.react("growth", [{ type: "bar", orientation: "h", y: t.map((d) => (me && me.field.includes(d.id) ? "▶ " : "") + d.name), x: t.map((d) => +(d.recent - d.early).toFixed(2)),
       marker: { color: t.map((d) => (d.recent >= d.early ? up : down)) },
       text: t.map((d) => `${d.early.toFixed(1)}% → ${d.recent.toFixed(1)}%`), textposition: "outside", cliponaxis: false,
       hovertemplate: "<b>%{y}</b><br>%{text} of all papers<extra></extra>" }],
@@ -187,7 +191,7 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
   }
   const tsel = document.getElementById("tcl");
   const byGrowth = inf.trend.slice().sort((a, b) => (b.recent - b.early) - (a.recent - a.early));
-  tsel.innerHTML = byGrowth.map((d) => `<option value="${d.id}">${esc(d.name)} (${d.recent >= d.early ? "+" : ""}${(d.recent - d.early).toFixed(1)} points)</option>`).join("");
+  tsel.innerHTML = byGrowth.map((d) => `<option value="${d.id}"${me && me.field[0] === d.id ? " selected" : ""}>${esc(d.name)} (${d.recent >= d.early ? "+" : ""}${(d.recent - d.early).toFixed(1)} points)</option>`).join("");
   function drawTrend() {
     const d = inf.trend.find((x) => String(x.id) === tsel.value);
     const yrs = Object.keys(d.share).map(Number).filter((y) => y >= 2010);
@@ -222,13 +226,17 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
     const g = inf.goals;
     if (!g) return;
     const refs = (ids) => `<p class="refs">Based on: ${ids.map(paperLink).join(" · ")}</p>`;
-    document.getElementById("goals").innerHTML = (g.goals || []).map((x) => `<div class="goal"><h3>${esc(x.goal)}</h3>
+    const minePaper = new Set(me ? papers.filter((p) => p.p.includes(me.id)).map((p) => p.id) : []);
+    const involves = (x) => !!me && ((x.papers || []).some((id) => minePaper.has(id)) || (x.people || []).includes(me.n));
+    const youTag = (x) => (involves(x) ? '<span class="you">your papers are part of this</span>' : "");
+    document.getElementById("goals").innerHTML = (g.goals || []).map((x) => `<div class="goal"><h3>${esc(x.goal)}${youTag(x)}</h3>
       <p>${esc(x.explanation)}</p>${x.questions && x.questions.length ? `<p><b>Questions:</b> ${x.questions.map(esc).join(" · ")}</p>` : ""}
       ${x.project ? `<p class="proj"><b>A possible joint project:</b> ${esc(x.project)}</p>` : ""}
       ${x.people && x.people.length ? `<p class="small"><b>People working on this:</b> ${x.people.map(esc).join(", ")}</p>` : ""}
       ${refs(x.papers || [])}</div>`).join("");
-    document.getElementById("perclus").innerHTML = (g.clusters || []).map((c) => `<details class="cl"><summary>${esc(cname[c.cluster_id] || "")}</summary>
-      <p>${esc(c.summary)}</p>${(c.questions || []).map((q) => `<div class="goal"><h3>${esc(q.question)}</h3><p>${esc(q.explanation)}</p>
+    const inF = (c) => !!me && me.field.includes(c.cluster_id);
+    document.getElementById("perclus").innerHTML = (g.clusters || []).slice().sort((a, b) => inF(b) - inF(a)).map((c) => `<details class="cl"${inF(c) ? " open" : ""}><summary>${esc(cname[c.cluster_id] || "")}${inF(c) ? '<span class="you">your subfield</span>' : ""}</summary>
+      <p>${esc(c.summary)}</p>${(c.questions || []).map((q) => `<div class="goal"><h3>${esc(q.question)}${youTag(q)}</h3><p>${esc(q.explanation)}</p>
       <p class="proj"><b>A possible joint project:</b> ${esc(q.project)}</p>
       ${q.people && q.people.length ? `<p class="small"><b>People:</b> ${q.people.map(esc).join(", ")}</p>` : ""}${refs(q.papers || [])}</div>`).join("")}</details>`).join("");
   }
