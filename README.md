@@ -14,6 +14,7 @@ which themes, at which institutions, and how the literature developed over time.
   institutions × themes.
 - **Over time**: the rise of terms such as preregistration and registered reports, rising keywords, citations.
 - **Places**: Dutch institutions on a map over time, collaboration between institutions, partner countries.
+- **Inferences**: who could work together, which themes are rising, and shared questions that could become joint projects.
 
 ## How the data were made
 
@@ -32,6 +33,9 @@ which themes, at which institutions, and how the literature developed over time.
    `excluded_by_hand.csv` (571 papers).
 6. Embeddings (`bge-m3`), a UMAP map and 20 k-means clusters named by the model (`embed_and_map.py`).
 7. The JSON files for the website (`build_site_data.py`, output in `docs/data/`).
+8. The Inferences page (`build_inferences.py`): collaboration suggestions from the paper embeddings, rising themes
+   from each cluster's share per year, and shared questions and goals (`goals.json`, written by Claude after reading
+   all 2025-2026 titles and abstracts; every statement cites the papers it rests on).
 
 The scripts read API keys from environment variables (`OPENALEX_API_KEY`, `SRC_API_KEY`, and `SURF_GPU_*` for the
 GPU workspace). The script that built the initial people list is not included, because its input contains

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metascience Inferences</title>
+<meta name="description" content="Inferences from the Dutch metascience data: who could work together, which themes are rising, and which shared questions could become joint projects.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
+<script src="assets/common.js"></script>
+<style>
+  .sugg { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .sugg .c { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--surface-1); }
+  .sugg .c h3 { font-size: 1rem; margin: 0 0 4px; }
+  .sugg .c p { margin: 4px 0 0; font-size: 0.86rem; color: var(--text-secondary); }
+  .bar { height: 6px; border-radius: 3px; background: var(--series-1); margin: 6px 0 2px; }
+  .pairs { width: 100%; }
+  .goal { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; background: var(--surface-1); margin-bottom: 12px; }
+  .goal h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .goal p { margin: 6px 0; font-size: 0.92rem; }
+  .goal .refs { font-size: 0.82rem; color: var(--text-muted); }
+  .goal .proj { border-left: 3px solid var(--series-1); padding-left: 10px; }
+  details.cl { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; background: var(--surface-1); }
+  details.cl summary { cursor: pointer; font-weight: 600; }
+  .note { border-left: 3px solid var(--axis); padding: 6px 12px; color: var(--text-secondary); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html">Who works with whom</a>
+    <a href="people.html">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="places.html">Places</a>
+    <a href="inferences.html" aria-current="page">Inferences</a>
+    <a href="about.html">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>Inferences</h1>
+  <p class="lede">What the data suggest, beyond describing them: who could work together, which themes are rising,
+  and which shared questions could become joint projects. These are suggestions computed from titles and abstracts,
+  not judgements about anyone's work; use them as a starting point for a conversation.</p>
+
+  <section class="card">
+    <h2>Who could work together?</h2>
+    <p class="sub">For every active researcher (<span id="rule"></span>; <span id="nactive"></span> people) we list the
+    researchers whose papers are closest in content, but with whom they have not written a metascience paper in
+    these data. "Closest in content" uses the same text fingerprints as the map on the Themes page; each suggestion
+    shows the clusters both work in and the two papers (one of each) that are most alike.</p>
+    <div class="controls">
+      <input type="search" id="who" list="activenames" placeholder="Type a name…" style="min-width:260px">
+      <datalist id="activenames"></datalist>
+      <span class="muted small" id="whohint">Or look at the strongest pairs below.</span>
+    </div>
+    <div id="suggest" class="sugg"></div>
+    <h3 style="margin-top:22px">Strongest pairs that have not written together</h3>
+    <p class="sub">Each person appears at most twice. A pair may in fact have worked together on papers outside
+    these data, or OpenAlex may have split one of them into two profiles.</p>
+    <div id="toppairs" class="sugg"></div>
+  </section>
+
+  <section class="card">
+    <h2>Communities that could talk more</h2>
+    <p class="sub">Each dot is a pair of research communities (groups that mostly write together; see Who works with
+    whom). Right means their papers are more alike in content than the average pair; up means they write together more often (joint
+    co-author links per 1,000 possible pairs of people). Pairs at the bottom right work on similar topics but rarely
+    write together.</p>
+    <div id="commchart" class="chart" style="min-height:460px"></div>
+    <div id="commlist"></div>
+  </section>
+
+  <section class="card">
+    <h2>Which themes are rising?</h2>
+    <p class="sub">The change in each cluster's share of all Dutch metascience papers: <span id="wrec"></span> against
+    <span id="wearly"></span>. A rising share means a theme gets relatively more attention, whatever the growth of
+    the field as a whole.</p>
+    <div id="growth" class="chart" style="min-height:620px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Where the trend points</h2>
+    <p class="sub">A cluster's share per year, with a straight line through 2016 to <span class="ly"></span>,
+    continued two years further (dashed). This continues the past trend; it is not a forecast, and a single new
+    project or a change in funding can change it. <span class="ly"></span> is not complete yet.</p>
+    <div class="controls"><label>Cluster <select id="tcl"></select></label></div>
+    <div id="trendchart" class="chart" style="min-height:420px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Rising keywords</h2>
+    <p class="sub">Keywords whose share of the papers grew most from <span class="wearly"></span> to
+    <span class="wrec"></span> (at least 10 recent papers). Keywords marked "new" first appeared in 2023 or later.</p>
+    <div id="kwchart" class="chart" style="min-height:520px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Shared goals and open questions</h2>
+    <div class="note" id="goalsnote">These texts were written by Claude, an AI assistant, after reading the titles
+    and abstracts of all 2025 and 2026 papers on this site, cluster by cluster. Every question links to the papers it
+    rests on. They are a first reading, meant to start discussions about joint projects; they can miss work that is
+    not in OpenAlex or not described in an abstract.</div>
+    <div id="goals" style="margin-top:14px"><p class="loading">Not available yet.</p></div>
+    <h3 style="margin-top:20px">Questions per cluster</h3>
+    <div id="perclus"></div>
+  </section>
+</main>
+<footer>Data: OpenAlex (CC0). Suggestions and trends are computed from titles and abstracts; texts on shared goals were written by an AI. See <a href="about.html">About</a>.</footer>
+
+<script>
+Promise.all([load("inferences"), load("people"), load("papers"), load("clusters")]).then(([inf, people, papers, clusters]) => {
+  const byP = Object.fromEntries(people.map((p) => [p.id, p]));
+  const byPaper = Object.fromEntries(papers.map((p) => [p.id, p]));
+  const cname = Object.fromEntries(clusters.map((c) => [c.id, c.name]));
+  const personLink = (id) => byP[id] ? `<a href="people.html#${encodeURIComponent(id)}">${esc(byP[id].n)}</a>` : "";
+  const paperLink = (id) => byPaper[id] ? `<a href="${doiLink(byPaper[id])}" target="_blank" rel="noopener">${esc(byPaper[id].t)}</a> (${byPaper[id].y || ""})` : "";
+  document.getElementById("rule").textContent = inf.active_rule;
+  document.getElementById("nactive").textContent = fmt(inf.n_active);
+  const w = inf.windows, wtxt = (a) => `${a[0]}–${a[1]}`;
+  ["wrec"].forEach((id) => (document.getElementById(id).textContent = wtxt(w.recent)));
+  document.getElementById("wearly").textContent = wtxt(w.early);
+  document.querySelectorAll(".wrec").forEach((e) => (e.textContent = wtxt(w.recent)));
+  document.querySelectorAll(".wearly").forEach((e) => (e.textContent = wtxt(w.early)));
+  document.querySelectorAll(".ly").forEach((e) => (e.textContent = inf.last_year));
+
+  // ---- suggestions ----
+  const active = Object.keys(inf.suggest).filter((id) => byP[id]).sort((a, b) => byP[a].n.localeCompare(byP[b].n));
+  document.getElementById("activenames").innerHTML = active.map((id) => `<option value="${esc(byP[id].n)}">`).join("");
+  const card = (a, s) => {
+    const [pa, pb] = s.pp || [];
+    return `<div class="c"><h3>${personLink(s.id)}</h3>
+      <div class="bar" style="width:${Math.round(100 * Math.max(0, s.s))}%" title="similarity ${s.s}"></div>
+      <p class="small muted">similarity ${s.s.toFixed(2)} · ${byP[s.id].k} papers, ${byP[s.id].y0}–${byP[s.id].y1}</p>
+      <p><b>Both work on:</b> ${esc(s.cl.join("; ") || "—")}</p>
+      <p><b>Closest papers:</b> ${paperLink(pa)} <i>and</i> ${paperLink(pb)}</p></div>`;
+  };
+  function showPerson(id) {
+    const s = inf.suggest[id] || [];
+    document.getElementById("whohint").innerHTML = `Suggestions for ${personLink(id)}:`;
+    document.getElementById("suggest").innerHTML = s.map((x) => card(id, x)).join("") || "<p class='muted'>No suggestions.</p>";
+  }
+  document.getElementById("who").addEventListener("change", (e) => {
+    const id = active.find((x) => byP[x].n.toLowerCase() === e.target.value.trim().toLowerCase());
+    if (id) showPerson(id);
+  });
+  document.getElementById("toppairs").innerHTML = inf.top_pairs.map((t) => {
+    const [pa, pb] = t.pp;
+    return `<div class="c"><h3>${personLink(t.a)} &amp; ${personLink(t.b)}</h3>
+      <div class="bar" style="width:${Math.round(100 * t.s)}%"></div>
+      <p class="small muted">similarity ${t.s.toFixed(2)}</p>
+      <p><b>Both work on:</b> ${esc(t.cl.join("; "))}</p>
+      <p><b>Closest papers:</b> ${paperLink(pa)} <i>and</i> ${paperLink(pb)}</p></div>`;
+  }).join("");
+
+  // ---- communities ----
+  const comm = Object.fromEntries(inf.communities.map((c) => [c.id, c]));
+  const clab = (c) => `around ${comm[c].label}`;
+  function drawComm() {
+    const cp = inf.comm_pairs;
+    Plotly.react("commchart", [{ type: "scatter", mode: "markers", x: cp.map((d) => d.sim), y: cp.map((d) => d.per1000),
+      text: cp.map((d) => `<b>${esc(clab(d.a))}</b><br>(${esc(comm[d.a].topics[0])})<br><b>${esc(clab(d.b))}</b><br>(${esc(comm[d.b].topics[0])})<br>` +
+        `content similarity ${d.sim.toFixed(2)} · ${d.links} co-author links`),
+      hovertemplate: "%{text}<extra></extra>",
+      marker: { size: 11, color: cssVar("--series-1"), opacity: 0.8, line: { width: 1.5, color: cssVar("--surface-1") } } }],
+      baseLayout({ hovermode: "closest", showlegend: false,
+        xaxis: Object.assign(baseLayout().xaxis, { title: "similarity of their papers' content (0 = as alike as average)" }),
+        yaxis: Object.assign(baseLayout().yaxis, { title: "co-author links per 1,000 pairs", rangemode: "tozero" }) }), PLOT_CONFIG);
+    // pairs with clearly similar content (similarity >= 0.2), the ones that write together least first
+    const top = cp.filter((d) => d.sim >= 0.2).sort((a, b) => a.per1000 - b.per1000 || b.sim - a.sim).slice(0, 5);
+    document.getElementById("commlist").innerHTML = "<h3 style='margin-top:10px'>Similar in content, few joint papers</h3><ul>" +
+      top.map((d) => `<li>The community ${esc(clab(d.a))} (${esc(comm[d.a].topics.slice(0, 2).join(", "))}) and the community
+        ${esc(clab(d.b))} (${esc(comm[d.b].topics.slice(0, 2).join(", "))}): content similarity ${d.sim.toFixed(2)}, ${d.links} co-author link${d.links === 1 ? "" : "s"} between them.</li>`).join("") + "</ul>";
+  }
+
+  // ---- rising themes ----
+  function drawGrowth() {
+    const t = inf.trend.slice().sort((a, b) => (a.recent - a.early) - (b.recent - b.early));
+    const up = cssVar("--series-1"), down = cssVar("--other");
+    Plotly.react("growth", [{ type: "bar", orientation: "h", y: t.map((d) => d.name), x: t.map((d) => +(d.recent - d.early).toFixed(2)),
+      marker: { color: t.map((d) => (d.recent >= d.early ? up : down)) },
+      text: t.map((d) => `${d.early.toFixed(1)}% → ${d.recent.toFixed(1)}%`), textposition: "outside", cliponaxis: false,
+      hovertemplate: "<b>%{y}</b><br>%{text} of all papers<extra></extra>" }],
+      baseLayout({ showlegend: false, margin: { l: 250, r: 90, t: 10, b: 40 },
+        xaxis: Object.assign(baseLayout().xaxis, { title: "change in share (percentage points)", zeroline: true }) }), PLOT_CONFIG);
+  }
+  const tsel = document.getElementById("tcl");
+  const byGrowth = inf.trend.slice().sort((a, b) => (b.recent - b.early) - (a.recent - a.early));
+  tsel.innerHTML = byGrowth.map((d) => `<option value="${d.id}">${esc(d.name)} (${d.recent >= d.early ? "+" : ""}${(d.recent - d.early).toFixed(1)} points)</option>`).join("");
+  function drawTrend() {
+    const d = inf.trend.find((x) => String(x.id) === tsel.value);
+    const yrs = Object.keys(d.share).map(Number).filter((y) => y >= 2010);
+    const fitYears = yrs.filter((y) => y >= 2016), proj = Object.keys(d.proj).map(Number);
+    const at = (y) => d.slope * y + (d.proj[proj[0]] - d.slope * proj[0]);
+    Plotly.react("trendchart", [
+      { type: "scatter", mode: "lines+markers", name: "share per year", x: yrs, y: yrs.map((y) => d.share[y]),
+        line: { color: cssVar("--series-1"), width: 2 }, marker: { size: 7 },
+        text: yrs.map((y) => `${d.n[y]} papers`), hovertemplate: "%{x}: %{y:.1f}% (%{text})<extra></extra>" },
+      { type: "scatter", mode: "lines", name: "straight-line trend", x: fitYears, y: fitYears.map((y) => Math.max(0, at(y))),
+        line: { color: cssVar("--text-muted"), width: 1.5 }, hoverinfo: "skip" },
+      { type: "scatter", mode: "lines", name: "trend continued", x: proj, y: proj.map((y) => d.proj[y]),
+        line: { color: cssVar("--text-muted"), width: 2, dash: "dash" }, hovertemplate: "%{x}: %{y:.1f}% if the trend continues<extra></extra>" }],
+      baseLayout({ hovermode: "closest", yaxis: Object.assign(baseLayout().yaxis, { title: "% of all metascience papers", rangemode: "tozero" }),
+        legend: { orientation: "h", y: -0.2 } }), PLOT_CONFIG);
+  }
+  tsel.addEventListener("change", drawTrend);
+  function drawKw() {
+    const r = inf.rising.slice(0, 18).reverse();
+    const ne = new Set(inf.new_keywords.map((d) => d.k));
+    Plotly.react("kwchart", [
+      { type: "bar", orientation: "h", name: `${w.early[0]}–${w.early[1]}`, y: r.map((d) => d.k + (ne.has(d.k) ? "  (new)" : "")), x: r.map((d) => d.early),
+        marker: { color: cssVar("--other") }, hovertemplate: "%{y}: %{x} papers<extra></extra>" },
+      { type: "bar", orientation: "h", name: `${w.recent[0]}–${w.recent[1]}`, y: r.map((d) => d.k + (ne.has(d.k) ? "  (new)" : "")), x: r.map((d) => d.recent),
+        marker: { color: cssVar("--series-1") }, hovertemplate: "%{y}: %{x} papers<extra></extra>" }],
+      baseLayout({ barmode: "group", margin: { l: 230, r: 20, t: 10, b: 40 }, legend: { orientation: "h", y: -0.12 },
+        xaxis: Object.assign(baseLayout().xaxis, { title: "papers with this keyword" }) }), PLOT_CONFIG);
+  }
+
+  // ---- shared goals and questions ----
+  function drawGoals() {
+    const g = inf.goals;
+    if (!g) return;
+    const refs = (ids) => `<p class="refs">Based on: ${ids.map(paperLink).join(" · ")}</p>`;
+    document.getElementById("goals").innerHTML = (g.goals || []).map((x) => `<div class="goal"><h3>${esc(x.goal)}</h3>
+      <p>${esc(x.explanation)}</p>${x.questions && x.questions.length ? `<p><b>Questions:</b> ${x.questions.map(esc).join(" · ")}</p>` : ""}
+      ${x.project ? `<p class="proj"><b>A possible joint project:</b> ${esc(x.project)}</p>` : ""}
+      ${x.people && x.people.length ? `<p class="small"><b>People working on this:</b> ${x.people.map(esc).join(", ")}</p>` : ""}
+      ${refs(x.papers || [])}</div>`).join("");
+    document.getElementById("perclus").innerHTML = (g.clusters || []).map((c) => `<details class="cl"><summary>${esc(cname[c.cluster_id] || "")}</summary>
+      <p>${esc(c.summary)}</p>${(c.questions || []).map((q) => `<div class="goal"><h3>${esc(q.question)}</h3><p>${esc(q.explanation)}</p>
+      <p class="proj"><b>A possible joint project:</b> ${esc(q.project)}</p>
+      ${q.people && q.people.length ? `<p class="small"><b>People:</b> ${q.people.map(esc).join(", ")}</p>` : ""}${refs(q.papers || [])}</div>`).join("")}</details>`).join("");
+  }
+
+  const all = () => { drawComm(); drawGrowth(); drawTrend(); drawKw(); };
+  all(); drawGoals(); onThemeChange(all);
+}).catch((e) => failed(document.getElementById("suggest"), e));
+</script>
+</body>
+</html>

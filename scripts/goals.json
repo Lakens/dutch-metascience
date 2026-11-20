@@ -1,0 +1,2098 @@
+{
+ "written_by": "Claude (Anthropic), from the titles and abstracts of all 2025-2026 papers on the site, 20 Nov 2026",
+ "goals": [
+  {
+   "goal": "Know how robust Dutch findings are",
+   "explanation": "Groups in psychology, medicine and the social sciences repeat studies in many labs and new cohorts, reanalyse existing data, and give one dataset to many analysts, to see which published conclusions hold.",
+   "questions": [
+    "How often do published results hold up when other researchers reproduce or reanalyse the same data?",
+    "Do well-known findings in psychology still hold when many labs repeat the original study together?",
+    "How replicable are findings in different fields, and how should we judge whether a replication succeeded?",
+    "How much do conclusions change when different researchers analyse the same data in different reasonable ways?",
+    "How much do research conclusions depend on the analysis and design choices researchers make?",
+    "Which published studies are most worth the time and money of a replication?"
+   ],
+   "project": "A national replication and reanalysis programme: one open register of Dutch replication and reanalysis attempts across fields, with an agreed set of success measures and a shared procedure for choosing which studies are most worth repeating, so that results can be compared across fields.",
+   "people": [
+    "Frantis̆ek Bartos̆",
+    "Jelte Wicherts",
+    "Robbie van Aert",
+    "Don van Ravenzwaaij",
+    "Marjan Bakker",
+    "Bruno Verschuère",
+    "Ewout Willem Steyerberg",
+    "Maarten van Smeden"
+   ],
+   "papers": [
+    "W7147467370",
+    "W7128546758",
+    "W4406800744",
+    "W4410169806",
+    "W7212079713",
+    "W4416288552",
+    "W7117224266",
+    "W4408446330"
+   ]
+  },
+  {
+   "goal": "Keep the published record complete and trustworthy",
+   "explanation": "Researchers measure unpublished outcomes, spin and missing harm data, build tools that flag implausible or fabricated studies, and want such studies kept out of systematic reviews and guidelines.",
+   "questions": [
+    "How strongly do publication bias, selective reporting and spin distort the published evidence?",
+    "How do weak study design, industry funding and missing harm data distort evidence on treatments and tests?",
+    "How often do research articles present their results more favourably than the data justify, and does it mislead readers?",
+    "How can journals detect problem papers and make corrections and retractions visible to every reader?",
+    "How can untrustworthy or fabricated studies be found and removed from the evidence base faster?",
+    "Can automated tools find untrustworthy or irreproducible studies at the scale of today's literature?"
+   ],
+   "project": "A shared, open trustworthiness check: combine the statistical, image and data-plausibility checks and retraction tracking that different groups are building into one pipeline that journals, systematic reviewers and guideline makers can run before they rely on a study.",
+   "people": [
+    "Daniël Lakens",
+    "Willem Halffman",
+    "Marjan Bakker",
+    "Kim Wever",
+    "Wytske M. Hepkema",
+    "Rene Aquarius",
+    "Stefan Daniel Michel Gaillard",
+    "Kevin van Schie"
+   ],
+   "papers": [
+    "W7130662651",
+    "W7204158888",
+    "W4413805291",
+    "W7154445799",
+    "W7220703641",
+    "W4406891205",
+    "W4415706837",
+    "W7164649457"
+   ]
+  },
+  {
+   "goal": "Check at scale whether transparency promises are kept",
+   "explanation": "Across clusters, researchers compare what papers and registries promise (available data and code, reported results, followed guidelines) with what is actually delivered, increasingly with software and language models.",
+   "questions": [
+    "How much are open data, preregistration and other transparency practices increasing, and can software measure this reliably?",
+    "When a paper says its data are available, are the data really there and usable?",
+    "How well do published studies follow reporting guidelines, and can software check this reliably?",
+    "Why are trial results still often missing from registries, and how can this be improved?",
+    "Can automated tools find untrustworthy or irreproducible studies at the scale of today's literature?"
+   ],
+   "project": "A yearly open monitor of Dutch research: validated automated tools measure per field and institution whether data, code, registration and reporting promises were kept, and the monitor is used to test which policies change the numbers.",
+   "people": [
+    "Michèle Nuijten",
+    "Eric-Jan Wagenmakers",
+    "Karel G.M. Moons",
+    "Lotty Hooft",
+    "Alexandra Sarafoglou",
+    "Kim Wever",
+    "Mariska Leeflang",
+    "Ingmar Visser"
+   ],
+   "papers": [
+    "W7161141450",
+    "W7167406590",
+    "W7208751377",
+    "W7204602311",
+    "W7171980754",
+    "W7161948168",
+    "W4414311412",
+    "W7151795685"
+   ]
+  },
+  {
+   "goal": "Use artificial intelligence in research responsibly",
+   "explanation": "Papers study AI in peer review, journal policies on chatbots, AI-assisted systematic reviews, language models as coders or survey participants, and what studies that use AI should report.",
+   "questions": [
+    "Can AI tools help with peer review, and how do reviewers judge their usefulness and risks?",
+    "When is using generative AI in research acceptable, and how should researchers disclose it?",
+    "Can AI tools speed up systematic reviews without missing relevant studies?",
+    "Can language models replace human coders or human survey participants without changing study conclusions?",
+    "What should medical studies that use artificial intelligence or large language models report so others can judge them?"
+   ],
+   "project": "Evidence-based Dutch guidance on AI in research: several groups test AI tools for screening, coding and reviewing against human work on the same tasks, and turn the results into shared rules for disclosure and use by journals, funders and ethics committees.",
+   "people": [
+    "Lex Bouter",
+    "Mariëtte van den Hoven",
+    "David Shaw",
+    "Marcel A. G. van der Heyden",
+    "Izaak Dekker",
+    "Remy M. J. P. Rikers",
+    "Bhoomika Agarwal",
+    "Bert Bredeweg"
+   ],
+   "papers": [
+    "W7225007452",
+    "W7164643829",
+    "W4413223006",
+    "W7165487254",
+    "W7140414949",
+    "W7125163761"
+   ]
+  },
+  {
+   "goal": "Make plans, data, code and theories open and reusable",
+   "explanation": "Researchers ask whether preregistration and Registered Reports reduce bias in practice, show that shared code and data make reproduction possible, and propose ways to state and share theories precisely.",
+   "questions": [
+    "Do registered study plans actually limit how researchers change their analyses and outcomes later?",
+    "Why is preregistration still uncommon outside clinical trials, and how can it be made easier?",
+    "How should theories, computational models and research software be shared so others can find and reuse them?",
+    "What makes shared research data findable and reusable, rather than just deposited?",
+    "How can psychology build precise, testable theories instead of loose verbal ones?"
+   ],
+   "project": "A shared template and infrastructure in which a study's plan, data, code and the theory it tests are linked and machine-readable, piloted in a few fields and judged by whether others can actually reproduce and reuse the work.",
+   "people": [
+    "Jelte Wicherts",
+    "Robbie van Aert",
+    "Michèle Nuijten",
+    "Alexandra Sarafoglou",
+    "Tamarinde Haven",
+    "Sarahanne Field",
+    "Flávio Azevedo",
+    "Willem Eduard Frankenhuis"
+   ],
+   "papers": [
+    "W7235297804",
+    "W7134238031",
+    "W4407702335",
+    "W7223138747",
+    "W7221794662",
+    "W7147495587",
+    "W4409075462",
+    "W4408688463"
+   ]
+  },
+  {
+   "goal": "Reward checking work and reform research assessment",
+   "explanation": "Papers argue that a reward system favouring novelty undervalues replication and data sharing, and that new rules for hiring and promotion need open, checkable research information.",
+   "questions": [
+    "How should countries and universities assess research beyond counting publications and citations?",
+    "How are new rules for hiring, promotion and funding put into practice, and who benefits from them?",
+    "How can research assessment indicators be made open, checkable, and fair to different kinds of contributions?",
+    "How can universities monitor and reward open science, including public engagement and the work of support staff?",
+    "Are open sources of information about publications complete and reliable enough to replace commercial databases?",
+    "How do career incentives shape what researchers publish, and which publication formats can counter this?"
+   ],
+   "project": "Follow the Recognition and Rewards reforms with open data: combine open publication data (such as OpenAlex) with institutional policies to study who gains under the new rules, and whether replication, data sharing and other checking work is rewarded.",
+   "people": [
+    "Ludo Waltman",
+    "Kathleen Gregory",
+    "Steven Verheyen",
+    "Vincent Traag"
+   ],
+   "papers": [
+    "W7211974673",
+    "W7171791700",
+    "W4407100488",
+    "W7104039273",
+    "W7221754275",
+    "W7134978013",
+    "W7160657317",
+    "W4416959060"
+   ]
+  },
+  {
+   "goal": "Standardise what studies measure and report",
+   "explanation": "Groups develop reporting guidelines and core outcome sets, and show how varied measurement and reporting are, which makes combining results hard.",
+   "questions": [
+    "How much does inconsistent measurement and reporting across studies hinder comparing and combining their results?",
+    "Which outcomes should every trial in a disease area measure, so that results can be compared and combined?",
+    "Do new field-specific reporting guidelines actually improve how studies are reported?",
+    "Which kinds of research beyond clinical trials need their own reporting guideline, and how should it be developed?",
+    "Can reporting standards be used earlier, to improve how trials are designed rather than only reported?"
+   ],
+   "project": "Instead of each field evaluating its own guideline, a joint study of which reporting guidelines and core outcome sets actually improve research, using the same before-and-after design across several fields.",
+   "people": [
+    "Eiko Fried",
+    "Pim J. Cuijpers",
+    "Ellen B. M. Elsman",
+    "Eirini Karyotaki",
+    "Clara Miguel",
+    "Susan Branje",
+    "Mathias Harrer",
+    "Evelien M. Hoeben"
+   ],
+   "papers": [
+    "W4412451219",
+    "W7160639092",
+    "W7163991254",
+    "W4416668058",
+    "W7165969066",
+    "W4417274943"
+   ]
+  },
+  {
+   "goal": "Make openness work for all kinds of research and researchers",
+   "explanation": "Several groups argue that open science rules built for quantitative research can harm qualitative, community and health research, and propose consent models, access conditions and ethics review that fit.",
+   "questions": [
+    "How can sensitive or qualitative data be shared openly while protecting the people in them?",
+    "How can open science be made fair for researchers whose work or situation differs from the dominant model?",
+    "How should ethics review change to fit participatory, artistic and citizen-led research?",
+    "How can research integrity rules be made fair for researchers in lower- and middle-income countries?",
+    "How can sensitive health and personal data be shared for research while respecting privacy and European law?"
+   ],
+   "project": "Develop and test, together with qualitative, community-based and health researchers, practical models for consent, data access and ethics review that make openness possible without harming the people studied.",
+   "people": [
+    "Sarahanne Field",
+    "Louise Bezuidenhout",
+    "Kathleen Gregory",
+    "Penelope Bollini",
+    "Szilvia Zörgő",
+    "Ioannis Stavrakakis"
+   ],
+   "papers": [
+    "W4411930201",
+    "W7213239543",
+    "W7151945382",
+    "W7159784465",
+    "W4409569735",
+    "W7103995205",
+    "W7233835490"
+   ]
+  },
+  {
+   "goal": "Involve patients, citizens and the public",
+   "explanation": "Papers involve patients and young people in setting reporting standards, study whether citizen science builds trust, and follow how research reaches journalists, policy makers and the public.",
+   "questions": [
+    "How can patients, young people and the public be meaningfully involved in setting research standards?",
+    "How should scientists take part in public and policy debates so that trust in science grows?",
+    "What role do preprints play, and how do journalists and the public understand them?",
+    "How does research travel beyond academia, through social media, policy documents and different languages?"
+   ],
+   "project": "A shared study of how involving patients, citizens and the public in setting research standards and priorities changes the research and trust in it, compared with standards set by experts alone.",
+   "people": [
+    "Lotty Hooft",
+    "Rodrigo Costas",
+    "Laurens K. Hessels",
+    "Janneke van ’t Hooft",
+    "Margaret M. Gold",
+    "Anne-Floor M. Schölvinck",
+    "Kirsten Vegt",
+    "Uta Wehn"
+   ],
+   "papers": [
+    "W4411896379",
+    "W7140338930",
+    "W7203702677",
+    "W7171775967",
+    "W7223039310",
+    "W7223808033"
+   ]
+  }
+ ],
+ "clusters": [
+  {
+   "cluster_id": 0,
+   "summary": "Dutch researchers in this cluster, mostly in medicine and health, developed agreed standards through Delphi consensus studies: core outcome sets that list what every trial in a disease area should measure, and reporting checklists for many types of studies. They also worked on measurement quality, on involving patients and young people in making these standards, and on paediatric extensions of the main trial reporting guidelines.",
+   "questions": [
+    {
+     "question": "Which outcomes should every trial in a disease area measure, so that results can be compared and combined?",
+     "explanation": "Groups across Dutch medical centres developed or planned core outcome sets for thyroid cancer, male infertility, depression, nerve surgery, kidney cancer, shared decision-making, cancer prehabilitation and infant feeding, because inconsistent outcomes block evidence synthesis. Whether trialists actually adopt these sets after publication is mostly unknown.",
+     "papers": [
+      "W4406288637",
+      "W4409468232",
+      "W7117562017",
+      "W7125391814",
+      "W7166861797",
+      "W7213340264",
+      "W7167203496",
+      "W7160372619"
+     ],
+     "people": [
+      "Madelon van Wely",
+      "Eiko Fried",
+      "Pim J. Cuijpers",
+      "Willem Pondaag",
+      "Ellen G. Engelhardt",
+      "Caroline Barbara Terwee"
+     ],
+     "project": "Follow trial registrations and publications in these disease areas over the coming years to measure how often the new core outcome sets are used, and interview trialists about why they do or do not use them."
+    },
+    {
+     "question": "Do new field-specific reporting guidelines actually improve how studies are reported?",
+     "explanation": "Teams created checklists for vignette experiments, test norms, virtual reality treatments, cognitive training, surgical prehabilitation and neurophysiological monitoring, a survey examined how well research leaders know reporting guidelines, and toxicologists called for mandatory reporting standards. Few of these groups have measured whether reporting improves after their guideline appears.",
+     "papers": [
+      "W4408389168",
+      "W4414465331",
+      "W7117574523",
+      "W7213941096",
+      "W7135405994",
+      "W7197041924",
+      "W4413102904",
+      "W4417482962"
+     ],
+     "people": [
+      "Marij A. Hillen",
+      "Marieke E. Timmerman",
+      "Syl Slatman",
+      "Guido P. H. Band",
+      "Patrick M. Bossuyt",
+      "Caroline Moermond"
+     ],
+     "project": "Use one common method to compare how complete reporting was before and after publication of several of these Dutch-led guidelines, and test whether journal endorsement makes a difference."
+    },
+    {
+     "question": "How can patients, young people and the public be meaningfully involved in setting research standards?",
+     "explanation": "Papers describe involving young people and family caregivers in paediatric trial guidelines, an international consensus on patient and public involvement to protect trial integrity, people with lived experience in stress research and depression outcome sets, and stakeholder engagement in medicine quality research. How such involvement changes the final standards is still rarely measured.",
+     "papers": [
+      "W4411896379",
+      "W7140338930",
+      "W4408936368",
+      "W4414824937",
+      "W7117562017",
+      "W4407746035",
+      "W7164933731",
+      "W4411995635"
+     ],
+     "people": [
+      "Lotty Hooft",
+      "Janneke van ’t Hooft",
+      "Erno J. Hermans",
+      "Conny W.E.M. Quaedflieg",
+      "Pim J. Cuijpers",
+      "Roland A Bal"
+     ],
+     "project": "Compare, across several recent Dutch consensus studies, which items were added, removed or reworded because of patient and public input, to build evidence-based guidance on when involvement matters most."
+    },
+    {
+     "question": "How should studies of measurement instruments and agreement between raters be carried out and reported?",
+     "explanation": "The COSMIN group updated its reporting guideline, designed tables for reviews of patient-reported measures and translated the guideline, applied its approach to surveys about data sharing, and began a review towards updating the guideline for reliability and agreement studies; others wrote practical guidance on agreement measures and on expert panels used as a reference standard. Aligning these overlapping standards into one consistent set is still to be done.",
+     "papers": [
+      "W4408972950",
+      "W4413954171",
+      "W7163696737",
+      "W7164944792",
+      "W4415303219",
+      "W4410289105",
+      "W7135026481"
+     ],
+     "people": [
+      "Lidwine Brigitta Mokkink",
+      "Caroline Barbara Terwee",
+      "Ellen B. M. Elsman",
+      "Sophie Vanbelle",
+      "Bas E Kellerhuis",
+      "Lauren Maxwell"
+     ],
+     "project": "Use the planned update of the reliability and agreement reporting guideline as a joint project in which COSMIN, the agreement-statistics guidance and the expert-panel guidance are brought together into one consistent set of terms and reporting items."
+    }
+   ]
+  },
+  {
+   "cluster_id": 1,
+   "summary": "Dutch researchers, librarians and policy staff in this cluster studied how open science is understood, adopted, taught, monitored and rewarded, from surveys of single fields to national monitoring frameworks and European projects. The 2025-2026 work included several new project proposals funded by Open Science NL, reviews of whether open science delivers what it promises, and critical work on equity, qualitative research and the resilience of open science under geopolitical pressure.",
+   "questions": [
+    {
+     "question": "Does open science actually deliver the benefits it promises, and what are its costs?",
+     "explanation": "A scoping review and the PathOS project collected evidence on the academic and societal effects of open science, while one survey found only a very weak link between open practices and irresponsible research behaviour and a book argued that data reuse remains rare. Whether transparency raises or lowers public trust, and how benefits weigh against time costs and inequalities, is still open and is the aim of several newly funded projects.",
+     "papers": [
+      "W4408072220",
+      "W7105809229",
+      "W4410841698",
+      "W4407103135",
+      "W7204451630",
+      "W7128077294",
+      "W4415371356",
+      "W7203702677"
+     ],
+     "people": [
+      "Vincent Traag",
+      "Inge Stegeman",
+      "Mariska Leeflang",
+      "Krist Vaesen",
+      "Amalia Kallergi",
+      "Laurens K. Hessels"
+     ],
+     "project": "Combine the PathOS impact indicators with the planned benefit-and-harm evaluation of Evidence Based Open Science to measure, in a few Dutch fields, both the gains (reuse, citations, trust) and the costs (time, inequality) of specific practices such as data sharing and preregistration."
+    },
+    {
+     "question": "What actually changes researchers' open science behaviour: policies, training, or local communities?",
+     "explanation": "Surveys in criminology, behavioural addictions and communication research show that data and code sharing remain limited and list the barriers researchers report, while a planned randomised trial, a pre-post course study and a teaching review test education, and new projects examine institutional policies and Open Science Communities. Which of these levers produces lasting change in practice has not yet been compared directly.",
+     "papers": [
+      "W7204719442",
+      "W4406797896",
+      "W4408771164",
+      "W7204143376",
+      "W4411022123",
+      "W4414320900",
+      "W7165943741",
+      "W4415342425"
+     ],
+     "people": [
+      "Michiel de Boer",
+      "Rene Bekkers",
+      "Lex Bouter",
+      "Bogdana Humă",
+      "Asier Moneva",
+      "Steven Verheyen"
+     ],
+     "project": "Run a coordinated study across several Dutch institutions in which policy changes, training courses and community activities are introduced at different times, and measure their effect with one shared outcome: the rate of data and code sharing in the publications that follow."
+    },
+    {
+     "question": "How can universities monitor and reward open science, including public engagement and the work of support staff?",
+     "explanation": "CWTS is building a Dutch open science monitoring framework, other teams propose frameworks for monitoring university programmes and indicators for citizen science and public engagement, and studies examine whether assessment reform plans mention open science and how support staff's invisible work can be recognised. How such indicators work in real hiring and promotion decisions is still untested.",
+     "papers": [
+      "W7212657887",
+      "W7126414280",
+      "W7204089283",
+      "W7171775967",
+      "W7162439435",
+      "W7128642597",
+      "W7204599677"
+     ],
+     "people": [
+      "Louise Bezuidenhout",
+      "Ludo Waltman",
+      "Anneke Zuiderwijk",
+      "Margaret M. Gold",
+      "Alexander Rushforth",
+      "Bart Penders"
+     ],
+     "project": "Pilot the new Dutch open science monitor at a few universities that signed the research assessment reform agreement (CoARA), adding the proposed indicators for public engagement, citizen science and support-staff contributions, and study whether they are used in recognition and reward decisions."
+    },
+    {
+     "question": "How can open science be made fair for researchers whose work or situation differs from the dominant model?",
+     "explanation": "Papers criticise the vague use of 'equity' in open science, show that policies rarely address inclusion, and describe the positions of qualitative researchers, researchers in developing countries, racialised researchers in the Netherlands and non-English speakers. Practical guides and frameworks have been proposed, but there is no shared way to test whether open science policies reduce or increase these inequalities.",
+     "papers": [
+      "W4408934328",
+      "W4411930201",
+      "W4413273662",
+      "W7204791495",
+      "W7164764292",
+      "W4409912679",
+      "W7223056825",
+      "W7160661638"
+     ],
+     "people": [
+      "Louise Bezuidenhout",
+      "Sarahanne Field",
+      "Zhiqi Xu",
+      "Krishma Labib",
+      "Esteban Morales",
+      "Jeroen Bosman"
+     ],
+     "project": "Build a joint set of equity checks for Dutch open science policies, based on the existing frameworks for qualitative openness and knowledge equity, and test them through interviews with qualitative, racialised and non-Western researchers working in the Netherlands."
+    }
+   ]
+  },
+  {
+   "cluster_id": 2,
+   "summary": "Dutch researchers in this cluster studied how open and checkable research is: whether results can be reproduced from the same data, how much results depend on who analyses the data, and how publication bias and spin distort the literature. They also proposed new reporting guidelines and journal formats, and wrote about how research is assessed and how research integrity should be governed, including the use of artificial intelligence.",
+   "questions": [
+    {
+     "question": "How often do published results hold up when other researchers reproduce or reanalyse the same data?",
+     "explanation": "These papers run large reproduction and reanalysis projects, mainly in the social and behavioural sciences and economics with examples from medical research, and propose ways for journals to check results routinely (robustness reports, verification reports). What is still open is how large the problem is in each field and which checks journals can afford to run on every paper.",
+     "papers": [
+      "W4408235907",
+      "W7128546758",
+      "W7147467370",
+      "W4407918365",
+      "W7204905681",
+      "W7225964793",
+      "W4410526481"
+     ],
+     "people": [
+      "Eric-Jan Wagenmakers",
+      "Don van Ravenzwaaij",
+      "Kai J. Jonas",
+      "Martijn Huysmans",
+      "Ana Martinovici",
+      "Mariska Leeflang"
+     ],
+     "project": "A shared Dutch reanalysis service in which teams from Amsterdam, Groningen, Rotterdam and Utrecht reproduce and reanalyse a random sample of newly accepted papers in several journals each year, reporting how often the results hold and what it cost in time."
+    },
+    {
+     "question": "How strongly do publication bias, selective reporting and spin distort the published evidence?",
+     "explanation": "The papers look at unpublished and selectively reported outcomes in rabies trials, publication and confirmation bias in health-economic studies, spin in reporting, the fate of null results, and how often significant phase III cancer trials would be expected to reproduce. Open is whether these biases are of similar size across fields and which measures reduce them.",
+     "papers": [
+      "W7130662651",
+      "W7168022778",
+      "W7170563197",
+      "W7204158888",
+      "W4412031372"
+     ],
+     "people": [
+      "Nada Al Arashi",
+      "Jaap J. van Netten",
+      "Sicco A. Bus",
+      "Tatiana Pereira-Cenci",
+      "Marjan Bakker",
+      "Erik W. van Zwet"
+     ],
+     "project": "Apply one common protocol for measuring unpublished outcomes and spin to trial registries in several medical fields (infectious disease, diabetes foot care, dentistry, oncology), so that the size of reporting bias can be compared across fields for the first time."
+    },
+    {
+     "question": "Which reporting rules and new journal formats best help readers check what a study actually did?",
+     "explanation": "The papers develop or update reporting guidelines (for coding observed behaviour, scoping reviews, and the use of language models), and introduce new formats such as preliminary reports for small studies, registered reports and verification reports. Open is whether these guidelines and formats are followed and actually improve the studies that use them, and how to avoid too many overlapping guidelines.",
+     "papers": [
+      "W4406615490",
+      "W4412451219",
+      "W7160639092",
+      "W7163991254",
+      "W4415854622",
+      "W7225964793",
+      "W7162998161",
+      "W4409508971"
+     ],
+     "people": [
+      "Esther J van Zuuren",
+      "Evelien M. Hoeben",
+      "Ellen B. M. Elsman",
+      "Daniël Lakens",
+      "Michiel van Elk",
+      "Aurélien Baillon"
+     ],
+     "project": "A joint study that compares papers published before and after a journal adopted a new guideline or format (for example registered reports, preliminary reports or the SCOBe guideline), measuring how complete the reporting is and how often the planned analyses were followed."
+    },
+    {
+     "question": "How should countries and universities assess research beyond counting publications and citations?",
+     "explanation": "These papers describe how experts, databases and academics shape evaluation policy, sort national research assessment systems into types, propose ways to include societal impact, and suggest new measures such as a contribution score for co-authored work. Open is which assessment systems lead to fairer and better research in practice.",
+     "papers": [
+      "W4407907710",
+      "W7118677602",
+      "W7127909856",
+      "W4413971859",
+      "W7117872138"
+     ],
+     "people": [
+      "Ludo Waltman",
+      "Guus Dix",
+      "Alexander Rushforth",
+      "Tommaso Ciarli",
+      "FRED G. W. C. PAAS",
+      "Andrew Plume"
+     ],
+     "project": "Use the typology of national assessment systems to compare how researchers' publishing and career choices changed in countries that moved away from metric-based assessment, combining bibliometric data with interviews."
+    }
+   ]
+  },
+  {
+   "cluster_id": 3,
+   "summary": "Dutch researchers in this cluster wrote and tested reporting guidelines: checklists of what a paper should report. Much of the work concerned prediction models and studies using artificial intelligence, but there were also new guidelines for bibliometric studies, cluster analyses, theory-driven psychology and microscopy, and first attempts to check adherence with large language models.",
+   "questions": [
+    {
+     "question": "What should medical studies that use artificial intelligence or large language models report so others can judge them?",
+     "explanation": "The papers present reporting guidelines for prediction models and diagnostic studies that use AI and large language models, a guideline for sharing analysis code, a checklist for AI in interventional radiology, and a review showing that no single guideline fits all users. How these overlapping guidelines relate and whether they improve reporting is still open.",
+     "papers": [
+      "W4406152263",
+      "W4412810783",
+      "W4414183234",
+      "W7128504626",
+      "W4411625527",
+      "W4410448008"
+     ],
+     "people": [
+      "Karel G.M. Moons",
+      "Patrick M. Bossuyt",
+      "Lotty Hooft",
+      "Maarten van Smeden",
+      "Johan van Soest",
+      "Fernando Gómez"
+     ],
+     "project": "Map the overlap between the AI reporting guidelines and test, in a sample of recent AI studies, whether papers published after the guidelines report more completely than earlier ones."
+    },
+    {
+     "question": "Which kinds of research beyond clinical trials need their own reporting guideline, and how should it be developed?",
+     "explanation": "The papers develop guidelines, through literature reviews, expert consensus rounds or community input, for bibliometric analyses, cluster analyses, theory-driven psychology, research validity, infectious disease models and light microscopy. Whether these guidelines will be adopted and improve reporting is not yet known.",
+     "papers": [
+      "W7154119591",
+      "W7224917902",
+      "W4413400549",
+      "W7163659742",
+      "W4407779358",
+      "W7117681254",
+      "W7131392640"
+     ],
+     "people": [
+      "Ludo Waltman",
+      "Rodrigo Costas",
+      "Marieke E. Timmerman",
+      "Noah van Dongen",
+      "Rink Hoekstra",
+      "Mirjam Kretzschmar"
+     ],
+     "project": "Share experience on developing these guidelines and jointly measure reporting completeness before and after their publication in bibliometrics, psychology and microscopy."
+    },
+    {
+     "question": "How well do published studies follow reporting guidelines, and can software check this reliably?",
+     "explanation": "The papers build an assessment tool for the prediction model guideline, test large language models for scoring reporting completeness, and measure adherence to guidelines in imaging, prosthesis migration and nutrition research. Automated checking is promising but its accuracy across guidelines still needs to be shown.",
+     "papers": [
+      "W7116843807",
+      "W7161141450",
+      "W4408498749",
+      "W4410764637",
+      "W7125255752"
+     ],
+     "people": [
+      "Isa Spiero",
+      "Lotty Hooft",
+      "Karel G.M. Moons",
+      "Pauline Heus",
+      "Daniel Arnoldus Korevaar",
+      "Neha Khandpur"
+     ],
+     "project": "Test large language model checks against human assessments for several guidelines (prediction models, diagnostic accuracy and systematic reviews) on one shared set of papers."
+    }
+   ]
+  },
+  {
+   "cluster_id": 4,
+   "summary": "This small cluster studied registration of studies before they start and reporting of results in trial registries. Dutch researchers contributed to WHO guidance on reporting results in registries, assessed compliance in the new European trial registry, measured how rarely research integrity studies are preregistered, and wrote preregistration templates and calls for registration of systematic reviews.",
+   "questions": [
+    {
+     "question": "Why are trial results still often missing from registries, and how can this be improved?",
+     "explanation": "Utrecht researchers helped write updated WHO guidance, reviewed results reporting across registries worldwide with barriers and recommendations, and assessed missing data and legal compliance for 7,547 trials in the European CTIS registry; a separate study examined whether registration status is associated with reports of large treatment effects in infertility trials. Whether the guidance and legal duties raise reporting rates has yet to be followed up.",
+     "papers": [
+      "W4408936335",
+      "W4412433978",
+      "W7150098132",
+      "W7144038219"
+     ],
+     "people": [
+      "Lotty Hooft",
+      "Johanna AAG Damen",
+      "Ghassan Karam",
+      "Demy L. Idema",
+      "Ben W Mol"
+     ],
+     "project": "Repeat the CTIS compliance check every year and link it to the new WHO guidance, so that changes in results reporting can be tracked and reported back to sponsors and regulators."
+    },
+    {
+     "question": "Why is preregistration still uncommon outside clinical trials, and how can it be made easier?",
+     "explanation": "Abstracts at three World Conferences on Research Integrity showed that only about 28% of empirical studies were registered, with no increase over time; others wrote a preregistration template for EEG studies, taught preregistration to applied researchers at universities of applied sciences, and called on journal editors to require registration of systematic reviews. Whether templates and training raise registration rates has not been tested.",
+     "papers": [
+      "W4416211172",
+      "W4406738886",
+      "W7119490360",
+      "W7213502340",
+      "W7225728094"
+     ],
+     "people": [
+      "Wilco H. M. Emons",
+      "Klaas Sijtsma",
+      "Lex Bouter",
+      "Antonio Schettino",
+      "Daan Alexander Ornée",
+      "Kim van der Braak"
+     ],
+     "project": "Measure preregistration rates in research integrity studies, EEG studies, applied research and systematic reviews before and after the new templates, training and journal requirements are introduced."
+    },
+    {
+     "question": "Can reporting standards be used earlier, to improve how trials are designed rather than only reported?",
+     "explanation": "Papers argue that reporting guidelines can guide trial design in paediatrics, publish paediatric extensions of the main protocol and trial reporting guidelines, propose reporting recommendations for preclinical radiobiology studies, and check whether spinal cord stimulation trials follow published design recommendations. Evidence that such use improves trial design is still limited.",
+     "papers": [
+      "W7166890104",
+      "W7131245528",
+      "W7131310246",
+      "W4408002774",
+      "W7221355691"
+     ],
+     "people": [
+      "Pauline Heus",
+      "Lotty Hooft",
+      "Karel Allegaert",
+      "Julie Nonnekens",
+      "Cham Al Salak"
+     ],
+     "project": "Compare trial protocols written with and without the paediatric protocol guideline (SPIRIT-C) for completeness and design quality, and apply the same alignment check used for spinal cord stimulation trials."
+    }
+   ]
+  },
+  {
+   "cluster_id": 5,
+   "summary": "Dutch researchers in this cluster studied the publishing system: how fraud, paper mills, corrections and retractions are handled, how preprints spread and are understood by journalists and the public, and how career incentives shape what is published. They also measured who gets to publish in leading journals and proposed new article types and publishing models.",
+   "questions": [
+    {
+     "question": "How can journals detect problem papers and make corrections and retractions visible to every reader?",
+     "explanation": "The papers document hidden 'stealth' corrections, show that corrections are often not labelled in databases and literature tools, check whether journalists update news about retracted papers, screen a journal for paper-mill articles, and describe how editors respond to fraud, including fraud using generative AI. Open is which detection tools and labelling rules work, and who should be responsible for them.",
+     "papers": [
+      "W4407751575",
+      "W4413059269",
+      "W7220703641",
+      "W4414487157",
+      "W4413398799",
+      "W4406037844",
+      "W7165487254"
+     ],
+     "people": [
+      "Rene Aquarius",
+      "Wytske M. Hepkema",
+      "Willem Halffman",
+      "Austė Valinčiūtė",
+      "Marcel A. G. van der Heyden",
+      "Ruben A van Diest"
+     ],
+     "project": "Screen a set of journals for image problems and paper-mill signs, and then follow every resulting correction or retraction to measure how quickly and clearly it reaches databases, reference tools and news reports."
+    },
+    {
+     "question": "What role do preprints play, and how do journalists and the public understand them?",
+     "explanation": "The papers measure the growth of preprinting across fields and regions (1991–2023), interview preprint server managers and moderators, test whether telling readers a study is a preprint changes trust in news, and track preprints in COVID-19 misinformation. Open is whether preprints change the quality of the final paper and how they should be communicated to the public.",
+     "papers": [
+      "W4409914306",
+      "W4407856370",
+      "W7167957883",
+      "W4414033909",
+      "W4411770097",
+      "W7155492313",
+      "W4417182964"
+     ],
+     "people": [
+      "Narmin Rzayeva",
+      "Ludo Waltman",
+      "Alice Fleerackers",
+      "Lex Bouter",
+      "Vincent Traag",
+      "Juan Pablo Bascur"
+     ],
+     "project": "Link large preprint and journal databases to compare preprints with their published versions across fields, and add an experiment testing how news readers judge findings that changed between the two versions."
+    },
+    {
+     "question": "How do career incentives shape what researchers publish, and which publication formats can counter this?",
+     "explanation": "The papers model why registered reports can be unattractive for careers, find that about 58% of studies registered on the OSF were shared publicly, describe misaligned publishing incentives and conflicts of interest from publishing pressure, and launch formats for null results and errors (LESSONS) and registered reports. Open is which changes in incentives make researchers actually choose these formats.",
+     "papers": [
+      "W7169802829",
+      "W4406891205",
+      "W4406855478",
+      "W7154445799",
+      "W4416103787",
+      "W7220898980"
+     ],
+     "people": [
+      "Anne Scheel",
+      "Daniël Lakens",
+      "Sarahanne Field",
+      "Stefan Daniel Michel Gaillard",
+      "Leonie A. Dudda",
+      "Rolf Hut"
+     ],
+     "project": "Survey and follow Dutch researchers who could submit to journals that offer registered reports or the LESSONS article type, and test whether changes in how hiring and grant committees value these formats change what researchers submit."
+    },
+    {
+     "question": "Who gets to publish in leading journals, and is authorship becoming more or less diverse?",
+     "explanation": "The papers find growing authorship concentration in management journals over six decades, study the most productive researchers in educational psychology, show more women and non-Western first authors in communication studies over 50 years, compare retractions by gender, and argue for scholar-led publishing in the Global South. Open is what causes these patterns and which journal policies change them.",
+     "papers": [
+      "W4385683054",
+      "W7133220857",
+      "W7165662489",
+      "W4410512119",
+      "W7204669270"
+     ],
+     "people": [
+      "Yvonne Gerarda Theodora van Rossenberg",
+      "Vincent Hoogerheide",
+      "Mark Boukes",
+      "Zhichao Fang",
+      "Jama Musse"
+     ],
+     "project": "Apply one shared method to measure author concentration, gender and region of authors across several social science fields over time, and relate changes to journal policies such as open access and editorial board make-up."
+    }
+   ]
+  },
+  {
+   "cluster_id": 6,
+   "summary": "Dutch researchers in this cluster examined how research ethics review and integrity rules work in practice: in participatory and artistic research, in clinical trials, in crises and fragile settings, and under academic pressure. Several groups wrote new codes and guidance, and others studied how researchers and ethics committees deal with new technologies such as artificial intelligence and neural implants.",
+   "questions": [
+    {
+     "question": "How should ethics review change to fit participatory, artistic and citizen-led research?",
+     "explanation": "Papers on research with 'vulnerable' groups, artistic research, adult language learners, people with disabilities, refugee women, citizen science and transformation-oriented research all describe a gap between formal ethics procedures built for biomedical experiments and what responsible practice requires. Open is what a workable alternative review process looks like and whether it protects participants better.",
+     "papers": [
+      "W4409046072",
+      "W4414822647",
+      "W7118765617",
+      "W7141486081",
+      "W7125379729",
+      "W7160908316",
+      "W7236411116",
+      "W7166727454"
+     ],
+     "people": [
+      "Annelieke Driessen",
+      "Veerle Spronck",
+      "Louise Shepperd",
+      "Julia Doornbos",
+      "Julia Maria Wittmayer",
+      "Kris Bevelander"
+     ],
+     "project": "Several Dutch universities pilot an ethics review route for participatory research, in which co-researchers take part in the review, and compare its outcomes and participants' experiences with the standard route."
+    },
+    {
+     "question": "What can research ethics committees do to improve the quality and speed of clinical trials?",
+     "explanation": "The papers use archives of a Dutch ethics committee to study early trial termination and over-optimistic sample size calculations, study how committees decide about removing neural implants, compare ethics review rules for child drug trials across six jurisdictions, propose a roadmap for faster approvals, and examine lasting changes to committees in Kenya after the pandemic. Open is which committee actions actually prevent wasted trials.",
+     "papers": [
+      "W4410292411",
+      "W4417293320",
+      "W4415056187",
+      "W7128685434",
+      "W4407382768",
+      "W4408887806",
+      "W7162207104"
+     ],
+     "people": [
+      "Marieke Sophie Jansen",
+      "Olaf M. Dekkers",
+      "Katherine C. Bassil",
+      "Karin Rolanda Jongsma",
+      "Marco Cavaleri",
+      "Gowri Gopalakrishna"
+     ],
+     "project": "Extend the analysis of archived trial protocols to several Dutch ethics committees, linking committee comments to later trial outcomes, and test whether a short checklist on sample size and feasibility lowers early termination."
+    },
+    {
+     "question": "How should ethics and integrity rules guide research during pandemics, conflicts and in fragile settings?",
+     "explanation": "Two international teams built codes of conduct (PREPARED for crises and TRUST for fragile settings) from reviews, surveys and interviews, and other papers reflect on ethics in post-conflict research and solidarity in research in Myanmar. Open is whether these codes are used and help researchers in the field.",
+     "papers": [
+      "W4410260549",
+      "W4410260558",
+      "W4416715834",
+      "W7221772100",
+      "W7221790462",
+      "W4415513762",
+      "W7155044872"
+     ],
+     "people": [
+      "Giulia Inguaggiato",
+      "Clàudia Pallisé Perelló",
+      "Michelle Singh",
+      "Marit de Haan",
+      "Saw John Bright"
+     ],
+     "project": "Evaluate the PREPARED and TRUST codes together by following research projects in crisis and fragile settings that use them, recording which dilemmas arise and whether the codes helped resolve them."
+    },
+    {
+     "question": "How do academic working conditions, leadership and codes of conduct shape whether researchers act with integrity?",
+     "explanation": "The papers study the role of senior researchers, integrity leadership in national surveys of five countries, system conditions that enable unethical behaviour in German academia, how PhD candidates understand the Netherlands Code of Conduct, and tensions in the European Code about values. Open is which changes in leadership, rules and working conditions actually improve research practice.",
+     "papers": [
+      "W4406738666",
+      "W4408971602",
+      "W4407997305",
+      "W7160412833",
+      "W4410231061",
+      "W7126278290",
+      "W4417321324"
+     ],
+     "people": [
+      "Susanne van den Hooff",
+      "Daniel Leising",
+      "Dorothee Mischkowski",
+      "Lodewijk A. Pet",
+      "Joeri K. Tijdink",
+      "Hugh Desmond"
+     ],
+     "project": "A repeated national survey of Dutch researchers, including PhD candidates, that links their understanding of the Code of Conduct and their supervision to their reported research practices, and tests a leadership training in some departments."
+    }
+   ]
+  },
+  {
+   "cluster_id": 7,
+   "summary": "Dutch researchers and data professionals in this cluster worked on making research data, and also theories, models and software, Findable, Accessible, Interoperable and Reusable (FAIR). They wrote guidance for sharing sensitive and qualitative data, checked how well fields such as security research, biophysics and palaeontology share data, built training and infrastructure such as identifier policies and repositories, and extended FAIR ideas to theories and computational models.",
+   "questions": [
+    {
+     "question": "How can sensitive or qualitative data be shared openly while protecting the people in them?",
+     "explanation": "Papers give worked examples of de-identifying behavioural data, assess re-identification risk in trauma research, release a synthetic homicide dataset, give guidance on terms for data reuse, and discuss sharing qualitative data and field notes. How well each approach keeps data useful while protecting privacy has not been compared.",
+     "papers": [
+      "W4410383479",
+      "W4410496737",
+      "W7170140343",
+      "W7214994914",
+      "W7108213465",
+      "W7125506948"
+     ],
+     "people": [
+      "Don van Ravenzwaaij",
+      "Marit Sijbrandij",
+      "Katharina Krüsselmann",
+      "Marieke C. A. Liem",
+      "Maaike Verburg",
+      "Pascal Flohr"
+     ],
+     "project": "Take the same sensitive datasets (trauma, criminology and behavioural studies) and test whether de-identified versions, synthetic versions and controlled access each still let others reproduce the original results, and how much re-identification risk remains."
+    },
+    {
+     "question": "How should theories, computational models and research software be shared so others can find and reuse them?",
+     "explanation": "Papers propose FAIR theory, a database of formal psychological models, CURE principles for biological models, a framework for reusable ecological analysis pipelines, and FAIR practices for research software in archaeology. Whether others actually reuse theories and models shared this way is still open.",
+     "papers": [
+      "W7125487564",
+      "W4414025668",
+      "W7141579262",
+      "W4407560614",
+      "W7235737237",
+      "W7160942547"
+     ],
+     "people": [
+      "Caspar van Lissa",
+      "Noah van Dongen",
+      "Denny Borsboom",
+      "Brett G. Olivier",
+      "Helena Rasche",
+      "Agnes Schneider"
+     ],
+     "project": "Ask independent teams to find, run and extend a sample of theories and models stored under FAIR theory and CURE guidelines, record where they get stuck, and revise the guidelines accordingly."
+    },
+    {
+     "question": "How far have research fields come in sharing data FAIRly, and what helps them improve?",
+     "explanation": "Studies found a gap between the intention to share and actually available materials at a security conference, fragmented data in optical tweezers research, and unclear standards for 3D fossil data; others propose practices for imaging, hydrology and environmental health registries, and training programmes. Whether training and guidelines close these gaps has not been measured.",
+     "papers": [
+      "W7166533914",
+      "W4408361466",
+      "W7147291688",
+      "W7128162683",
+      "W4412810842",
+      "W4414297246",
+      "W7128383113",
+      "W7166780387"
+     ],
+     "people": [
+      "Alexandra Dirksen",
+      "Matthew T. J. Halma",
+      "Femke M. Holwerda",
+      "Donnie Cameron",
+      "Rolf Hut",
+      "Loek Brinkman"
+     ],
+     "project": "Develop one shared audit that checks whether data and code mentioned in papers can actually be found and reused, apply it in several fields (security, biophysics, palaeontology, imaging, hydrology), and repeat it after researchers in those fields receive FAIR training."
+    },
+    {
+     "question": "What shared infrastructure, such as identifiers and trusted repositories, lets data from different sources work together?",
+     "explanation": "Papers introduce interoperability for Dutch research, set out a persistent identifier policy for the European Open Science Cloud, compare requirements for trustworthy repositories, promote linked open data, offer a checklist for making data policies FAIR, and describe a European project that connects research infrastructures. How well these pieces work together in practice is still open.",
+     "papers": [
+      "W7104653261",
+      "W7147358531",
+      "W7116094946",
+      "W7164555441",
+      "W7167933700",
+      "W4411062444"
+     ],
+     "people": [
+      "Kimberley C. Zwiers",
+      "Natascha van Lieshout",
+      "Maaike Verburg",
+      "René van Horik",
+      "Jansen Erik",
+      "Marjan Grootveld"
+     ],
+     "project": "Run a pilot in which several Dutch repositories apply the identifier policy and linked open data to a shared set of datasets, and measure how much easier it becomes for people and computers to find and combine those datasets."
+    }
+   ]
+  },
+  {
+   "cluster_id": 8,
+   "summary": "This is a large cluster in which Dutch researchers repeated earlier studies in fields ranging from psychology, sports science and the social sciences to neuroscience, plant science, battery testing and art history. They also debated how to choose which studies to replicate, how to judge whether a replication succeeded, and which practices and policies by researchers, journals and funders make research more reproducible. Several groups studied replication itself as a social and historical practice.",
+   "questions": [
+    {
+     "question": "Which published studies are most worth the time and money of a replication?",
+     "explanation": "A proposed formula ranks studies for replication by citation count and sample size, and several commentaries from different Dutch groups proposed changes (for example a log of sample size, or weighting societal impact and test severity) or argued that the choice is more complex. A study of 1,075 replications found that researchers' actual motives differ from what such frameworks recommend; how well any rule predicts useful replications has not been tested.",
+     "papers": [
+      "W4415699447",
+      "W4401126579",
+      "W4406855740",
+      "W4407863224",
+      "W4406973408",
+      "W4408853171",
+      "W4415699485",
+      "W4415699526"
+     ],
+     "people": [
+      "Daniël Lakens",
+      "Anna van 't Veer",
+      "Sarahanne Field",
+      "Don van Ravenzwaaij",
+      "Rene Bekkers",
+      "Steven Verheyen"
+     ],
+     "project": "Apply the competing replication-value formulas and a structured expert rating to the same collection of already replicated studies, and test which method best predicts the studies whose replication changed what the field believes."
+    },
+    {
+     "question": "How replicable are findings in different fields, and how should we judge whether a replication succeeded?",
+     "explanation": "Dutch researchers took part in the SCORE project, which replicated 274 claims from the social and behavioural sciences, estimated replicability in sports science, sociology and communication research, and reviewed and compared the many measures of replication success now in use. Because different projects use different measures, a shared way to judge success is still missing.",
+     "papers": [
+      "W7117224266",
+      "W7150220606",
+      "W4412464884",
+      "W4411351188",
+      "W4409051736",
+      "W7211891559",
+      "W7149592192",
+      "W4411768220"
+     ],
+     "people": [
+      "Marjan Bakker",
+      "Robbie van Aert",
+      "Marcel van Assen",
+      "Kim Wever",
+      "Cristian Mesquida",
+      "Kasper Otten"
+     ],
+     "project": "Apply the thirteen measures of replication success studied on the SCORE data to the sports-science and communication-privacy replication projects, to see whether conclusions about each field's replicability depend on the measure chosen."
+    },
+    {
+     "question": "What does replication mean and achieve in different research communities, including the humanities and archaeology?",
+     "explanation": "A team replicated a Rembrandt attribution study to learn what replication can do in art history, ethnographers observed psychologists doing replications, and others argued that replication moves through research communities as a social process, that direct replication reveals the context of findings, and that a narrow focus on replicability carries risks in archaeology; an international consortium also described how disciplinary differences shaped its own reproducibility work. When replication is useful outside experimental science is still open.",
+     "papers": [
+      "W4413275898",
+      "W7166852633",
+      "W4408472624",
+      "W4415566005",
+      "W7139991551",
+      "W4409370963",
+      "W7127040417",
+      "W7162420183"
+     ],
+     "people": [
+      "Lex Bouter",
+      "Rik Peels",
+      "Sarahanne Field",
+      "Maarten Derksen",
+      "Stephanie Meirmans",
+      "Krist Vaesen"
+     ],
+     "project": "Run a set of small replications in art history, archaeology and psychology in parallel, each observed by an ethnographer, and compare what each replication taught its field and at what cost."
+    },
+    {
+     "question": "Which interventions by researchers, journals and funders actually improve reproducibility?",
+     "explanation": "A scoping review collected the evidence on whether open science interventions work; other papers show that conference reproducibility guidelines and shared code improved reproduction, test an open science checklist in grant review, simulate statistical interventions, and offer co-created recommendations for funders and research communities. Strong tests of these recommendations in real settings are still rare.",
+     "papers": [
+      "W4409280816",
+      "W4416920605",
+      "W4408688463",
+      "W7134283245",
+      "W7167227198",
+      "W7155489955",
+      "W4408278747",
+      "W7171785652"
+     ],
+     "people": [
+      "Leonie A. Dudda",
+      "Frank Ostermann",
+      "Joeri K. Tijdink",
+      "Ayu Putu Madri Dewi",
+      "Kim Wever",
+      "Serge Horbach"
+     ],
+     "project": "Together with one or more Dutch funders, run a randomised trial of the Reproducibility Promotion Plan recommendations and the open science checklist in grant review, and follow the funded projects to measure whether their publications can be reproduced."
+    }
+   ]
+  },
+  {
+   "cluster_id": 9,
+   "summary": "Researchers in this cluster studied whether research data are really shared and reused, how sensitive health, personal and qualitative data can be shared within European law, and how open sources of information about publications compare with commercial databases. The work ranges from audits of data availability statements and journal policies to the design of federated health data networks, national training for data professionals and open bibliographic data.",
+   "questions": [
+    {
+     "question": "When a paper says its data are available, are the data really there and usable?",
+     "explanation": "An analysis of 8,826 Dutch-funded articles found frequent mismatches between data availability statements and actual data, and the same team wrote recommendations for journals; other studies assessed journal data policies in ecology and materials science, wrote guidelines for checking data and code quality, and tracked how authors respond to data requests. Whether stricter journal checks fix the problem has not yet been tested.",
+     "papers": [
+      "W7151795685",
+      "W7147084733",
+      "W4414307914",
+      "W4413380076",
+      "W7163897494",
+      "W4409948226"
+     ],
+     "people": [
+      "Michèle Nuijten",
+      "Bjørn Peare Bartholdy",
+      "Bawan Amin",
+      "Natalie E. van Dis",
+      "Kevin Rossi",
+      "Marijn de Bruin"
+     ],
+     "project": "Carry out one shared audit, across psychology, ecology, materials science and health, of whether promised data and code are available and usable, and test the journal recommendations at a few journals that agree to adopt them."
+    },
+    {
+     "question": "How can sensitive health and personal data be shared for research while respecting privacy and European law?",
+     "explanation": "Papers studied consent and 'data altruism' under the GDPR, lessons from federated networks in which the data stay local, a federated analysis across 52 databases, infrastructure for a Parkinson's consortium, neuroimaging sharing in the EU, synthetic data, and machine-readable access rules for sensitive data. How these approaches can work together under the coming European Health Data Space is still open.",
+     "papers": [
+      "W4407919962",
+      "W7170154972",
+      "W4414578797",
+      "W4415436569",
+      "W4415250461",
+      "W7213443403",
+      "W4410447904",
+      "W7213558525"
+     ],
+     "people": [
+      "Mahsa Shabani",
+      "Peter R. Rijnbeek",
+      "Esther A. H. Warnert",
+      "Lucas van der Meer",
+      "Jim Achterberg",
+      "Marleen M. Eijkholt"
+     ],
+     "project": "Test machine-readable access conditions inside an existing federated health data network, and measure how long access takes, what privacy risks remain, and whether the setup meets European Health Data Space rules."
+    },
+    {
+     "question": "What makes shared research data findable and reusable, rather than just deposited?",
+     "explanation": "Papers argue that reuse depends on the relationship between data creators and reusers, show that researchers still struggle to find relevant data, and build structured data collections and shared data standards in fields such as attention research, primate behaviour and psychoneuroendocrinology. Which of these approaches actually increases reuse has not been measured.",
+     "papers": [
+      "W4391833076",
+      "W4406141414",
+      "W7128674954",
+      "W4410348514",
+      "W4407173594",
+      "W4413270056",
+      "W7164893337",
+      "W4407421416"
+     ],
+     "people": [
+      "Paul Groth",
+      "Kathleen Gregory",
+      "Madlen Hoffstadt",
+      "Puyu Yang",
+      "Naichuan Su",
+      "Milou Sep"
+     ],
+     "project": "Compare reuse of datasets placed in structured, standardised collections with reuse of similar datasets deposited in general repositories, using text-mining of dataset mentions in later publications and interviews with reusers."
+    },
+    {
+     "question": "Are open sources of information about publications complete and reliable enough to replace commercial databases?",
+     "explanation": "Studies measured which metadata publishers deposit in Crossref, how well OpenAlex covers Chinese-language journals, how indicators differ between Web of Science and OpenAlex, and how open metadata can track open access agreements and strategic technologies. Shared criteria for what counts as an open source, and fixes for its gaps, are still being worked out.",
+     "papers": [
+      "W4410304991",
+      "W4417530193",
+      "W7211949388",
+      "W7208768810",
+      "W7211927977",
+      "W4407302865",
+      "W7166528004"
+     ],
+     "people": [
+      "Ludo Waltman",
+      "Nees Jan van Eck",
+      "Rodrigo Costas",
+      "Hans de Jonge",
+      "Jeroen Sondervan",
+      "Matthijs de Zwaan"
+     ],
+     "project": "Build a shared, openly documented test set of Dutch publications to compare open and commercial databases on coverage, affiliations, funding and open access status, and report the gaps back to the open data providers."
+    }
+   ]
+  },
+  {
+   "cluster_id": 10,
+   "summary": "Dutch statisticians and methodologists in this cluster worked on better ways to test hypotheses, especially how to show that an effect is absent or too small to matter. They developed Bayes factor methods and software (including sample size planning), related Bayes factors to p-values and error control, and debated whether problems with significance testing come from the method or from how it is used.",
+   "questions": [
+    {
+     "question": "How can researchers decide which effect is too small to matter, and test for it?",
+     "explanation": "Papers introduce three-sided testing, review minimum-effect and equivalence testing, show how to set the smallest effect size of interest (for example by asking professionals), offer power analysis tools, and warn against wrong conclusions after a non-significant result. How to agree on such thresholds within a field is still largely open.",
+     "papers": [
+      "W4405279598",
+      "W4412399854",
+      "W4415605352",
+      "W7124258934",
+      "W7164903231",
+      "W4407921446",
+      "W4408558904",
+      "W4410768167"
+     ],
+     "people": [
+      "Jack Fitzgerald",
+      "Paul Riesthuis",
+      "Henry Otgaar",
+      "Tsz Keung Wong",
+      "Daniël Lakens",
+      "Amand Floriaan Schmidt"
+     ],
+     "project": "Run consensus studies with experts and practitioners in several fields to set the smallest effect sizes that matter, and then re-test published non-significant results against these thresholds with equivalence or three-sided tests."
+    },
+    {
+     "question": "How many participants does a study need when results will be judged with Bayes factors?",
+     "explanation": "A Utrecht group developed sample size methods for Bayes factors in cluster-randomised trials, unequal group sizes, longitudinal and behavioural intervention studies, and another team released the BayesPower package that calculates power for Bayes factors without simulation. These tools still cover different designs and are not yet joined in one place.",
+     "papers": [
+      "W4412496029",
+      "W4412631516",
+      "W4412700749",
+      "W7127666251",
+      "W7128959288",
+      "W7212448709"
+     ],
+     "people": [
+      "Mirjam Moerbeek",
+      "Camila Natalia Barragán Ibáñez",
+      "Ulrich Lösener",
+      "Tsz Keung Wong"
+     ],
+     "project": "Add the multilevel and longitudinal sample size methods to the BayesPower package so that one free tool covers common trial designs, and check its answers against simulation."
+    },
+    {
+     "question": "When do Bayes factors give reliable evidence, and how do they relate to p-values and error rates?",
+     "explanation": "Papers show that approximate Bayes factors behave as e-processes with error control, recover Bayesian evidence from p-values, argue for Bayes factors in meta-analysis, and point out problems with default priors, prior probabilities of hypotheses, and outlier exclusion. A shared view on which choices make Bayes factors trustworthy in practice is still developing.",
+     "papers": [
+      "W7129088696",
+      "W7168376251",
+      "W4416976515",
+      "W4411332042",
+      "W7225799428",
+      "W4408215682"
+     ],
+     "people": [
+      "Eric-Jan Wagenmakers",
+      "Frederik Aust",
+      "Joris Mulder",
+      "Robbie van Aert",
+      "Henk A. L. Kiers"
+     ],
+     "project": "Apply the Amsterdam, Tilburg and Groningen approaches (Bayes factors from p-values, e-process Bayes factors, alternative priors and prior probabilities) to the same set of published meta-analyses and report where and why their conclusions differ."
+    },
+    {
+     "question": "Are problems with significance testing caused by the method itself or by how researchers use it?",
+     "explanation": "One paper argues that misuse rather than the method is to blame, a systematic review maps decades of essays on the problems and solutions of significance testing, and others argue that management accounting and biology rely too much on it; related work checks reported test results for errors and tests whether significant results survive different data exclusions. How much of the problem is misuse has not been measured directly.",
+     "papers": [
+      "W4411171488",
+      "W4410210538",
+      "W4408446712",
+      "W7220361118",
+      "W4406216889",
+      "W7222006082"
+     ],
+     "people": [
+      "Daniël Lakens",
+      "Noah van Dongen",
+      "Frank G. H. Hartmann",
+      "Henk A. L. Kiers",
+      "Michèle Nuijten",
+      "Jelte Wicherts"
+     ],
+     "project": "Take a shared sample of articles from psychology, management accounting and biology and count specific errors of use (reporting inconsistencies, results that depend on data exclusion, claims of no effect from non-significant results), to separate misuse from limits of the method."
+    }
+   ]
+  },
+  {
+   "cluster_id": 11,
+   "summary": "Dutch researchers in this cluster checked whether medical and brain research findings repeat in new patient groups and cohorts, and studied how bias, industry funding and weak design affect reported treatment effects. Many papers also reviewed how inconsistently outcomes are measured and reported, and how reliable it is to reuse and pool existing patient data.",
+   "questions": [
+    {
+     "question": "Do biomedical and brain-imaging findings repeat when tested in new, independent patient groups?",
+     "explanation": "The papers repeat earlier findings on bacteria in breast cancer cells (not found in 129 samples), a brain-scan marker for dementia in the Rotterdam Study, brain networks and social problems across disorders, brain rhythms in ALS in Dutch and Irish patients, ultrasound brain stimulation, and genetic and epigenetic markers; one estimates the sample size needed for stable brain-scan results. Open is which kinds of findings tend to repeat and how large studies must be.",
+     "papers": [
+      "W4411214854",
+      "W4407669232",
+      "W7155683451",
+      "W7204567315",
+      "W4416288552",
+      "W7162614860",
+      "W7165673913",
+      "W7166475187"
+     ],
+     "people": [
+      "Noel F.C.C. de Miranda",
+      "Meike Willemijn Vernooij",
+      "Maarten Mennes",
+      "Stefan Dukic",
+      "Lennart Verhagen",
+      "Jana Runze"
+     ],
+     "project": "A shared register of replication attempts in Dutch biomedical and brain research, recording the original and new effect sizes, sample sizes and methods, so that the groups can study together which features predict whether a finding repeats."
+    },
+    {
+     "question": "How do weak study design, industry funding and missing harm data distort evidence on treatments and tests?",
+     "explanation": "The papers study links between risk of bias and effect sizes in low back pain trials, whether those trials build treatment mechanisms into their design, industry payments and nerve-repair results, the evidence behind claims for brain-aneurysm devices and tumour treating fields, bias in diagnostic test studies, and how rarely harms of EMDR therapy are recorded (9 of 51 trials mentioned them). Open is how large these distortions are across fields and how reviews should correct for them.",
+     "papers": [
+      "W7147519432",
+      "W7161492805",
+      "W4416428792",
+      "W4414082258",
+      "W7165365151",
+      "W7164009699",
+      "W4413805291"
+     ],
+     "people": [
+      "Annemarie de Zoete",
+      "Raymond Ostelo",
+      "Nienke A. Krijnen",
+      "Victor Volovici",
+      "Hendri H. Pas",
+      "Kevin van Schie"
+     ],
+     "project": "A joint study across several treatment areas (back pain, nerve repair, medical devices, psychotherapy) using one protocol to estimate how much risk of bias, industry funding and missing harm reporting change pooled treatment effects."
+    },
+    {
+     "question": "How much does inconsistent measurement and reporting across studies hinder comparing and combining their results?",
+     "explanation": "Reviews show large variation in depression outcome measures over 50 years, in muscle-signal recording, fluorescence imaging, balance training and heart radiotherapy reporting, in brain-imaging methods for sitting behaviour, and in how race and ethnicity are used; several propose reporting standards. Open is whether these new standards are taken up and make results easier to combine.",
+     "papers": [
+      "W4417274943",
+      "W4415994616",
+      "W4416668058",
+      "W7128909785",
+      "W7165969066",
+      "W7170135141",
+      "W7138039665",
+      "W4408223758"
+     ],
+     "people": [
+      "Mathias Harrer",
+      "Pim J. Cuijpers",
+      "Annemijn H. Jonkman",
+      "Alexander L. Vahrmeijer",
+      "Christopher L. McCrum",
+      "Joost J.C. Verhoeff"
+     ],
+     "project": "Follow the uptake of the new reporting standards (such as Reflect, ProRePBT and the STAR review items) in the papers published over the next three years, and test whether complete reporting makes it easier to pool their results."
+    },
+    {
+     "question": "How reliably can existing patient and cohort data be reused and pooled to answer new questions?",
+     "explanation": "The papers show that reasonable choices in grouping 4,509 brain-injury patients give different groups, test which gene-expression results repeat across nine cohorts, describe how hard it was to obtain trial data for a pooled analysis, propose methods for pooling patient data, compare registry results with landmark trials, and give rules for reusing open brain scans. Open is how to make shared data both available and used correctly.",
+     "papers": [
+      "W7212079713",
+      "W7172487764",
+      "W7131833627",
+      "W7166579421",
+      "W4406628014",
+      "W7204630011"
+     ],
+     "people": [
+      "Maarten van Smeden",
+      "Erik W. van Zwet",
+      "Alessandro Chiarotto",
+      "Valentijn M. T. de Jong",
+      "Ralf E. Harskamp",
+      "Anneke Alkemade"
+     ],
+     "project": "Develop and test a common checklist for reusing and pooling patient data, by having several teams independently analyse the same shared cohort with and without the checklist and comparing how much their results differ."
+    }
+   ]
+  },
+  {
+   "cluster_id": 12,
+   "summary": "Dutch researchers in this cluster developed and tested statistical methods. They worked on correcting meta-analyses for publication bias, on showing how much results depend on analysis choices, on planning sample sizes, including for clinical prediction models, and on making psychological network models more reliable.",
+   "questions": [
+    {
+     "question": "How can meta-analyses correct for studies that were never published or analysed selectively?",
+     "explanation": "The papers extend Bayesian and frequentist correction methods to moderators and dependent effect sizes, simulate how publication bias and selective analyses distort estimates, propose using preregistered studies, and introduce a visual check. Which method works best in which real situation is still debated.",
+     "papers": [
+      "W4407702390",
+      "W4417449910",
+      "W4407702335",
+      "W7131822643",
+      "W7223198011",
+      "W4411085076",
+      "W4416876712",
+      "W7169789679"
+     ],
+     "people": [
+      "Frantis̆ek Bartos̆",
+      "Eric-Jan Wagenmakers",
+      "Robbie van Aert",
+      "Marcel van Assen",
+      "Jelte Wicherts",
+      "Vincent E. Kunst"
+     ],
+     "project": "Jointly compare the correction methods developed in Amsterdam, Tilburg and Utrecht on the same simulated and real data sets, using meta-analyses for which large preregistered replications give a trusted reference value."
+    },
+    {
+     "question": "How much do conclusions change when different researchers analyse the same data in different reasonable ways?",
+     "explanation": "The papers report a many-analyst study in ecology, start a journal for robustness reports, give tutorials for crowdsourced multiverse analyses and analysis blinding, propose a method to combine results from many analyses of one data set, and reanalyse 46 economics papers to show how one transformation choice can change estimates. How to report and weigh this variation in ordinary papers is still open.",
+     "papers": [
+      "W4407194079",
+      "W4409507897",
+      "W4414321472",
+      "W4414341611",
+      "W4416667629",
+      "W4416103376",
+      "W7137022550"
+     ],
+     "people": [
+      "Heung Ying Janet Chik",
+      "Don van Ravenzwaaij",
+      "Tom Heyman",
+      "Steven Verheyen",
+      "Alexandra Sarafoglou",
+      "Suzanne Hoogeveen"
+     ],
+     "project": "Organise a joint many-analyst and multiverse study on a shared data set from several disciplines, and combine the results with the single-dataset meta-analysis method to compare how sensitive the fields are to analysis choices."
+    },
+    {
+     "question": "How many participants or observations does a study need to give precise and reliable answers?",
+     "explanation": "The papers show that many machine-learning prediction models are built on too few patients, extend sample size calculations for prediction models, offer tools for planning ANOVA designs and for estimation-focused studies, and discuss sample sizes in neuroimaging and time-series networks. Guidance still differs between fields and goals.",
+     "papers": [
+      "W4406337329",
+      "W4410957636",
+      "W4411902038",
+      "W4412075888",
+      "W7128731126",
+      "W7125588586",
+      "W4406237519",
+      "W4416527165"
+     ],
+     "people": [
+      "Ben VAN CALSTER",
+      "Maarten van Smeden",
+      "Karel G.M. Moons",
+      "Laure Wynants",
+      "Don van Ravenzwaaij",
+      "Tom Heyman"
+     ],
+     "project": "Create one shared, freely available guide and tool for sample size planning that covers hypothesis tests, estimation and prediction models, and use it to check how often recent Dutch studies meet the required size."
+    },
+    {
+     "question": "How reliable are conclusions drawn from psychological network models of symptoms and behaviour?",
+     "explanation": "The papers add uncertainty estimates to dynamic network models, propose power and prediction checks for individual networks, test fit criteria for confirmatory network analysis, and show how analysis blinding can protect against bias. Agreed standards for when a network result can be trusted are still lacking.",
+     "papers": [
+      "W4409899527",
+      "W7215101025",
+      "W4416527165",
+      "W4411539419",
+      "W4416103376",
+      "W7223138747"
+     ],
+     "people": [
+      "Laura Francina Bringmann",
+      "Yong Zhang",
+      "Ria H. A. Hoekstra",
+      "René Freichel",
+      "Alexandra Sarafoglou",
+      "Eiko Fried"
+     ],
+     "project": "Write joint guidelines for confirmatory network analysis that combine power analysis, fit criteria, uncertainty estimates and blinding, and test them on existing clinical time-series data."
+    }
+   ]
+  },
+  {
+   "cluster_id": 13,
+   "summary": "Dutch researchers in this cluster studied how research is evaluated and how good research practice is encouraged. They wrote about the Dutch Recognition and Rewards programme and other reforms that move away from journal-based metrics, about training and supervision in research integrity, about fairness towards researchers in lower-income countries, and about how scientists relate to policymakers and the public.",
+   "questions": [
+    {
+     "question": "Which kinds of research integrity training and PhD supervision actually change how researchers do their work?",
+     "explanation": "The papers describe what supervisors do to promote responsible research, propose a roadmap for training supervisors, evaluate online courses for PhD students, and analyse existing training materials. A review of how such education is evaluated found that few outcome measures have been validated, so it is still unclear which approaches have lasting effects.",
+     "papers": [
+      "W4406910917",
+      "W4409165634",
+      "W4410436930",
+      "W4413998656",
+      "W4414614814",
+      "W7165665530",
+      "W4414537735",
+      "W7167662179"
+     ],
+     "people": [
+      "Tamarinde Haven",
+      "Mariëtte van den Hoven",
+      "Miriam S. van Loon",
+      "Natalie Evans",
+      "Rita Santos",
+      "Jenny Theodora van der Steen"
+     ],
+     "project": "Develop one shared set of validated outcome measures for integrity training and supervision, and use it to compare several training programmes at Dutch universities and medical centres over two or more years."
+    },
+    {
+     "question": "How are new rules for hiring, promotion and funding put into practice, and who benefits from them?",
+     "explanation": "The papers analyse the Dutch Recognition and Rewards programme and the public debate about it, propose principles for responsible assessment in psychology, describe funder action plans and how the European Research Council responded to reform, and argue that reforms pay too little attention to equity and inclusion. What is still missing is evidence on whether actual hiring and funding decisions change.",
+     "papers": [
+      "W4407683788",
+      "W4410996972",
+      "W4409967537",
+      "W7127193694",
+      "W7211974673",
+      "W7225109796",
+      "W7234758565",
+      "W7154028113"
+     ],
+     "people": [
+      "Alexander Rushforth",
+      "Anne Scheel",
+      "Wolfgang Kaltenbrunner",
+      "Ludo Waltman",
+      "María de los Ángeles Crespo López",
+      "Andrea Kis"
+     ],
+     "project": "Follow hiring and promotion committees at several Dutch universities and at funders over time, recording which criteria they use and how the outcomes differ for groups of researchers, to test whether the reforms change decisions."
+    },
+    {
+     "question": "How can research integrity rules be made fair for researchers in lower- and middle-income countries?",
+     "explanation": "The papers examine how fairness appears in integrity guidelines worldwide, argue that integrity and fairness should be connected, interview research regulators in Kenya, Malawi and Uganda, describe institution-wide integrity training in Kenya, and propose a framework for equal partnerships in psychiatric genetics. How to write guidance that is not imposed from richer countries remains open.",
+     "papers": [
+      "W4412738326",
+      "W7204874632",
+      "W7154036144",
+      "W7151866865",
+      "W4412145750"
+     ],
+     "people": [
+      "Krishma Labib",
+      "Clàudia Pallisé Perelló",
+      "Mariëtte van den Hoven",
+      "Gowri Gopalakrishna",
+      "Maurice Zeegers",
+      "Enock Kipchirchir Kebenei"
+     ],
+     "project": "Together with research institutions in East Africa, write and test integrity guidance and training that is developed jointly by partners from both regions, and evaluate how it is used in practice."
+    },
+    {
+     "question": "How should scientists take part in public and policy debates so that trust in science grows?",
+     "explanation": "The papers study the conditions for public trust, question whether science communication can repair trust, argue that building trust is a team task, describe the risk of harassment for scientists who engage in public, and give advice and models for working with policymakers. There is little empirical testing of which forms of engagement actually increase trust.",
+     "papers": [
+      "W7133222096",
+      "W7133216489",
+      "W7133216500",
+      "W7162312341",
+      "W7167668024",
+      "W4410979476",
+      "W7169553209"
+     ],
+     "people": [
+      "Hub Zwart",
+      "Amalia Kallergi",
+      "Laurens Landeweerd",
+      "Lisa Maria Herzog",
+      "Niels G. Mede",
+      "Bert van Wee"
+     ],
+     "project": "Compare several forms of public and policy engagement (for example participatory research, public talks and advisory roles) in a joint study that measures changes in trust and records the support scientists need when they face hostile reactions."
+    }
+   ]
+  },
+  {
+   "cluster_id": 14,
+   "summary": "Dutch researchers in this cluster examined how psychology and nearby fields do research: the weak state of theory, the many choices researchers make during analysis, questionable and responsible research practices, sample sizes, and reporting checklists. Others wrote about large international team projects, about making open science more globally inclusive, and about the role of novelty-seeking and subjectivity in science.",
+   "questions": [
+    {
+     "question": "How can psychology build precise, testable theories instead of loose verbal ones?",
+     "explanation": "These papers describe psychology's theory problem, propose indicators of theoretical rigour for research assessment, show how to turn a narrative theory into a formal model, test a hackathon where content experts and modellers build theories together, and argue that research should first establish robust phenomena. How to make such theory work common practice and rewarded is still open.",
+     "papers": [
+      "W7128600353",
+      "W7127439165",
+      "W7203444551",
+      "W4408154769",
+      "W7144196671",
+      "W7214714522",
+      "W4408533457",
+      "W4413883149"
+     ],
+     "people": [
+      "Noah van Dongen",
+      "Anne Scheel",
+      "Caspar van Lissa",
+      "Alexandra Sarafoglou",
+      "Eiko Fried",
+      "Daniël Lakens"
+     ],
+     "project": "Score a sample of published psychology articles with the theoretical rigour indicators, then hold many-modeller hackathons to formalise the most-used theories that score lowest, and share the resulting models openly."
+    },
+    {
+     "question": "How much do research conclusions depend on the analysis and design choices researchers make?",
+     "explanation": "Papers give guidance for many-analyst studies, argue for moving beyond single-design, single-analysis studies, discuss sensitivity analysis and the variation in factor analysis results, explain how to reanalyse published data, and discuss preregistering simulation studies. How large this dependence is across fields, and how to report it routinely, is still open.",
+     "papers": [
+      "W4416583473",
+      "W7216015906",
+      "W4414890088",
+      "W4410002792",
+      "W7163991785",
+      "W7126015054"
+     ],
+     "people": [
+      "Alexandra Sarafoglou",
+      "Eiko Fried",
+      "Gerben ter Riet",
+      "David Goretzko",
+      "Jelte Wicherts"
+     ],
+     "project": "Reanalyse a set of openly shared psychology datasets with many reasonable analysis paths, following the reanalysis guide and the many-analyst recommendations, and report how often the main conclusion changes."
+    },
+    {
+     "question": "How can large international team projects make findings more general and research more globally inclusive?",
+     "explanation": "Papers draw lessons from big team science and a decade of ManyBabies infant studies, call for open science that is diverse and equitable, and argue that African research communities and the open science movement can strengthen each other. How to share credit, funding and decisions fairly across countries is still open.",
+     "papers": [
+      "W4403818143",
+      "W7164007000",
+      "W4406946826",
+      "W7133238684"
+     ],
+     "people": [
+      "Flávio Azevedo",
+      "Ingmar Visser",
+      "Christina Bergmann",
+      "Nina Hansen",
+      "Niels G. Mede"
+     ],
+     "project": "Set up a big-team study with partner labs in Africa and Europe that tests a developmental or social psychology finding in both regions, and document how authorship, funding and design decisions were shared."
+    },
+    {
+     "question": "Which questionable and responsible research practices are common, and do reforms change them?",
+     "explanation": "Researchers built a community list of questionable research practices, measured practices in 300 master's theses, showed that sample sizes in psychology grew over time, and proposed Registered Reports, the PECANS reporting checklist, and sharing non-anonymised meta-science data. Whether these reforms change practice in the long run is not yet known.",
+     "papers": [
+      "W4412134464",
+      "W7123872084",
+      "W4409085343",
+      "W4410890886",
+      "W4414083522",
+      "W7124518378"
+     ],
+     "people": [
+      "Aleksandrina Skvortsova",
+      "Hilde Elisabeth Maria Augusteijn",
+      "Jelte Wicherts",
+      "Marjan Bakker",
+      "Anita Eerland",
+      "Willem Eduard Frankenhuis"
+     ],
+     "project": "Code master's theses and published articles from several Dutch universities with the list of questionable research practices, and compare work done as Registered Reports or with reporting checklists against other work."
+    }
+   ]
+  },
+  {
+   "cluster_id": 15,
+   "summary": "Dutch researchers in this cluster studied how peer review works and how it can be improved. They documented the growing pressure on reviewers, tested new review formats, examined the use of AI in reviewing, worked on a shared definition of peer review, and described alternatives such as preprint review and Registered Reports.",
+   "questions": [
+    {
+     "question": "How can peer review keep working while submissions grow faster than the number of willing reviewers?",
+     "explanation": "The papers survey reviewer workload, test a blended programme committee and a collective Peer Circle for grant review, and describe how review labour is paid for or outsourced to companies. Which new formats reduce workload without lowering quality has so far been tested only in single settings.",
+     "papers": [
+      "W7106525079",
+      "W4415665752",
+      "W7162521427",
+      "W7202073200",
+      "W7211924551",
+      "W7211946117",
+      "W4410768055",
+      "W7169657014"
+     ],
+     "people": [
+      "Peter van den Besselaar",
+      "Ayushi Rastogi",
+      "Justus Bogner",
+      "Willem Halffman",
+      "Serge Horbach",
+      "Wolfgang Kaltenbrunner"
+     ],
+     "project": "Run coordinated field experiments at several journals, conferences and funders in which new review formats are compared with the usual format on reviewer time and review quality, using the same outcome measures."
+    },
+    {
+     "question": "Can AI tools help with peer review, and how do reviewers judge their usefulness and risks?",
+     "explanation": "The papers survey medical reviewers about AI chatbots, compare AI-written and human criticisms of Nature-family papers rated by 45 scientists, develop AI review systems for preprints and rubric-based reviews, and discuss automated integrity checks at journals. How reliable and fair these tools are in real editorial work is still open.",
+     "papers": [
+      "W4414982208",
+      "W7151340983",
+      "W7161948168",
+      "W7171980754",
+      "W7224675110",
+      "W7202073200",
+      "W4408818686"
+     ],
+     "people": [
+      "Lex Bouter",
+      "Aleksandar Shulevski",
+      "Frits Richard Rosendaal",
+      "Zhaochun Ren",
+      "Justus Bogner",
+      "Caroline Dawn Sutton"
+     ],
+     "project": "Carry out a preregistered trial on a preprint platform in which papers receive AI-assisted reports, human reports or both, and experts rate the correctness and usefulness of each criticism."
+    },
+    {
+     "question": "What exactly counts as peer review, and which outcomes should studies of peer review measure?",
+     "explanation": "The papers report a scoping review and an international consensus study defining manuscript peer review, a protocol for a core set of outcomes for peer review research, and studies of open peer review and of the information content of published review reports. The agreed outcomes still need to be used in comparative studies.",
+     "papers": [
+      "W7221005739",
+      "W7221592452",
+      "W7225693648",
+      "W7223683716",
+      "W7171777024",
+      "W7115186824",
+      "W7125798219"
+     ],
+     "people": [
+      "Ludo Waltman",
+      "Olmo van den Akker",
+      "Bahar Mehmani",
+      "Serge Horbach"
+     ],
+     "project": "Use the new core outcome set to compare open and closed peer review across a group of journals that agree to share their review data."
+    },
+    {
+     "question": "Do newer publishing models, such as reviewing preprints or reviewing plans before results, work better than traditional journal review?",
+     "explanation": "The papers describe preprint review services and the publish-review-curate model, test live community review of preprints, introduce Registered Reports in a journal, argue that Registered Reports should be the default for confirmatory studies, and propose replacing standard conference papers with registered proposals followed by results reports. Systematic comparisons with traditional review are still scarce.",
+     "papers": [
+      "W7104039273",
+      "W7213423930",
+      "W7165451498",
+      "W7147495587",
+      "W7221794662",
+      "W7125800320",
+      "W7221754275"
+     ],
+     "people": [
+      "Ludo Waltman",
+      "Dmitry M. Kochetkov",
+      "Peter Christiaan Klink",
+      "Willem Eduard Frankenhuis",
+      "Sarahanne Field",
+      "Fabio Massacci"
+     ],
+     "project": "Compare articles that went through preprint review, Registered Report review and traditional review on reporting quality, time to publication and later corrections."
+    }
+   ]
+  },
+  {
+   "cluster_id": 16,
+   "summary": "Dutch researchers in this cluster repeated earlier studies, often as preregistered or registered reports, across psychology, neuroscience, communication science, economics and computer science. Many were large multi-lab projects; others reanalysed existing data, checked whether findings hold in new countries or newer technology, or tested how well surveys and language models reflect real behaviour.",
+   "questions": [
+    {
+     "question": "Do well-known findings in psychology still hold when many labs repeat the original study together?",
+     "explanation": "The papers report multi-lab replications of stereotype threat, terror management, infant rule learning (ManyBabies 3, 839 infants), construal-level theory (11,775 participants in 27 countries), stress recovery from viewing nature, Tetris and trauma intrusions, and unethical behaviour at work. Open is why some effects shrink or vanish and how much results vary between labs and countries.",
+     "papers": [
+      "W4410169806",
+      "W7222122276",
+      "W4409672125",
+      "W7213301637",
+      "W4415630324",
+      "W7141510788",
+      "W4408305761",
+      "W4411731251"
+     ],
+     "people": [
+      "Andrea Helena Stoevenbelt",
+      "Jelte Wicherts",
+      "Maximilian A. Primbs",
+      "Ingmar Visser",
+      "Agnes E. Van den Berg",
+      "Ineke Wessel"
+     ],
+     "project": "Pool the participant-level data of these Dutch-led multi-lab replications to study, across projects, how much effects differ between labs and countries and which lab or sample features explain those differences."
+    },
+    {
+     "question": "How much do conclusions change when the same data are reanalysed or corrected for publication bias?",
+     "explanation": "Robustness reports and a multiverse analysis of a water-tasting study, bias-adjusted reanalyses of meta-analyses on ChatGPT in education and social comparison, a reanalysis of sea-level data, six differing commentaries on one multi-lab data set, and pooled equivalence testing for oxytocin test whether conclusions survive other reasonable analyses; some held (the water preference), while others weakened or reversed. Open is how journals should report this uncertainty as standard.",
+     "papers": [
+      "W4406782626",
+      "W4406800744",
+      "W4410304439",
+      "W4410577402",
+      "W7128297201",
+      "W4416955402",
+      "W7135018173"
+     ],
+     "people": [
+      "Alexandra Sarafoglou",
+      "Suzanne Hoogeveen",
+      "Eric-Jan Wagenmakers",
+      "Richard J S Tol",
+      "Deniz Başkent",
+      "Wolfgang Viechtbauer"
+     ],
+     "project": "Run bias-adjusted reanalyses and multiverse analyses on a set of recent, highly cited meta-analyses from several fields, and publish them as linked robustness reports to measure how often the headline conclusion changes."
+    },
+    {
+     "question": "Do findings from one country, group or period also hold in other places and at other times?",
+     "explanation": "These replications move studies to Africa, German politicians on X, Flemish policymakers, Thai language learners, children in recommender-system data, a Croatian earthquake, and newer chatbots. Open is how to tell whether a different result reflects a real difference in context or a weakness in the original study.",
+     "papers": [
+      "W4205492896",
+      "W4405995593",
+      "W4414028537",
+      "W7156132167",
+      "W4417227936",
+      "W4414034979",
+      "W4407885744"
+     ],
+     "people": [
+      "Maximilian A. Primbs",
+      "Corinna Oschatz",
+      "Maria Tiggelaar",
+      "Christine Liebrecht",
+      "Maria Soledad Pera",
+      "Gaëtan Mertens"
+     ],
+     "project": "Plan a set of replications in which the same studies are repeated in the Netherlands and in one or two very different settings at the same time, stating beforehand which differences in context should and should not change the result."
+    },
+    {
+     "question": "How well do surveys, vignettes, student samples and language models capture how people really behave?",
+     "explanation": "The papers compare a vignette survey with a field experiment, language models with 843 real respondents, wording that reduces socially desirable answers, the effort of students who take part for course credit, who agrees to donate digital data, and which Dutch businesses answer surveys (19% did). Open is when these cheaper data sources can be trusted and how to correct for their gaps.",
+     "papers": [
+      "W4406758035",
+      "W7171845489",
+      "W4415772236",
+      "W7220997870",
+      "W4415148104",
+      "W7159964299"
+     ],
+     "people": [
+      "Andrea Gabriele Forster",
+      "Shuying Guo",
+      "Yfke Ongena",
+      "Anselm B. M. Fuermaier",
+      "Bella Struminskaya",
+      "Jack Fitzgerald"
+     ],
+     "project": "Build a Dutch benchmark in which the same questions are answered through a survey, a vignette, a student pool and several language models, and compared with administrative or behavioural data on the same people or firms."
+    }
+   ]
+  },
+  {
+   "cluster_id": 17,
+   "summary": "Dutch researchers in this cluster, many at Leiden University, studied how research is counted and noticed: through citations, journal and university rankings, and mentions on social media platforms such as X, WeChat and Bluesky and in policy documents. Others linked citation data to retractions, proposed new or open indicators (such as an open version of the Journal Impact Factor and an authorship-weighted index), and compared methods for drawing maps of research fields.",
+   "questions": [
+    {
+     "question": "How does research travel beyond academia, through social media, policy documents and different languages?",
+     "explanation": "These papers measure who mentions scientific publications on X, Bluesky and WeChat, in which languages, and how often policy documents indexed by Overton cite research; one shows that promotional wording in abstracts goes with more online attention. What is still open is whether these new data sources can serve as reliable measures of societal reach, now that platforms change quickly.",
+     "papers": [
+      "W4411495334",
+      "W4413371078",
+      "W4416174570",
+      "W4416347692",
+      "W7211963969",
+      "W7132836674",
+      "W4414370984",
+      "W4412956396"
+     ],
+     "people": [
+      "Zhichao Fang",
+      "Rodrigo Costas",
+      "Dongyi Wang",
+      "Vincent Traag",
+      "Konstantina Delli",
+      "Olga Stavrova"
+     ],
+     "project": "Build one open dataset that follows the same set of publications across X, Bluesky, WeChat and Overton policy documents, and use it to compare which kinds of research (by field, language and wording) reach which audiences on each channel."
+    },
+    {
+     "question": "How can research assessment indicators be made open, checkable, and fair to different kinds of contributions?",
+     "explanation": "The papers rebuild the Journal Impact Factor from open OpenAlex data, audit the rules of a national Russian journal register, propose an index that weights authorship position, study how researchers want data work to be cited, and design an indicator of clinical relevance with language models; the Ukrainian case shows what happens when ranking scores become goals in themselves, and another study compares citation metrics with honours such as academy membership. Whether these new indicators measure what they claim, and how they change researchers' behaviour, is still open.",
+     "papers": [
+      "W7222838667",
+      "W7219822520",
+      "W7165688511",
+      "W7134978013",
+      "W7169801920",
+      "W4406884622",
+      "W7235586548"
+     ],
+     "people": [
+      "Utz Weitzel",
+      "Dmitry M. Kochetkov",
+      "Athanasios Angelakis",
+      "Kathleen Gregory",
+      "Silvia Fattori",
+      "Myroslava Hladchenko"
+     ],
+     "project": "Compute several of the proposed open indicators (the Open Journal Factor, data citation counts, an authorship-weighted score and the clinical-relevance indicator) for one shared set of Dutch publications, and compare each with the judgement of expert panels to see which indicators agree with how experts value the work."
+    },
+    {
+     "question": "Can publication and citation databases reliably signal research integrity problems and mentoring relationships at large scale?",
+     "explanation": "Researchers linked retraction records to a database of highly cited scientists, looked at gender differences in retractions and at institution-level warning signs, proposed a classification of citation irregularities, tested an algorithm that finds mentor–student pairs against recorded PhD supervision, and improved the separation of authors with the same Chinese name. How well such signals identify real problems, without unfairly labelling people, is still open.",
+     "papers": [
+      "W4406983842",
+      "W7214936981",
+      "W7221699250",
+      "W7146956965",
+      "W7221924462",
+      "W7151598164"
+     ],
+     "people": [
+      "Jeroen Baas",
+      "Guillaume Roberge",
+      "Roy Boverhof",
+      "Lex Bouter",
+      "Tamarinde Haven",
+      "Mingrong She"
+     ],
+     "project": "Combine the author database that includes retractions with the validated mentorship algorithm to test whether retractions and citation irregularities are passed on from mentors to the researchers they trained, while checking how errors in telling authors apart affect the results."
+    },
+    {
+     "question": "Which methods for mapping research fields, citation links or text similarity, best show the topics researchers recognise?",
+     "explanation": "Two Leiden studies compared maps built from citation links with maps built from text, and found that they capture topics differently and overlap only weakly; a Maastricht study mapped neuroscience with text embeddings and language models. Which method fits which purpose is still unsettled.",
+     "papers": [
+      "W4406778103",
+      "W4409809050",
+      "W4408662309"
+     ],
+     "people": [
+      "Juan Pablo Bascur",
+      "Suzan Verberne",
+      "Nees Jan van Eck",
+      "Ludo Waltman",
+      "Qianqian Xie",
+      "Mario Senden"
+     ],
+     "project": "Map the same large corpus (for example neuroscience or cardiovascular research) with citation clustering, topic models and language-model text embeddings, and judge all three maps against MeSH topic labels and against judgements by researchers in the field."
+    }
+   ]
+  },
+  {
+   "cluster_id": 18,
+   "summary": "Dutch researchers in this cluster checked how completely and honestly clinical and psychological studies are reported. They measured spin in abstracts, compared registered plans with published papers, detected problematic or fabricated studies, and tracked how often open science practices such as open data and preregistration are used.",
+   "questions": [
+    {
+     "question": "How often do research articles present their results more favourably than the data justify, and does it mislead readers?",
+     "explanation": "The papers measure this so-called spin in trials in physiotherapy, dentistry and other medical fields, review earlier studies on its prevalence, and test in a randomised experiment whether spin changes how clinicians interpret abstracts. Ways to prevent spin before publication are still largely untested.",
+     "papers": [
+      "W4407762235",
+      "W7118243213",
+      "W7128681065",
+      "W7148460117",
+      "W7162211191",
+      "W7165577356",
+      "W7203786935"
+     ],
+     "people": [
+      "Tijn van Hoesel",
+      "Marjan Bakker",
+      "Jana Verveer",
+      "Naichuan Su",
+      "Tatiana Pereira-Cenci",
+      "Bas Loomans"
+     ],
+     "project": "Run a joint randomised study in which authors receive guidance against spin before submission, and measure both the amount of spin in their papers and how readers interpret the results."
+    },
+    {
+     "question": "Do registered study plans actually limit how researchers change their analyses and outcomes later?",
+     "explanation": "The papers compare registrations and publications in psychotherapy trials, surgery trials, qualitative research, meta-analyses and animal systematic reviews, and one review combines studies on whether preregistration improves replicability. They find that changes between plan and publication are common, but it is not clear which registration formats limit them best.",
+     "papers": [
+      "W4407493597",
+      "W7134238031",
+      "W7235297804",
+      "W7235673174",
+      "W7125970357",
+      "W7223299382",
+      "W4414702867"
+     ],
+     "people": [
+      "Eric-Jan Wagenmakers",
+      "Tamarinde Haven",
+      "Jelte Wicherts",
+      "Michèle Nuijten",
+      "Kim Wever",
+      "Maaike G. J. Gademan"
+     ],
+     "project": "Build one shared coding scheme for comparing registrations with publications and apply it across psychology, surgery, animal research and qualitative research, to find which features of a registration best prevent undisclosed changes."
+    },
+    {
+     "question": "How can untrustworthy or fabricated studies be found and removed from the evidence base faster?",
+     "explanation": "The papers propose a method to check the collected work of one author group, test the data of 223 trials from one author network, find image problems in 40% of animal studies in one field, survey researchers on image fraud, track how publishers respond to concerns, and study how retracted trials end up in systematic reviews. Fast and reliable correction by journals is still lacking.",
+     "papers": [
+      "W4406240387",
+      "W4407987743",
+      "W4415706837",
+      "W7197037924",
+      "W7164649457",
+      "W7131272374",
+      "W4413257649"
+     ],
+     "people": [
+      "Ben W. Mol",
+      "Esmée M Bordewijk",
+      "Rene Aquarius",
+      "Kim Wever",
+      "Daan Langeveld",
+      "Robert Michael Kwee"
+     ],
+     "project": "Combine statistical checks of trial data with image checks into one screening procedure, apply it to the full evidence base of one clinical field, and record how quickly journals correct or retract the flagged papers."
+    },
+    {
+     "question": "How much are open data, preregistration and other transparency practices increasing, and can software measure this reliably?",
+     "explanation": "The papers track open data, preregistration and Bayesian analysis in 28,738 psychology articles, review open science policies of medical journals, count data availability statements in dentistry, and test the tool statcheck in peer review. They use different automated and partly automated methods, whose accuracy is still being established.",
+     "papers": [
+      "W7167406590",
+      "W7208751377",
+      "W7151873491",
+      "W7202253534",
+      "W7204602311",
+      "W4415482963"
+     ],
+     "people": [
+      "Julius Pfadt",
+      "Eric-Jan Wagenmakers",
+      "Mariska Leeflang",
+      "Gowri Gopalakrishna",
+      "Naichuan Su",
+      "Michèle Nuijten"
+     ],
+     "project": "Build a shared, openly available yearly overview of transparency practices in Dutch publications across fields, and check the automated tools against careful human coding of the same papers."
+    }
+   ]
+  },
+  {
+   "cluster_id": 19,
+   "summary": "Researchers in this cluster studied how artificial intelligence, especially large language models, is changing research: as a tool to speed up systematic reviews, to detect problematic or irreproducible studies, and to annotate text or simulate survey respondents. They also wrote principles and disclosure rules for responsible use, and carried out many replication studies of published AI and computer science results.",
+   "questions": [
+    {
+     "question": "Can AI tools speed up systematic reviews without missing relevant studies?",
+     "explanation": "Utrecht researchers ran large simulation studies and a scoping review of active learning for screening, other groups tested AI as a second reviewer, evaluated machine learning for rheumatology reviews, automated risk-of-bias assessment, and studied how the reporting quality of abstracts affects whether screening tools find them. A test in which an AI wrote a full scoping review failed key steps, so when to stop screening and how much human checking is needed remain open.",
+     "papers": [
+      "W4409818425",
+      "W4410030482",
+      "W4415209337",
+      "W4414579213",
+      "W7118095375",
+      "W7163200720",
+      "W4412421246",
+      "W7117142436"
+     ],
+     "people": [
+      "Rens van de Schoot",
+      "Jelle Jasper Teijema",
+      "Isa Spiero",
+      "Lisa Affengruber",
+      "Carlijn R. Hooijmans",
+      "Tibor Hortobágyi"
+     ],
+     "project": "Build a shared benchmark from completed Dutch systematic reviews and use it to compare screening tools, second-reviewer setups and automated risk-of-bias checks against the same human decisions."
+    },
+    {
+     "question": "Can automated tools find untrustworthy or irreproducible studies at the scale of today's literature?",
+     "explanation": "Papers used language models to support trustworthiness checks of trials, developed the INSPECT-SR tool, tested whether critical tweets predict retraction, compared 11 automated rigor-checking tools, tested AI-assisted teams in reproducing social science results, and ranked AI venues by reproducibility. How accurate these tools are in routine editorial and review work is still unclear.",
+     "papers": [
+      "W4406518681",
+      "W7214235199",
+      "W4414486019",
+      "W7128766200",
+      "W7162657887",
+      "W7172003981",
+      "W7214235388",
+      "W7221195564"
+     ],
+     "people": [
+      "Ben W. Mol",
+      "Esmée M Bordewijk",
+      "Zhichao Fang",
+      "Gerben ter Riet",
+      "Hannes Datta",
+      "Holger H. Hoos"
+     ],
+     "project": "Assemble a shared set of known problematic and sound studies (retracted trials, failed and successful reproductions) and test the existing automated tools on it to see which checks are accurate enough to use in peer review."
+    },
+    {
+     "question": "When is using generative AI in research acceptable, and how should researchers disclose it?",
+     "explanation": "Groups wrote consensus principles for responsible use, disclosure guidance, an editors' consensus for anaesthesia journals, and an argument that authors must be accountable for each claim; surveys and data studies measured how researchers and editors use and disclose AI and how writing style has shifted since ChatGPT. Whether disclosure rules are followed in practice is still unknown.",
+     "papers": [
+      "W4415149087",
+      "W7117582907",
+      "W7125986437",
+      "W4414042524",
+      "W7131625985",
+      "W7164385536",
+      "W4406166075",
+      "W7163408733"
+     ],
+     "people": [
+      "Evelien Heyselaar",
+      "Erik W. Driessen",
+      "Lex Bouter",
+      "Ward van Zoonen",
+      "Serge Horbach",
+      "Keren Better"
+     ],
+     "project": "Compare self-disclosed AI use in submitted manuscripts with signs of AI use found by language analysis, and combine this with a survey of Dutch researchers to see where existing principles and disclosure rules are and are not followed."
+    },
+    {
+     "question": "Can language models replace human coders or human survey participants without changing study conclusions?",
+     "explanation": "Studies showed that choices of model and prompt can change conclusions when language models label text, that model labels are systematically biased compared with human coders, that simulated respondents give overly socially desirable answers, and that AI-generated answers are entering online surveys. Methods to measure and correct these errors are still being developed.",
+     "papers": [
+      "W4417071108",
+      "W7114769629",
+      "W7166860975",
+      "W7117655861",
+      "W7163362941",
+      "W7223728366",
+      "W7164332552"
+     ],
+     "people": [
+      "Flor Miriam Plaza-del-Arco",
+      "Sjoerd B. Stolwijk",
+      "Damian Trilling",
+      "Songgaojun Deng",
+      "Mairieli Wessel",
+      "Caspar van Lissa"
+     ],
+     "project": "Create a shared collection of human-coded social science datasets and survey results, and use it to measure how often model-based labels or simulated respondents lead to different conclusions, together with checks for AI-written survey answers."
+    }
+   ]
+  }
+ ]
+}
