@@ -255,9 +255,13 @@ for q in dutch_ids:
     a = authors.get(q) or [people.get(x, "") for x in p["p"]]
     rec.update(a=a[:3], na=max(len(a), int(p.get("na") or 0)), dth=dth, dp=p["p"], dn=[people.get(x, "") for x in p["p"]])
 events = json.load(open(events_path, encoding="utf-8")) if os.path.exists(events_path) else []
+# "discussed on blogs" events (blog_candidates.py, written by Claude agents, checked by check_blog_events.py), next to the
+# Wikipedia events file
+blogs_path = os.path.join(os.path.dirname(os.path.abspath(events_path)), "blog_events.json")
+blog_events = json.load(open(blogs_path, encoding="utf-8")) if os.path.exists(blogs_path) else []
 json.dump(dict(themes=themes, combined=[dict(id=k, th=v) for k, v in chosen_all.items()] +
                                      [dict(id=k, th=v, du=1) for k, v in dutch_combined.items()], works=out_works,
-               events=events, n_papers=len(papers), n_with_refs=n_with_refs, n_cited=len({r for p in papers for r in refs.get(p["id"], [])}),
+               events=events, blogs=blog_events, n_papers=len(papers), n_with_refs=n_with_refs, n_cited=len({r for p in papers for r in refs.get(p["id"], [])}),
                n_cited_min_k=len(cand_all) + len(tools),
                settings=dict(min_k=MIN_K, n_per_theme=N_PER_THEME, n_combined=N_COMBINED, max_overlap=MAX_OVERLAP,
                              max_guidelines=MAX_GUIDELINES, max_themes=MAX_THEMES, tool_share=TOOL_SHARE,
@@ -279,7 +283,7 @@ print(f"history_people.json: {sum(1 for v in cites_of.values() if v)} people cit
       f"{os.path.getsize(os.path.join(data_dir, 'history_people.json')) / 1e6:.2f} MB")
 print("left out as tools:", len(tools), "|", "; ".join(sorted(works[k]["t"][:40] for k in tools)[:40]))
 print(f"history.json: {len(themes)} themes, {len(used)} landmark papers ({sum(out_works[k]['nl'] for k in used)} with a Dutch author), "
-      f"{len(dutch_ids)} most cited Dutch papers, {len(chosen_all)} + {len(dutch_combined)} on the combined timeline, {len(events)} events")
+      f"{len(dutch_ids)} most cited Dutch papers, {len(chosen_all)} + {len(dutch_combined)} on the combined timeline, {len(events)} events, {len(blog_events)} blog debates")
 for t in themes:
     print(f"\n== {t['id']} {t['name']} ({t['n']} papers with references, {t['n_cand']} candidates)")
     for k in sorted(t["papers"], key=lambda k: works[k]["y"]):

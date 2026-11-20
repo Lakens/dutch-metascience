@@ -67,8 +67,8 @@
 
   <section class="card">
     <h2>Communities that could talk more</h2>
-    <p class="sub">Each dot is a pair of research communities (groups that mostly write together; see Who works with
-    whom). Right means their papers are more alike in content than the average pair; up means they write together more often (joint
+    <p class="sub">Each dot is a pair of research communities: groups of people who mostly write together, numbered
+    by size (group 1 is the largest), with the same numbers as on <a href="network.html">Who works with whom</a>. Right means their papers are more alike in content than the average pair; up means they write together more often (joint
     co-author links per 1,000 possible pairs of people). Pairs at the bottom right work on similar topics but rarely
     write together.</p>
     <div id="commchart" class="chart" style="min-height:460px"></div>
@@ -179,11 +179,11 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
 
   // ---- communities ----
   const comm = Object.fromEntries(inf.communities.map((c) => [c.id, c]));
-  const clab = (c) => `around ${comm[c].label}`;
+  const clab = (c) => `group ${c + 1}`;   // the same numbers as on Who works with whom (group 1 is the largest)
   function drawComm() {
     const cp = inf.comm_pairs;
     Plotly.react("commchart", [{ type: "scatter", mode: "markers", x: cp.map((d) => d.sim), y: cp.map((d) => d.per1000),
-      text: cp.map((d) => `<b>${esc(clab(d.a))}</b><br>(${esc(comm[d.a].topics[0])})<br><b>${esc(clab(d.b))}</b><br>(${esc(comm[d.b].topics[0])})<br>` +
+      text: cp.map((d) => `<b>${esc(clab(d.a))}</b> (${comm[d.a].n} people)<br>${esc(comm[d.a].topics.slice(0, 2).join("; "))}<br><b>${esc(clab(d.b))}</b> (${comm[d.b].n} people)<br>${esc(comm[d.b].topics.slice(0, 2).join("; "))}<br>` +
         `content similarity ${d.sim.toFixed(2)} · ${d.links} co-author links`),
       hovertemplate: "%{text}<extra></extra>",
       marker: { size: 11, color: cssVar("--series-1"), opacity: 0.8, line: { width: 1.5, color: cssVar("--surface-1") } } }],
@@ -193,8 +193,8 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
     // pairs with clearly similar content (similarity >= 0.2), the ones that write together least first
     const top = cp.filter((d) => d.sim >= 0.2).sort((a, b) => a.per1000 - b.per1000 || b.sim - a.sim).slice(0, 5);
     document.getElementById("commlist").innerHTML = "<h3 style='margin-top:10px'>Similar in content, few joint papers</h3><ul>" +
-      top.map((d) => `<li>The community ${esc(clab(d.a))} (${esc(comm[d.a].topics.slice(0, 2).join(", "))}) and the community
-        ${esc(clab(d.b))} (${esc(comm[d.b].topics.slice(0, 2).join(", "))}): content similarity ${d.sim.toFixed(2)}, ${d.links} co-author link${d.links === 1 ? "" : "s"} between them.</li>`).join("") + "</ul>";
+      top.map((d) => `<li>Group ${d.a + 1} (${esc(comm[d.a].topics.slice(0, 2).join("; "))}) and
+        ${esc(clab(d.b))} (${esc(comm[d.b].topics.slice(0, 2).join("; "))}): content similarity ${d.sim.toFixed(2)}, ${d.links} co-author link${d.links === 1 ? "" : "s"} between them.</li>`).join("") + "</ul>";
   }
 
   // ---- rising themes: model-based change in share, new authors per theme ----

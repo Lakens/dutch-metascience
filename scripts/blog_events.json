@@ -1,0 +1,649 @@
+[
+ {
+  "title": "Launch of Registered Replication Reports at Perspectives",
+  "text": "Perspectives on Psychological Science launched Registered Replication Reports, edited by Dan Simons and Alex Holcombe, publishing multi-lab replications whose protocols are reviewed before data collection; bloggers called it an important step and discussed resistance to replication.",
+  "year": 2013,
+  "month": 3,
+  "end_year": 2013,
+  "end_month": 3,
+  "themes": [
+   8,
+   15,
+   16
+  ],
+  "dutch": false,
+  "n_bloggers": 8,
+  "n_posts": 9,
+  "bloggers": [
+   "Alex Holcombe",
+   "Bobbie Spellman",
+   "Brent Donnellan",
+   "Dan Simons",
+   "David Funder",
+   "Sanjay Srivastava",
+   "Tal Yarkoni",
+   "Åse Innes-Ker"
+  ],
+  "posts": [
+   {
+    "a": "Alex Holcombe",
+    "t": "Registered Replication Reports are open for submissions!",
+    "d": "2013-03-03",
+    "u": "https://alexholcombe.wordpress.com/2013/03/03/registered-replication-reports-are-open-for-submissions/",
+    "arch": "https://web.archive.org/web/20140803225239/http://alexholcombe.wordpress.com/2013/03/03/registered-replication-reports-are-open-for-submissions/",
+    "live": true
+   },
+   {
+    "a": "Åse Innes-Ker",
+    "t": "Registered Replication Reports are open for submissions!",
+    "d": "2013-03-05",
+    "u": "https://asehelene.wordpress.com/2013/03/05/2741/",
+    "arch": "https://web.archive.org/web/20200516073716/https://asehelene.wordpress.com/2013/03/05/2741/",
+    "live": true
+   },
+   {
+    "a": "Bobbie Spellman",
+    "t": "“But I don’t want people to try to replicate my research.”",
+    "d": "2013-03-05",
+    "u": "https://morepops.wordpress.com/2013/03/05/but-i-dont-want-people-to-try-to-replicate-my-research/",
+    "arch": "https://web.archive.org/web/20130311134757/http://morepops.wordpress.com:80/2013/03/05/but-i-dont-want-people-to-try-to-replicate-my-research/",
+    "live": true
+   },
+   {
+    "a": "Dan Simons",
+    "t": "Registered replication reports at APS journal, Perspectives",
+    "d": "2013-03-05",
+    "u": "http://profsimons.blogspot.com/2013/03/registered-replication-reports-at-aps.html",
+    "arch": "https://web.archive.org/web/20260407095137/https://profsimons.blogspot.com/2013/03/registered-replication-reports-at-aps.html",
+    "live": true
+   },
+   {
+    "a": "Sanjay Srivastava",
+    "t": "The PoPS replication reports format is a good start",
+    "d": "2013-03-05",
+    "u": "https://thehardestscience.com/2013/03/05/the-pops-replication-reports-format-is-a-good-start/",
+    "arch": "https://web.archive.org/web/20190823023644/https://thehardestscience.com/2013/03/05/the-pops-replication-reports-format-is-a-good-start/",
+    "live": true
+   },
+   {
+    "a": "Tal Yarkoni",
+    "t": "the truth is not optional: five bad reasons (and one mediocre one) for defending the status quo",
+    "d": "2013-03-12",
+    "u": "https://talyarkoni.org/blog/2013/03/12/the-truth-is-not-optional-five-bad-reasons-and-one-mediocre-one-for-defending-the-status-quo/",
+    "arch": "https://web.archive.org/web/20130402172108/http://www.talyarkoni.org:80/blog/2013/03/12/the-truth-is-not-optional-five-bad-reasons-and-one-mediocre-one-for-defending-the-status-quo/",
+    "live": true
+   }
+  ],
+  "episode": 4
+ },
+ {
+  "title": "Debate over failed replication of Schnall's cleanliness study",
+  "text": "After a registered replication in a Social Psychology special issue failed to reproduce Schnall's cleanliness and moral judgment finding, bloggers debated her claim of a ceiling effect, reanalysed the open data, and argued over 'replication bullying' and tone.",
+  "year": 2014,
+  "month": 5,
+  "end_year": 2014,
+  "end_month": 7,
+  "themes": [
+   8,
+   16
+  ],
+  "dutch": true,
+  "n_bloggers": 16,
+  "n_posts": 25,
+  "bloggers": [
+   "Brent Donnellan",
+   "Brent Roberts",
+   "Daniel Lakens",
+   "Data Colada",
+   "David Funder",
+   "Etienne Lebel",
+   "Felix Schönbrodt",
+   "Katie Corker",
+   "Nicole Janz",
+   "Open Science Collaboration",
+   "Rolf Zwaan",
+   "Sanjay Srivastava",
+   "Simine Vazire",
+   "Simone Schnall",
+   "Statistical Modeling",
+   "Tal Yarkoni"
+  ],
+  "posts": [
+   {
+    "a": "Brent Roberts",
+    "t": "Additional Reflections on Ceiling Effects in Recent Replication Research",
+    "d": "2014-05-24",
+    "u": "https://pigee.wordpress.com/2014/05/24/additional-reflections-on-ceiling-effects-in-recent-replication-research/",
+    "arch": "https://web.archive.org/web/20140603133522/http://pigee.wordpress.com/2014/05/24/additional-reflections-on-ceiling-effects-in-recent-replication-research/",
+    "live": true
+   },
+   {
+    "a": "Nicole Janz",
+    "t": "“Replication Bullying:” Who replicates the replicators?",
+    "d": "2014-05-25",
+    "u": "https://politicalsciencereplication.wordpress.com/2014/05/25/replication-bullying-who-replicates-the-replicators/",
+    "arch": "https://web.archive.org/web/20140530011306/http://politicalsciencereplication.wordpress.com:80/2014/05/25/replication-bullying-who-replicates-the-replicators/",
+    "live": true
+   },
+   {
+    "a": "Sanjay Srivastava",
+    "t": "Does the replication debate have a diversity problem?",
+    "d": "2014-05-25",
+    "u": "https://thehardestscience.com/2014/05/25/does-the-replication-debate-have-a-diversity-problem/",
+    "arch": "https://web.archive.org/web/20190826001631/https://thehardestscience.com/2014/05/25/does-the-replication-debate-have-a-diversity-problem/",
+    "live": true
+   },
+   {
+    "a": "Tal Yarkoni",
+    "t": "There is no ceiling effect in Johnson, Cheung, & Donnellan (2014)",
+    "d": "2014-06-01",
+    "u": "https://talyarkoni.org/blog/2014/06/01/there-is-no-ceiling-effect-in-johnson-cheung-donnellan-2014/",
+    "arch": "",
+    "live": true
+   },
+   {
+    "a": "Data Colada",
+    "t": "[23] Ceiling Effects and Replications - Data Colada",
+    "d": "2014-06-04",
+    "u": "http://datacolada.org/23",
+    "arch": "https://web.archive.org/web/20160416083538/http://datacolada.org/23",
+    "live": true
+   },
+   {
+    "a": "David Funder",
+    "t": "The Real Source of the Replication Crisis",
+    "d": "2014-07-12",
+    "u": "https://funderstorms.wordpress.com/2014/07/12/the-real-source-of-the-replication-crisis/",
+    "arch": "https://web.archive.org/web/20140916114400/http://funderstorms.wordpress.com/2014/07/12/the-real-source-of-the-replication-crisis/",
+    "live": true
+   }
+  ],
+  "episode": 2
+ },
+ {
+  "title": "Bloggers examine the p-curve method",
+  "text": "Bloggers explained the p-curve method of Simonsohn, Nelson and Simmons (2014), simulated how p-hacking shapes p-value distributions, asked whether p-curve detects moderator trawling, and applied it to a precognition meta-analysis.",
+  "year": 2014,
+  "month": 5,
+  "end_year": 2014,
+  "end_month": 7,
+  "themes": [
+   10,
+   12,
+   14
+  ],
+  "dutch": false,
+  "n_bloggers": 5,
+  "n_posts": 5,
+  "bloggers": [
+   "Daniel Lakens",
+   "Joe Hilgard",
+   "Open Science Collaboration",
+   "Ryne Sherman",
+   "Will Gervais"
+  ],
+  "posts": [
+   {
+    "a": "Daniel Lakens",
+    "t": "A pre-publication peer-review of the 'Feeling The Future' meta-analysis",
+    "d": "2014-05-23",
+    "u": "http://daniellakens.blogspot.com/2014/05/a-pre-publication-peer-review-of-meta.html",
+    "arch": "https://web.archive.org/web/20150120000211/http://daniellakens.blogspot.com:80/2014/05/a-pre-publication-peer-review-of-meta.html",
+    "live": true
+   },
+   {
+    "a": "Ryne Sherman",
+    "t": "phack: An R Function for Examining the Effects of p-hacking",
+    "d": "2014-06-27",
+    "u": "http://rynesherman.com/blog/?p=18",
+    "arch": "",
+    "live": true
+   },
+   {
+    "a": "Joe Hilgard",
+    "t": "Can p-curve detect p-hacking through moderator trawling?",
+    "d": "2014-07-01",
+    "u": "http://crystalprisonzone.blogspot.com/2014/07/can-p-curve-detect-p-hacking-through.html",
+    "arch": "https://web.archive.org/web/20210619005834/http://crystalprisonzone.blogspot.com/2014/07/can-p-curve-detect-p-hacking-through.html",
+    "live": true
+   },
+   {
+    "a": "Open Science Collaboration",
+    "t": "phack - An R Function for Examining the Effects of P-hacking",
+    "d": "2014-07-02",
+    "u": "http://centerforopenscience.github.io/osc/2014/07/02/phack/",
+    "arch": "https://web.archive.org/web/20150326060359/http://centerforopenscience.github.io:80/osc/2014/07/02/phack/",
+    "live": true
+   }
+  ],
+  "episode": 7
+ },
+ {
+  "title": "Debate over Simonsohn's critique of the default Bayes factor test",
+  "text": "Uri Simonsohn argued on Data Colada that the default Bayesian t-test is prejudiced against small effects; Rouder, Morey, Hilgard and others replied, debating priors, alternative hypotheses and evaluating Bayes factors through simulations.",
+  "year": 2015,
+  "month": 4,
+  "end_year": 2015,
+  "end_month": 5,
+  "themes": [
+   10,
+   12
+  ],
+  "dutch": false,
+  "n_bloggers": 5,
+  "n_posts": 8,
+  "bloggers": [
+   "Data Colada",
+   "Jeff Rouder",
+   "Joe Hilgard",
+   "Richard Morey",
+   "Uli Schimmack"
+  ],
+  "posts": [
+   {
+    "a": "Data Colada",
+    "t": "[35] The Default Bayesian Test is Prejudiced Against Small Effects - Data Colada",
+    "d": "2015-04-09",
+    "u": "https://datacolada.org/35",
+    "arch": "https://web.archive.org/web/20160427120747/http://datacolada.org/35",
+    "live": true
+   },
+   {
+    "a": "Jeff Rouder",
+    "t": "Reply to Uri Simonsohn's Critique of Default Bayesian Tests",
+    "d": "2015-04-09",
+    "u": "https://web.archive.org/web/20150413114503/http://jeffrouder.blogspot.com:80/2015/04/reply-to-uri-simonsohns-critique-of.html",
+    "arch": "https://web.archive.org/web/20150413114503/http://jeffrouder.blogspot.com:80/2015/04/reply-to-uri-simonsohns-critique-of.html",
+    "live": false
+   },
+   {
+    "a": "Richard Morey",
+    "t": "All about that \"bias, bias, bias\" (it's no trouble)",
+    "d": "2015-04-10",
+    "u": "http://bayesfactor.blogspot.com/2015/04/all-about-that-bias-bias-bias-its-no.html",
+    "arch": "https://web.archive.org/web/20200803112449/http://bayesfactor.blogspot.com/2015/04/all-about-that-bias-bias-bias-its-no.html",
+    "live": true
+   },
+   {
+    "a": "Joe Hilgard",
+    "t": "Bayes Factor: Asking the Right Questions",
+    "d": "2015-04-20",
+    "u": "http://crystalprisonzone.blogspot.com/2015/04/bayes-factor-asking-right-questions.html",
+    "arch": "https://web.archive.org/web/20160206142309/http://crystalprisonzone.blogspot.com/2015/04/bayes-factor-asking-right-questions.html",
+    "live": true
+   },
+   {
+    "a": "Uli Schimmack",
+    "t": "Replacing p-values with Bayes-Factors: A Miracle Cure for the Replicability Crisis in Psychological Science",
+    "d": "2015-04-30",
+    "u": "https://replicationindex.com/2015/04/30/replacing-p-values-with-bayes-factors-a-miracle-cure-for-the-replicability-crisis-in-psychological-science/",
+    "arch": "https://web.archive.org/web/20190524151054/https://replicationindex.com/2015/04/30/replacing-p-values-with-bayes-factors-a-miracle-cure-for-the-replicability-crisis-in-psychological-science/",
+    "live": true
+   },
+   {
+    "a": "Jeff Rouder",
+    "t": "Simulating Bayes Factors and p-Values",
+    "d": "2015-05-31",
+    "u": "https://web.archive.org/web/20200806103012/http://jeffrouder.blogspot.com/2015/05/simulating-bayes-factors-and-p-values.html",
+    "arch": "https://web.archive.org/web/20200806103012/http://jeffrouder.blogspot.com/2015/05/simulating-bayes-factors-and-p-values.html",
+    "live": false
+   }
+  ],
+  "episode": 5
+ },
+ {
+  "title": "Launch of the Peer Reviewers' Openness Initiative",
+  "text": "Richard Morey, Rolf Zwaan and colleagues launched the Peer Reviewers' Openness Initiative, whose signatories will not offer comprehensive review from 2017 for manuscripts lacking open data and materials or a justification; bloggers explained why they signed.",
+  "year": 2015,
+  "month": 12,
+  "end_year": 2016,
+  "end_month": 1,
+  "themes": [
+   1,
+   9,
+   15
+  ],
+  "dutch": true,
+  "n_bloggers": 5,
+  "n_posts": 5,
+  "bloggers": [
+   "Daniel Lakens",
+   "Felix Schönbrodt",
+   "Nicole Janz",
+   "Richard Morey",
+   "Rolf Zwaan"
+  ],
+  "posts": [
+   {
+    "a": "Richard Morey",
+    "t": "Reviewers and open science: why PRO?",
+    "d": "2015-12-02",
+    "u": "http://bayesfactor.blogspot.com/2015/12/reviewers-and-open-science-why-pro.html",
+    "arch": "https://web.archive.org/web/20170603085059/http://bayesfactor.blogspot.com/2015/12/reviewers-and-open-science-why-pro.html",
+    "live": true
+   },
+   {
+    "a": "Rolf Zwaan",
+    "t": "Stepping in as Reviewers",
+    "d": "2015-12-08",
+    "u": "https://rolfzwaan.blogspot.com/2015/12/stepping-in-as-reviewers.html",
+    "arch": "https://web.archive.org/web/20160220134716/http://rolfzwaan.blogspot.com/2015/12/stepping-in-as-reviewers.html",
+    "live": true
+   },
+   {
+    "a": "Daniel Lakens",
+    "t": "Can you explain why you did not share data and materials when publishing your article?",
+    "d": "2015-12-11",
+    "u": "http://daniellakens.blogspot.com/2015/12/can-you-explain-why-you-did-not-share.html",
+    "arch": "https://web.archive.org/web/20160124224956/http://daniellakens.blogspot.com:80/2015/12/can-you-explain-why-you-did-not-share.html",
+    "live": true
+   },
+   {
+    "a": "Nicole Janz",
+    "t": "Don’t review articles that withhold data",
+    "d": "2016-01-16",
+    "u": "https://politicalsciencereplication.wordpress.com/2016/01/16/dont-review-articles-that-withhold-data/",
+    "arch": "https://web.archive.org/web/20160415115958/https://politicalsciencereplication.wordpress.com/2016/01/16/dont-review-articles-that-withhold-data/",
+    "live": true
+   }
+  ],
+  "episode": 20
+ },
+ {
+  "title": "Debate over Gilbert et al.'s critique of the Reproducibility Project",
+  "text": "Gilbert, King, Pettigrew and Wilson published a Science commentary arguing that the Reproducibility Project: Psychology underestimated replicability; bloggers examined their statistical reasoning, the design differences they raised, and the tone of the debate.",
+  "year": 2016,
+  "month": 3,
+  "end_year": 2016,
+  "end_month": 4,
+  "themes": [
+   8,
+   10
+  ],
+  "dutch": false,
+  "n_bloggers": 15,
+  "n_posts": 16,
+  "bloggers": [
+   "Ana Todorovic",
+   "Daniel Lakens",
+   "Data Colada",
+   "David Funder",
+   "Dorothy Bishop",
+   "Dr. Primestein",
+   "Hannah Watkins",
+   "Joe Hilgard",
+   "John Sakaluk",
+   "Patrick Forscher",
+   "Rolf Zwaan",
+   "Sanjay Srivastava",
+   "Simine Vazire",
+   "Statistical Modeling",
+   "Uli Schimmack"
+  ],
+  "posts": [
+   {
+    "a": "Data Colada",
+    "t": "[47] Evaluating Replications: 40% Full ≠ 60% Empty - Data Colada",
+    "d": "2016-03-03",
+    "u": "http://datacolada.org/47",
+    "arch": "https://web.archive.org/web/20160912145458/http://datacolada.org/47",
+    "live": true
+   },
+   {
+    "a": "Sanjay Srivastava",
+    "t": "Evaluating a new critique of the Reproducibility Project",
+    "d": "2016-03-03",
+    "u": "https://thehardestscience.com/2016/03/03/evaluating-a-new-critique-of-the-reproducibility-project/",
+    "arch": "https://web.archive.org/web/20180507222100/https://thehardestscience.com/2016/03/03/evaluating-a-new-critique-of-the-reproducibility-project/",
+    "live": true
+   },
+   {
+    "a": "Dorothy Bishop",
+    "t": "There is a reproducibility crisis in psychology and we need to act on it",
+    "d": "2016-03-05",
+    "u": "http://deevybee.blogspot.com/2016/03/there-is-reproducibility-crisis-in.html",
+    "arch": "https://web.archive.org/web/20160308110043/http://deevybee.blogspot.com:80/2016/03/there-is-reproducibility-crisis-in.html",
+    "live": true
+   },
+   {
+    "a": "Daniel Lakens",
+    "t": "The statistical conclusions in Gilbert et al (2016) are completely invalid",
+    "d": "2016-03-06",
+    "u": "http://daniellakens.blogspot.com/2016/03/the-statistical-conclusions-in-gilbert.html",
+    "arch": "",
+    "live": true
+   },
+   {
+    "a": "David Funder",
+    "t": "What if Gilbert is Right?",
+    "d": "2016-03-06",
+    "u": "https://funderstorms.wordpress.com/2016/03/06/what-if-gilbert-is-right/",
+    "arch": "https://web.archive.org/web/20160616220725/https://funderstorms.wordpress.com/2016/03/06/what-if-gilbert-is-right/",
+    "live": true
+   },
+   {
+    "a": "Uli Schimmack",
+    "t": "Die Verdrängung des selektiven Publizierens: 7 Fallstudien von prominenten Sozialpsychologen",
+    "d": "2016-04-20",
+    "u": "https://replicationindex.com/2016/04/20/die-verdrangung-des-selektiven-publizierens-7-fallstudien-von-prominenten-sozialpsychologen/",
+    "arch": "https://web.archive.org/web/20190430034401/https://replicationindex.com/2016/04/20/die-verdrangung-des-selektiven-publizierens-7-fallstudien-von-prominenten-sozialpsychologen/",
+    "live": true
+   }
+  ],
+  "episode": 1
+ },
+ {
+  "title": "Registered Replication Report finds no ego-depletion effect",
+  "text": "A Registered Replication Report in which more than 20 labs tested the ego-depletion effect found no clear effect, and bloggers discussed what it meant for the resource model of self-control and for the published ego-depletion literature.",
+  "year": 2016,
+  "month": 3,
+  "end_year": 2016,
+  "end_month": 4,
+  "themes": [
+   8,
+   16
+  ],
+  "dutch": false,
+  "n_bloggers": 5,
+  "n_posts": 5,
+  "bloggers": [
+   "Alex Holcombe",
+   "Hannah Watkins",
+   "Michael Inzlicht",
+   "Rolf Zwaan",
+   "Uli Schimmack"
+  ],
+  "posts": [
+   {
+    "a": "Rolf Zwaan",
+    "t": "Why Continue to Elicit False Confessions from the Data?",
+    "d": "2016-03-07",
+    "u": "https://rolfzwaan.blogspot.com/2016/03/why-continue-to-elicit-false.html",
+    "arch": "https://web.archive.org/web/20160310025408/http://rolfzwaan.blogspot.com:80/2016/03/why-continue-to-elicit-false.html",
+    "live": true
+   },
+   {
+    "a": "Hannah Watkins",
+    "t": "Bring out yer nulls?",
+    "d": "2016-03-31",
+    "u": "https://myscholarlygoop.wordpress.com/2016/03/31/bring-out-yer-nulls/",
+    "arch": "https://web.archive.org/web/20170321140832/https://myscholarlygoop.wordpress.com/2016/03/31/bring-out-yer-nulls/",
+    "live": true
+   },
+   {
+    "a": "Alex Holcombe",
+    "t": "What Reproducibility Crisis?",
+    "d": "2016-04-13",
+    "u": "https://alexholcombe.wordpress.com/2016/04/13/what-reproducibility-crisis/",
+    "arch": "https://web.archive.org/web/20161026093051/https://alexholcombe.wordpress.com/2016/04/13/what-reproducibility-crisis/",
+    "live": true
+   },
+   {
+    "a": "Uli Schimmack",
+    "t": "Replicability Report No. 1: Is Ego-Depletion a Replicable Effect?",
+    "d": "2016-04-18",
+    "u": "https://replicationindex.com/2016/04/18/rr1egodepletion/",
+    "arch": "https://web.archive.org/web/20250501031656/https://replicationindex.com/2016/04/18/rr1egodepletion/",
+    "live": true
+   }
+  ],
+  "episode": 21
+ },
+ {
+  "title": "Debate over Fiske's 'methodological terrorism' column",
+  "text": "A leaked draft APS Observer column by Susan Fiske described some online critics with terms such as 'methodological terrorism' and 'self-appointed data police'; bloggers debated tone, public criticism on social media, and the replication crisis.",
+  "year": 2016,
+  "month": 9,
+  "end_year": 2016,
+  "end_month": 11,
+  "themes": [
+   8,
+   13,
+   14
+  ],
+  "dutch": false,
+  "n_bloggers": 13,
+  "n_posts": 18,
+  "bloggers": [
+   "Ana Todorovic",
+   "Brent Roberts",
+   "Chris Chambers",
+   "Cogtales",
+   "Data Colada",
+   "Hannah Watkins",
+   "Hilda Bastian",
+   "Jee Jussim",
+   "Simine Vazire",
+   "Statistical Modeling",
+   "Susan Fiske",
+   "Tal Yarkoni",
+   "Xenia Schmalz"
+  ],
+  "posts": [
+   {
+    "a": "Brent Roberts",
+    "t": "Andrew Gelman’s blog about the Fiske fiasco",
+    "d": "2016-09-21",
+    "u": "https://pigee.wordpress.com/2016/09/21/andrew-gelmans-blog-about-the-fiske-fiasco/",
+    "arch": "https://web.archive.org/web/20161011210706/https://pigee.wordpress.com/2016/09/21/andrew-gelmans-blog-about-the-fiske-fiasco/",
+    "live": true
+   },
+   {
+    "a": "Data Colada",
+    "t": "[52] Menschplaining: Three Ideas for Civil Criticism - Data Colada",
+    "d": "2016-09-26",
+    "u": "http://datacolada.org/52",
+    "arch": "https://web.archive.org/web/20161002130433/http://datacolada.org/52",
+    "live": true
+   },
+   {
+    "a": "Tal Yarkoni",
+    "t": "There is no “tone” problem in psychology",
+    "d": "2016-10-01",
+    "u": "https://talyarkoni.org/blog/2016/10/01/there-is-no-tone-problem-in-psychology/",
+    "arch": "https://web.archive.org/web/20161005081615/http://www.talyarkoni.org:80/blog/2016/10/01/there-is-no-tone-problem-in-psychology/",
+    "live": true
+   },
+   {
+    "a": "Cogtales",
+    "t": "An interview with a next generation methodological freedom fighter",
+    "d": "2016-10-20",
+    "u": "https://cogtales.wordpress.com/2016/10/20/an-interview-with-a-next-generation-methodological-freedom-fighter/",
+    "arch": "https://web.archive.org/web/20170718170056/https://cogtales.wordpress.com/2016/10/20/an-interview-with-a-next-generation-methodological-freedom-fighter/",
+    "live": true
+   },
+   {
+    "a": "Susan Fiske",
+    "t": "A Call to Change Science’s Culture of Shaming",
+    "d": "2016-10-31",
+    "u": "https://www.psychologicalscience.org/observer/a-call-to-change-sciences-culture-of-shaming",
+    "arch": "https://web.archive.org/web/20170511011836/https://www.psychologicalscience.org/observer/a-call-to-change-sciences-culture-of-shaming",
+    "live": true
+   },
+   {
+    "a": "Jee Jussim",
+    "t": "The Science Reform Effort and Its Discontents",
+    "d": "2016-11-17",
+    "u": "https://www.psychologytoday.com/us/blog/rabble-rouser/201611/the-science-reform-effort-and-its-discontents",
+    "arch": "",
+    "live": true
+   }
+  ],
+  "episode": 3
+ },
+ {
+  "title": "Criticism and resignation of Perspectives editor Robert Sternberg",
+  "text": "Bloggers discussed concerns about Robert Sternberg's editorship of Perspectives on Psychological Science, including self-citation and apparent text recycling in his publications, and his resignation as editor in 2018.",
+  "year": 2018,
+  "month": 4,
+  "end_year": 2018,
+  "end_month": 5,
+  "themes": [
+   5,
+   13,
+   17
+  ],
+  "dutch": false,
+  "n_bloggers": 6,
+  "n_posts": 8,
+  "bloggers": [
+   "Bobbie Spellman",
+   "Daniel Lakens",
+   "Dorothy Bishop",
+   "James Heathers",
+   "Nick Brown",
+   "Uli Schimmack"
+  ],
+  "posts": [
+   {
+    "a": "Bobbie Spellman",
+    "t": "Dear APS:  It’s not me, it’s YOU !",
+    "d": "2018-04-22",
+    "u": "https://morepops.wordpress.com/2018/04/22/dear-aps-its-not-me-its-you/",
+    "arch": "https://web.archive.org/web/20180511215258/https://morepops.wordpress.com/2018/04/22/dear-aps-its-not-me-its-you/",
+    "live": true
+   },
+   {
+    "a": "James Heathers",
+    "t": "The Unbearable Heaviness of Text Recycling",
+    "d": "2018-04-25",
+    "u": "https://jamesheathers.medium.com/the-unbearable-heaviness-of-text-recycling-12389fe9850d",
+    "arch": "https://web.archive.org/web/20210614163750/https://jamesheathers.medium.com/the-unbearable-heaviness-of-text-recycling-12389fe9850d",
+    "live": true
+   },
+   {
+    "a": "Nick Brown",
+    "t": "Some instances of apparent duplicate publication by Dr. Robert J. Sternberg",
+    "d": "2018-04-25",
+    "u": "http://steamtraen.blogspot.com/2018/04/some-instances-of-apparent-duplicate.html",
+    "arch": "https://web.archive.org/web/20180430024505/http://steamtraen.blogspot.com:80/2018/04/some-instances-of-apparent-duplicate.html",
+    "live": true
+   },
+   {
+    "a": "Dorothy Bishop",
+    "t": "Power, responsibility and role models in academia",
+    "d": "2018-05-03",
+    "u": "http://deevybee.blogspot.com/2018/05/power-responsibility-and-role-models-in.html",
+    "arch": "https://web.archive.org/web/20180509175522/http://deevybee.blogspot.com:80/2018/05/power-responsibility-and-role-models-in.html",
+    "live": true
+   },
+   {
+    "a": "Daniel Lakens",
+    "t": "Prestige and Punishment: Preventing Norm Violations in Science",
+    "d": "2018-05-05",
+    "u": "http://daniellakens.blogspot.com/2018/05/prestige-and-punishment-preventing-norm.html",
+    "arch": "https://web.archive.org/web/20190720071333/http://daniellakens.blogspot.com/2018/05/prestige-and-punishment-preventing-norm.html",
+    "live": true
+   },
+   {
+    "a": "Bobbie Spellman",
+    "t": "At 30, APS Needs to Realize That It Has Grown Up",
+    "d": "2018-05-21",
+    "u": "https://morepops.wordpress.com/2018/05/21/at-30-aps-needs-to-realize-that-it-has-grown-up/",
+    "arch": "https://web.archive.org/web/20180627041728/https://morepops.wordpress.com/2018/05/21/at-30-aps-needs-to-realize-that-it-has-grown-up/",
+    "live": true
+   }
+  ],
+  "episode": 14
+ }
+]

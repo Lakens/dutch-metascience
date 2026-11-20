@@ -54,7 +54,10 @@ which themes, at which institutions, and how the literature developed over time.
     plus the 5 most cited Dutch papers per theme (`build_history.py`, rules explained at the top of the script;
     it reads the raw database for the full author lists); historical events collected from Wikipedia by
     Claude agents, each with the article's own words for the date, and kept only when a script finds those words and
-    the year in the current article (`check_events.py`, result in `history_events.json`).
+    the year in the current article (`check_events.py`, result in `history_events.json`); and debates from the
+    [Open Science Blogs Archive](https://github.com/Lakens/open_science_blogs): candidate episodes from shared links and
+    bursts of names across bloggers (`export_blogs.R`, `blog_candidates.py`), read and summarised by Claude agents, and
+    kept only with at least 5 bloggers and working links (`check_blog_events.py`, result in `blog_events.json`).
 
 The scripts read API keys from environment variables (`OPENALEX_API_KEY`, `SRC_API_KEY`, and `SURF_GPU_*` for the
 GPU workspace). The script that built the initial people list is not included, because its input contains

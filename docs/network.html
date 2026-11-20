@@ -34,7 +34,7 @@
   <div class="controls">
     <label>At least <select id="minp"><option>1</option><option selected>2</option><option>3</option><option>5</option><option>10</option></select> papers</label>
     <label>Colour by <select id="colorby">
-      <option value="comm" selected>research community</option>
+      <option value="comm" selected>co-author group</option>
       <option value="inst">main institution</option></select></label>
     <label><input type="checkbox" id="labels" checked> names</label>
     <input type="search" id="search" placeholder="Find a person…" aria-label="Find a person">
@@ -46,15 +46,16 @@
     <aside class="card panel" style="margin:0" id="panel">
       <h3>Click a person</h3>
       <p class="muted small">Their co-authors light up in the network, and their details and papers appear here.</p>
-      <p class="muted small">Communities are groups that write together more than with others (Louvain method on the
-      co-authorship links). They are not formal groups.</p>
+      <p class="muted small">The colours show groups of people who write together more than with others (Louvain method
+      on the co-authorship links). They are not formal groups and have no names; hover over a colour or a person to see
+      the group's size and its two most common themes.</p>
     </aside>
   </div>
 </main>
 <footer>Data: OpenAlex (CC0). Author identities come from OpenAlex and can merge or split people; see <a href="about.html">About</a>.</footer>
 
 <script>
-Promise.all([load("people"), load("edges"), load("papers"), load("institutions"), load("meta"), Me.ready]).then(([people, edges, papers, insts, meta, me]) => {
+Promise.all([load("people"), load("edges"), load("papers"), load("institutions"), load("meta"), load("clusters"), Me.ready]).then(([people, edges, papers, insts, meta, clusters, me]) => {
   document.getElementById("maxauth").textContent = meta.max_authors_for_links;
   const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
   const byId = Object.fromEntries(people.map((p) => [p.id, p]));
@@ -68,16 +69,28 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
   const topComms = Object.keys(commSize).map(Number).filter((c) => c >= 0).sort((a, b) => commSize[b] - commSize[a]).slice(0, 7);
   const instSize = {}; people.forEach((p) => p.ins[0] && (instSize[p.ins[0]] = (instSize[p.ins[0]] || 0) + 1));
   const topInsts = Object.keys(instSize).sort((a, b) => instSize[b] - instSize[a]).slice(0, 7);
-  function commLabel(c) {
-    const members = people.filter((p) => p.cm === c).sort((a, b) => b.k - a.k).slice(0, 2).map((p) => p.n);
-    return `Community around ${members.join(" & ")}`;
+  // groups have no names: a number (cm + 1; the site data number them by size, so group 1 is the largest) and their
+  // two most common themes, counting each of the group's papers once
+  const clName = Object.fromEntries(clusters.map((c) => [c.id, c.name]));
+  const themeCache = {};
+  function commThemes(c) {
+    if (!(c in themeCache)) {
+      const seen = new Set(), cnt = {};
+      for (const p of people) if (p.cm === c) for (const x of papersOf[p.id] || []) {
+        if (seen.has(x.id) || x.cl == null) continue;
+        seen.add(x.id); cnt[x.cl] = (cnt[x.cl] || 0) + 1;
+      }
+      themeCache[c] = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([k]) => clName[k]);
+    }
+    return themeCache[c];
   }
+  const commText = (c) => (commSize[c] > 1 ? `Group ${c + 1} (${fmt(commSize[c])} people): ${commThemes(c).join("; ")}` : "");
   function groupOf(p, by) {
     if (by === "comm") { const i = topComms.indexOf(p.cm); return i < 0 ? 8 : i; }
     const i = topInsts.indexOf(p.ins[0]); return i < 0 ? 8 : i;
   }
   function legendItems(by) {
-    if (by === "comm") return topComms.map((c, i) => [i, commLabel(c)]).concat([[8, "Other communities"]]);
+    if (by === "comm") return topComms.map((c, i) => [i, "", commText(c)]).concat([[8, "smaller groups"]]);
     return topInsts.map((id, i) => [i, instName[id] || id]).concat([[8, "Other institutions"]]);
   }
 
@@ -190,8 +203,9 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
 
   function legend() {
     const by = document.getElementById("colorby").value, el = document.getElementById("legend");
-    el.innerHTML = legendItems(by).map(([i, lab]) =>
-      `<span class="item"><span class="swatch" style="background:${i === 8 ? cssVar("--other") : seriesColor(i)}"></span>${esc(lab)}</span>`).join("");
+    el.innerHTML = (by === "comm" ? '<span>The 7 largest groups of people who often write together:</span>' : "") +
+      legendItems(by).map(([i, lab, tip]) =>
+      `<span class="item"${tip ? ` title="${esc(tip)}" aria-label="${esc(tip)}"` : ""}><span class="swatch" style="background:${i === 8 ? cssVar("--other") : seriesColor(i)}"></span>${esc(lab)}</span>`).join("");
   }
 
   function showPanel(p) {
@@ -241,7 +255,7 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
       const p = n.p;
       Tip.show(`<b>${esc(p.n)}</b><br>${p.k} paper${p.k === 1 ? "" : "s"} · ${(neighborsAll[p.id] || []).length} co-authors<br>
         <span class="muted">${p.ins.slice(0, 2).map((i) => esc(instName[i] || i)).join(" · ")}</span><br>
-        <span class="muted">${esc(p.kw.slice(0, 5).join(", "))}</span>`, ev);
+        <span class="muted">${esc(p.kw.slice(0, 5).join(", "))}</span>${commText(p.cm) ? `<br>${esc(commText(p.cm))}` : ""}`, ev);
       canvas.style.cursor = "pointer";
     } else { Tip.hide(); canvas.style.cursor = "grab"; }
   });

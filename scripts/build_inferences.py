@@ -121,18 +121,18 @@ for a, b, w in edges:
     ca, cb = comm_of.get(a), comm_of.get(b)
     if ca in cv and cb in cv and ca != cb:
         links[tuple(sorted((ca, cb)))] += 1
-def comm_label(c):
-    top = sorted(comm_people[c], key=lambda x: -x["k"])[:2]
-    return " & ".join(x["n"] for x in top)
 def comm_topics(c):
-    cnt = collections.Counter(p["cl"] for x in comm_people[c] for p in papers_of[x["id"]] if p["cl"] is not None)
+    # the group's papers, each counted once (also when several members wrote it); groups have no names, only a
+    # number (id + 1, so group 1 is the largest) and these themes
+    ps = {p["id"]: p for x in comm_people[c] for p in papers_of[x["id"]]}
+    cnt = collections.Counter(p["cl"] for p in ps.values() if p["cl"] is not None)
     return [cname[k] for k, _ in cnt.most_common(3)]
 comm_pairs = []
 for ca, cb in itertools.combinations(big, 2):
     na, nb = len(comm_people[ca]), len(comm_people[cb])
     comm_pairs.append(dict(a=ca, b=cb, sim=round(float(cv[ca] @ cv[cb]), 3), links=links[(min(ca, cb), max(ca, cb))],
                            per1000=round(1000 * links[(min(ca, cb), max(ca, cb))] / (na * nb), 2)))
-communities = [dict(id=c, label=comm_label(c), n=len(comm_people[c]), topics=comm_topics(c)) for c in big]
+communities = [dict(id=c, n=len(comm_people[c]), topics=comm_topics(c)) for c in big]
 
 # ---------------------------------------------------------------- 2. rising themes
 FIT_FROM, CHANGE_YEARS, MAX_AUTHORS = 2005, 4, 30

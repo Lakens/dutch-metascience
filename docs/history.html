@@ -22,6 +22,7 @@
   .hist .dot.ev { background: var(--series-3); border-radius: 2px; }
   .hist .dot.pa { background: var(--series-1); }
   .hist .dot.du { background: var(--series-2); }
+  .hist .dot.bl { background: var(--series-4); border-radius: 2px; }
   .hist .item { position: absolute; width: var(--cw); box-sizing: border-box; padding: 6px 8px; border-radius: 6px;
                 background: var(--page); border: 1px solid var(--border); font-size: 0.78rem; line-height: 1.25;
                 cursor: pointer; overflow: hidden; }
@@ -29,6 +30,9 @@
   .hist .item.ev { border-top: 3px solid var(--series-3); }
   .hist .item.pa { border-top: 3px solid var(--series-1); }
   .hist .item.du { border-top: 3px solid var(--series-2); }
+  .hist .item.bl { border-top: 3px solid var(--series-4); }
+  .hist-detail ul.posts { margin: 6px 0; padding-left: 18px; }
+  .hist-detail ul.posts li { margin: 2px 0; }
   .hist .item .y { color: var(--text-muted); font-variant-numeric: tabular-nums; }
   .hist .item .t { color: var(--text-primary); font-weight: 600; display: -webkit-box; -webkit-line-clamp: 3;
                    -webkit-box-orient: vertical; overflow: hidden; }
@@ -73,7 +77,8 @@
 <main>
   <h1>History</h1>
   <p class="lede">A timeline of metascience as in a history book: events above the line, papers below it.
-  Events come from Wikipedia. Landmark papers are the works that Dutch metascience papers cite most, chosen as explained
+  Events come from Wikipedia and from an archive of open science blogs (debates that many bloggers joined at the same
+  time). Landmark papers are the works that Dutch metascience papers cite most, chosen as explained
   below; next to them are the most cited papers that Dutch metascientists wrote themselves.
   Choose one of the 20 themes, or see the combined timeline of all themes.</p>
 
@@ -81,11 +86,12 @@
     <div class="controls">
       <label>Theme <select id="theme"></select></label>
       <label>Papers <select id="paf"><option value="both">landmarks and Dutch papers</option><option value="lm">landmarks only</option><option value="du">most cited Dutch papers only</option></select></label>
-      <label>Events <select id="evf"><option value="all">all</option><option value="nl">Dutch only</option><option value="none">none</option></select></label>
+      <label>Events <select id="evf"><option value="all">all</option><option value="wp">Wikipedia only</option><option value="bl">blog debates only</option><option value="nl">Dutch only</option><option value="none">none</option></select></label>
       <div class="seg" id="zoom"><button aria-pressed="false" data-v="0.7">Compact</button><button aria-pressed="true" data-v="1">Normal</button><button aria-pressed="false" data-v="1.6">Wide</button></div>
     </div>
     <div class="key">
       <span><i style="border-color:var(--series-3)"></i>Event (Wikipedia)</span>
+      <span><i style="border-color:var(--series-4)"></i>Debated on blogs</span>
       <span><i style="border-color:var(--series-1)"></i>Landmark paper (cited most by Dutch metascience)</span>
       <span><i style="border-color:var(--series-2)"></i>Most cited Dutch paper of the theme</span>
       <span><span class="nl" style="margin:0">NL</span>Dutch event, or paper with a Dutch author</span>
@@ -104,7 +110,8 @@
   </section>
 </main>
 <footer>Events: Wikipedia (CC BY-SA), each linked to its article; every event's date was checked automatically
-against the article text. Papers and reference lists: OpenAlex (CC0). Event texts written by Claude (Anthropic).</footer>
+against the article text. Papers and reference lists: OpenAlex (CC0). Blog debates: the Open Science Blogs Archive, linked to the original posts or
+their Wayback Machine copies. Event texts and blog summaries written by Claude (Anthropic).</footer>
 
 <script>
 Promise.all([load("history"), Me.ready])
@@ -119,15 +126,21 @@ Promise.all([load("history"), Me.ready])
   themeSel.innerHTML = `<option value="all">All themes combined</option>` +
     H.themes.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join("");
   const themeName = Object.fromEntries(H.themes.map((t) => [t.id, t.name]));
+  const BL = H.blogs || [];
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const fmtDate = (s) => { const [y, m, dd] = s.split("-"); return `${+dd} ${MON[+m - 1]} ${y}`; };
+  // personal view: a debate the person blogged in (blogger names compared without accents and case)
+  const blogTag = (b) => (me && b.bloggers.some((n) => foldText(n) === foldText(me.n)) ? '<span class="you">you blogged</span>' : "");
   let zoom = 1, selected = null;
 
   // ---- year scale: each year gets the width its items need (about ROWS rows of cards), with a small minimum ----
   const ROWS = 3;
+  const UP = (d) => d.kind === "ev" || d.kind === "bl";   // events and blog debates above the axis, papers below
   function minPx(y) { return y < 1900 ? 0.5 : y < 1990 ? 4 : 30; }
   function makeScale(its, k, cardW) {
     const y0 = Math.min(...its.map((d) => d.year), 1990), y1 = 2027;
     const nEv = {}, nPa = {};
-    for (const d of its) (d.kind === "ev" ? nEv : nPa)[d.year] = ((d.kind === "ev" ? nEv : nPa)[d.year] || 0) + 1;
+    for (const d of its) (UP(d) ? nEv : nPa)[d.year] = ((UP(d) ? nEv : nPa)[d.year] || 0) + 1;
     const start = {}; let x = 40;
     for (let y = y0; y <= y1; y++) {
       start[y] = x;
@@ -141,24 +154,27 @@ Promise.all([load("history"), Me.ready])
 
   function items() {
     const th = themeSel.value, ev = evSel.value, pa = paSel.value;
-    let papers, events;
+    let papers, events, blogs;
     if (th === "all") {
       papers = H.combined.map((c) => ({ id: c.id, th: c.th, kind: c.du ? "du" : "pa" }));
-      events = H.events.filter((e) => ev === "all" ? (e.themes.length >= 2 || e.dutch) : ev === "nl" ? e.dutch : false);
+      events = H.events.filter((e) => ev === "all" || ev === "wp" ? (e.themes.length >= 2 || e.dutch) : ev === "nl" ? e.dutch : false);
+      blogs = (ev === "all" || ev === "bl") ? BL : ev === "nl" ? BL.filter((b) => b.dutch) : [];
     } else {
       const t = H.themes.find((x) => String(x.id) === th);
       papers = t.papers.map((id) => ({ id, th: [t.id], kind: "pa" })).concat((t.dutch || []).map((id) => ({ id, th: [t.id], kind: "du" })));
-      events = H.events.filter((e) => e.themes.includes(+th) && (ev === "all" || (ev === "nl" && e.dutch)));
+      events = H.events.filter((e) => e.themes.includes(+th) && (ev === "all" || ev === "wp" || (ev === "nl" && e.dutch)));
+      blogs = BL.filter((b) => b.themes.includes(+th) && (ev === "all" || ev === "bl" || (ev === "nl" && b.dutch)));
     }
     papers = papers.filter((p) => pa === "both" || (pa === "lm" ? p.kind === "pa" : p.kind === "du"));
     const nLm = papers.filter((p) => p.kind === "pa").length, nDu = papers.length - nLm;
     const plural = (n, a, b) => `${n} ${n === 1 ? a : b}`;
-    const counts = `${plural(nLm, "landmark paper", "landmark papers")}, ${plural(nDu, "Dutch paper", "Dutch papers")} and ${plural(events.length, "event", "events")}`;
+    const counts = `${plural(nLm, "landmark paper", "landmark papers")}, ${plural(nDu, "Dutch paper", "Dutch papers")}, ${plural(events.length, "event", "events")} and ${plural(blogs.length, "blog debate", "blog debates")}`;
     document.getElementById("note").textContent = th === "all"
-      ? `Combined timeline: the ${H.settings.n_combined} strongest landmark papers and the ${H.settings.n_dutch_combined} most cited Dutch papers of each theme, the events that concern at least two themes, and all Dutch events. ${counts}.`
+      ? `Combined timeline: the ${H.settings.n_combined} strongest landmark papers and the ${H.settings.n_dutch_combined} most cited Dutch papers of each theme, the events that concern at least two themes, all Dutch events, and all blog debates. ${counts}.`
       : `${themeName[+th]}: ${counts}.`;
     const out = [];
     for (const e of events) out.push({ kind: "ev", y: e.year + ((e.month || 6) - 0.5) / 12, year: e.year, e });
+    for (const b of blogs) out.push({ kind: "bl", y: b.year + (b.month - 0.5) / 12, year: b.year, b });
     for (const p of papers) {
       const w = W[p.id];
       out.push({ kind: p.kind, y: w.y + 0.5, year: w.y, w, id: p.id, th: p.th });
@@ -195,7 +211,7 @@ Promise.all([load("history"), Me.ready])
       }
       return ends.length;
     }
-    const evs = its.filter((d) => d.kind === "ev"), pas = its.filter((d) => d.kind !== "ev");
+    const evs = its.filter(UP), pas = its.filter((d) => !UP(d));
     const nUp = Math.max(1, lanes(evs)), nDown = Math.max(1, lanes(pas));
     const axisY = 14 + nUp * LANE + 18;
     const width = Math.max(X(maxY + 1) + 20, ...its.map((d) => d.left + CW + 12), wrap.clientWidth);
@@ -213,7 +229,7 @@ Promise.all([load("history"), Me.ready])
     for (const y of ticks) html += `<div class="tick" style="left:${X(y)}px;top:${axisY + 10}px">${y}</div>`;
     // stems and dots first, cards after them, so that cards cover the stems of items further from the axis
     for (const d of its) {
-      const up = d.kind === "ev";
+      const up = UP(d);
       d.top = up ? axisY - 18 - (d.lane + 1) * LANE + 10 : axisY + 30 + d.lane * LANE;
       const stemTop = up ? d.top + CH : axisY, stemH = up ? axisY - (d.top + CH) : d.top - axisY;
       html += `<div class="stem" style="left:${d.x}px;top:${stemTop}px;height:${Math.max(0, stemH)}px"></div>`;
@@ -222,9 +238,13 @@ Promise.all([load("history"), Me.ready])
     for (const d of its) {
       const top = d.top;
       const left = d.left;
-      const key = d.kind === "ev" ? "e:" + d.e.url + d.e.year : "p:" + d.id;
+      const key = d.kind === "ev" ? "e:" + d.e.url + d.e.year : d.kind === "bl" ? "b:" + d.b.episode + d.b.title : "p:" + d.id;
       d.key = key;
-      if (d.kind === "ev") {
+      if (d.kind === "bl") {
+        html += `<div class="item bl${selected === key ? " on" : ""}" data-key="${esc(key)}" style="left:${left}px;top:${top}px;height:${CH}px">
+          <div class="y">${MON[d.b.month - 1]} ${d.b.year} · ${d.b.n_bloggers} bloggers${d.b.dutch ? '<span class="nl">NL</span>' : ""}${blogTag(d.b)}</div>
+          <div class="t">${esc(d.b.title)}</div></div>`;
+      } else if (d.kind === "ev") {
         html += `<div class="item ev${selected === key ? " on" : ""}" data-key="${esc(key)}" style="left:${left}px;top:${top}px;height:${CH}px">
           <div class="y">${d.e.year}${d.e.end ? "–" + d.e.end : ""}${d.e.dutch ? '<span class="nl">NL</span>' : ""}</div>
           <div class="t">${esc(d.e.title)}</div></div>`;
@@ -249,7 +269,19 @@ Promise.all([load("history"), Me.ready])
   function showDetail(d) {
     const el = document.getElementById("detail");
     if (!d) { el.innerHTML = `<span class="muted">Click an event or paper for details.</span>`; return; }
-    if (d.kind === "ev") {
+    if (d.kind === "bl") {
+      const b = d.b;
+      const when = b.year === b.end_year && b.month === b.end_month ? `${MON[b.month - 1]} ${b.year}`
+        : `${MON[b.month - 1]} ${b.year} – ${MON[b.end_month - 1]} ${b.end_year}`;
+      el.innerHTML = `<h3>${esc(b.title)}${b.dutch ? '<span class="nl">NL</span>' : ""}</h3>
+        <div class="meta">${when} · Debated on blogs: ${b.n_posts} posts by ${b.n_bloggers} bloggers · themes: ${b.themes.map((t) => esc(themeName[t])).join("; ")}</div>
+        <div>${esc(b.text)}</div>
+        ${blogTag(b) ? `<div style="margin-top:4px"><b>${esc(me.n)} blogged about this.</b></div>` : ""}
+        <ul class="posts">${b.posts.map((q) => `<li>${esc(q.a)}, <a href="${esc(q.u)}" target="_blank" rel="noopener">${esc(q.t)}</a>
+          <span class="muted">(${fmtDate(q.d)})</span>${q.arch && q.arch !== q.u ? ` · <a class="small" href="${esc(q.arch)}" target="_blank" rel="noopener">archived copy</a>` : ""}</li>`).join("")}</ul>
+        <span class="small muted">Bloggers in this debate: ${b.bloggers.map(esc).join(", ")}. All posts can be read in the
+        <a href="https://shiny.ieis.tue.nl/open_science_blogs/" target="_blank" rel="noopener">Open Science Blogs Archive</a>.</span>`;
+    } else if (d.kind === "ev") {
       const e = d.e;
       const lang = e.url.includes("nl.wikipedia") ? "Dutch Wikipedia" : "Wikipedia";
       el.innerHTML = `<h3>${esc(e.title)}${e.dutch ? '<span class="nl">NL</span>' : ""}</h3>
@@ -278,7 +310,9 @@ Promise.all([load("history"), Me.ready])
   }
 
   function drawList(its) {
-    const rows = its.slice().sort((a, b) => a.y - b.y).map((d) => d.kind === "ev"
+    const rows = its.slice().sort((a, b) => a.y - b.y).map((d) => d.kind === "bl"
+      ? `<tr><td class="yr">${d.b.year}</td><td>Blog debate</td><td>${esc(d.b.title)}${d.b.dutch ? '<span class="nl">NL</span>' : ""}${blogTag(d.b)}<br><span class="muted small">${esc(d.b.text)} ${d.b.n_bloggers} bloggers; e.g. ${d.b.posts.slice(0, 3).map((q) => `<a href="${esc(q.u)}" target="_blank" rel="noopener">${esc(q.a)}</a>`).join(", ")}</span></td></tr>`
+      : d.kind === "ev"
       ? `<tr><td class="yr">${d.e.year}${d.e.end ? "–" + d.e.end : ""}</td><td>Event</td><td><a href="${esc(d.e.url)}" target="_blank" rel="noopener">${esc(d.e.title)}</a>${d.e.dutch ? '<span class="nl">NL</span>' : ""}<br><span class="muted small">${esc(d.e.text)}</span></td></tr>`
       : `<tr><td class="yr">${d.w.y}</td><td>${d.kind === "du" ? "Dutch paper" : "Landmark paper"}</td><td><a href="${d.w.doi ? "https://doi.org/" + esc(d.w.doi) : "https://openalex.org/" + d.id}" target="_blank" rel="noopener">${esc(d.w.t)}</a>${d.w.nl ? '<span class="nl">NL</span>' : ""}${citeTag(d.id)}<br><span class="muted small">${esc((d.w.a || []).join(", "))}${d.w.na > 3 ? " et al." : ""} · cited by ${fmt(d.w.k)} papers on this site</span></td></tr>`);
     document.getElementById("list").innerHTML = `<table class="hlist"><thead><tr><th>Year</th><th>Type</th><th>What</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
@@ -302,7 +336,15 @@ Promise.all([load("history"), Me.ready])
     least one Dutch author) that have the most citations in total. A paper that is already one of the theme's landmark
     papers is not repeated (it carries the NL mark there), and one family of papers (for example, a guideline published
     in several journals) counts once. Total citations favour older papers. The combined timeline shows the
-    ${s.n_dutch_combined} most cited Dutch papers of each theme.`;
+    ${s.n_dutch_combined} most cited Dutch papers of each theme.
+    <br><br>Blog debates come from the <a href="https://github.com/Lakens/open_science_blogs">Open Science Blogs Archive</a>
+    (3,530 posts by 54 bloggers or groups, 2008–2025, mostly in psychology). A script looked for moments when several
+    different bloggers wrote about the same thing at the same time: the same link (a paper, project, column or blog post)
+    in posts by at least 3 bloggers within 60 days, or a name or phrase suddenly used by many more bloggers than usual.
+    Claude (Anthropic) read the posts of each candidate, rejected chance word bursts and topics outside metascience, and
+    wrote the title and summary; a debate is shown only when at least 5 different bloggers wrote about it. Its date runs
+    from the first to the last post about it. Debates that ran for years (Stapel, Bem, Registered Reports) have no burst
+    and are not found this way; the archive covers mostly psychology, so other themes have few or no blog debates.`;
 
   document.querySelectorAll("#zoom button").forEach((b) => b.addEventListener("click", () => {
     zoom = +b.dataset.v;
