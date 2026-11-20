@@ -37,7 +37,9 @@ which themes, at which institutions, and how the literature developed over time.
    `hand_check_rules.md`, by Claude (an AI assistant) as 14 separate reviewers, with check papers and double-judged
    papers to measure agreement. All verdicts: `hand_check_verdicts.tsv`; papers left out, with reasons:
    `excluded_by_hand.csv` (571 papers).
-6. Embeddings (`bge-m3`), a UMAP map and 20 k-means clusters named by the model (`embed_and_map.py`).
+6. Embeddings (`bge-m3`), a UMAP map and 20 k-means clusters named by the model (`embed_and_map.py`); the names
+   were then revised by hand after reading each cluster's keywords and titles (`cluster_names.json`, applied by
+   `build_site_data.py`).
 7. The JSON files for the website (`build_site_data.py`, output in `docs/data/`).
 8. The Inferences page (`build_inferences.py`): collaboration suggestions from the paper embeddings, rising themes
    from each cluster's share per year, and shared questions and goals (`goals.json`, written by Claude after reading

@@ -51,7 +51,11 @@
       data, a meta-analysis of a drug, the reproducibility of a lab measurement, DNA replication).</li>
       <li><b>The map of themes</b>: each metascience paper's title and abstract were turned into a numeric fingerprint
       with the bge-m3 model, placed on a 2-D map with UMAP, and grouped into 20 clusters (k-means); the AI named each
-      cluster from the 20 titles nearest its centre.</li>
+      cluster from the 20 titles nearest its centre. Several of those names fitted those 20 titles but not the whole
+      cluster (for example, a cluster on hypothesis testing in general was called "Bayesian"), so all 20 names were
+      revised by Claude (Anthropic) after reading each cluster's most distinctive title words, its most common
+      keywords and topics, its most cited titles and a random sample of titles. One cluster has no single subject and
+      is called "Mixed metascience topics". The names and the reasons are in <code>scripts/cluster_names.json</code>.</li>
       <li><b>Who is on the site</b>: everyone with a Dutch institution on at least one of these metascience papers,
       plus the people on the reviewed list. Co-authorship lines use only papers with at most 30 authors.</li>
       <li><b>History</b>: the reference lists of all papers came from OpenAlex. Landmark papers per theme are works

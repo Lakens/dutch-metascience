@@ -256,6 +256,16 @@ cl_count = collections.Counter(p["cl"] for p in papers if p["cl"] is not None)
 clusters = [dict(id=c, name=n, desc=d, k=cl_count.get(c, 0)) for c, n, d, k in
             db.execute("SELECT cluster, name, description, n_papers FROM cluster_names ORDER BY cluster")] \
     if db.execute("SELECT name FROM sqlite_master WHERE name='cluster_names'").fetchone() else []
+# revised names (cluster_names.json), used only for clusters whose model name is unchanged (same clustering)
+_names_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cluster_names.json")
+if os.path.exists(_names_path):
+    _rev = {r["id"]: r for r in json.load(open(_names_path, encoding="utf-8"))["clusters"]}
+    for c in clusters:
+        r = _rev.get(c["id"])
+        if r and r["model_name"] == c["name"]:
+            c["name"], c["desc"] = r["name"], r["desc"]
+        else:
+            print(f"  WARNING: cluster {c['id']} ({c['name']}) has no revised name in cluster_names.json", flush=True)
 
 meta = dict(n_papers=len(papers), n_people=len(people_out), n_listed=sum(r["l"] for r in people_out),
             n_institutions=len(insts_out), n_countries=len(countries_out), n_links=len(edges_out),

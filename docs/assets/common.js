@@ -290,6 +290,12 @@ Me.ready = (async () => {
     if (!p) return s;
     return Me.set(p, s && s.mode);
   }
+  if (s) {
+    // the stored subfield names can be out of date (theme names were revised); look them up again
+    const name = Object.fromEntries((await load("clusters")).map((c) => [c.id, c.name]));
+    s.fieldNames = s.field.map((c) => name[c] || "");
+    Me._save(s);
+  }
   return s;
 })().catch(() => null);
 
