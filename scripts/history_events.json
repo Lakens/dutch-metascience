@@ -1,0 +1,1949 @@
+[
+ {
+  "year": 1665,
+  "month": null,
+  "end": null,
+  "title": "First recorded editorial peer review",
+  "text": "Henry Oldenburg, founding editor of Philosophical Transactions of the Royal Society, left the first record of editorial review of manuscripts before publication.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Scholarly_peer_review",
+  "quote": "The first record of an editorial pre-publication peer-review is from 1665 by Henry Oldenburg"
+ },
+ {
+  "year": 1665,
+  "month": 1,
+  "end": null,
+  "title": "First scientific journal appears in Paris",
+  "text": "The Journal des sçavans, founded by Denis de Sallo, published its first issue; it is regarded as the earliest scientific journal.",
+  "themes": [
+   5
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Journal_des_s%C3%A7avans",
+  "quote": "The first issue appeared as a twelve-page quarto pamphlet on Monday, 5 January 1665."
+ },
+ {
+  "year": 1710,
+  "month": null,
+  "end": null,
+  "title": "Arbuthnot's early significance test on birth records",
+  "text": "John Arbuthnot analysed 82 years of London birth records; his reasoning is credited as the first use of significance tests.",
+  "themes": [
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/P-value",
+  "quote": "John Arbuthnot studied this question in 1710"
+ },
+ {
+  "year": 1747,
+  "month": 5,
+  "end": null,
+  "title": "James Lind's controlled scurvy experiment",
+  "text": "Ship surgeon James Lind compared several dietary treatments for scurvy in twelve sailors, one of the first controlled clinical experiments; citrus fruit gave the best results.",
+  "themes": [
+   11
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/James_Lind",
+  "quote": "This was carried out from 20 May 1747 with twelve patients"
+ },
+ {
+  "year": 1763,
+  "month": 12,
+  "end": null,
+  "title": "Bayes' essay on inverse probability presented",
+  "text": "Thomas Bayes's posthumous essay, edited by Richard Price, was read aloud at the Royal Society; it contains a special case of Bayes' theorem.",
+  "themes": [
+   10
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Bayes%27_theorem",
+  "quote": "read it aloud at the Royal Society on 23 December 1763"
+ },
+ {
+  "year": 1774,
+  "month": null,
+  "end": null,
+  "title": "Laplace independently develops Bayesian reasoning",
+  "text": "Pierre-Simon Laplace reproduced and extended Bayes's results without knowing of Bayes's work; the Bayesian interpretation of probability was developed mainly by Laplace.",
+  "themes": [
+   10
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Bayes%27_theorem",
+  "quote": "He reproduced and extended Bayes's results in 1774"
+ },
+ {
+  "year": 1878,
+  "month": null,
+  "end": null,
+  "title": "Peirce describes the 'weight of evidence'",
+  "text": "Charles Sanders Peirce used the logarithm of the factor in the odds form of Bayes' theorem, now called the Bayes factor, as the weight of evidence.",
+  "themes": [
+   10
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Bayes%27_theorem",
+  "quote": "In 1878, Charles Sanders Peirce used the logarithm of this factor"
+ },
+ {
+  "year": 1904,
+  "month": null,
+  "end": null,
+  "title": "Karl Pearson pools typhoid inoculation studies",
+  "text": "Karl Pearson collated data from several studies of typhoid inoculation in the British Medical Journal, seen as the first use of a meta-analytic approach.",
+  "themes": [
+   11,
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Meta-analysis",
+  "quote": "a 1904 paper by the statistician Karl Pearson published in the British Medical Journal collated data from several studies of typhoid inoculation"
+ },
+ {
+  "year": 1925,
+  "month": null,
+  "end": null,
+  "title": "Fisher's Statistical Methods for Research Workers",
+  "text": "In this influential book Ronald Fisher popularised significance tests and proposed p = 0.05 as a limit for statistical significance.",
+  "themes": [
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/P-value",
+  "quote": "In his highly influential book Statistical Methods for Research Workers (1925), Fisher proposed the level p = 0.05"
+ },
+ {
+  "year": 1933,
+  "month": null,
+  "end": null,
+  "title": "Neyman and Pearson publish their lemma",
+  "text": "Jerzy Neyman and Egon Pearson published the Neyman–Pearson lemma, showing how to construct most powerful tests with a fixed Type I error rate.",
+  "themes": [
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Neyman%E2%80%93Pearson_lemma",
+  "quote": "It was introduced by Jerzy Neyman and Egon Pearson in a paper in 1933."
+ },
+ {
+  "year": 1939,
+  "month": null,
+  "end": null,
+  "title": "Jeffreys publishes Theory of Probability",
+  "text": "Harold Jeffreys's book played an important role in the revival of the objective Bayesian view of probability.",
+  "themes": [
+   10
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Harold_Jeffreys",
+  "quote": "His book, Theory of Probability, which was first published in 1939"
+ },
+ {
+  "year": 1947,
+  "month": null,
+  "end": null,
+  "title": "Sensitivity and specificity introduced",
+  "text": "Biostatistician Jacob Yerushalmy introduced the terms sensitivity and specificity, the basic measures for reporting the accuracy of diagnostic tests.",
+  "themes": [
+   3
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Sensitivity_and_specificity",
+  "quote": "were introduced by American biostatistician Jacob Yerushalmy in 1947"
+ },
+ {
+  "year": 1947,
+  "month": 8,
+  "end": null,
+  "title": "Nuremberg Code formulated in Doctors' Trial",
+  "text": "The judges in the Nuremberg Doctors' Trial delivered their verdict; its ten points, including voluntary informed consent, became known as the Nuremberg Code.",
+  "themes": [
+   6
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Nuremberg_Code",
+  "quote": "On 20 August 1947, the judges delivered their verdict against Karl Brandt and 22 others."
+ },
+ {
+  "year": 1948,
+  "month": null,
+  "end": null,
+  "title": "First published randomised controlled trial in medicine",
+  "text": "A Medical Research Council trial of streptomycin for pulmonary tuberculosis became the first published randomised controlled trial in medicine.",
+  "themes": [
+   11
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Randomized_controlled_trial",
+  "quote": "The first published Randomized Controlled Trial in medicine appeared in the 1948 paper entitled"
+ },
+ {
+  "year": 1948,
+  "month": null,
+  "end": null,
+  "title": "Framingham Heart Study begins",
+  "text": "The Framingham Heart Study started following 5,209 adults; it became the source of the term risk factor.",
+  "themes": [
+   3
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Framingham_Heart_Study",
+  "quote": "The study began in 1948 with 5,209 adult subjects from Framingham"
+ },
+ {
+  "year": 1954,
+  "month": null,
+  "end": null,
+  "title": "Meehl's Clinical vs. Statistical Prediction",
+  "text": "Paul Meehl argued that mechanical, algorithmic methods of combining data predict behaviour better than clinical judgement, a controversial conclusion later supported by meta-analyses.",
+  "themes": [
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Paul_E._Meehl",
+  "quote": "Meehl's 1954 book Clinical vs. Statistical Prediction"
+ },
+ {
+  "year": 1957,
+  "month": null,
+  "end": null,
+  "title": "Lindley names the Bayesian–frequentist paradox",
+  "text": "Dennis Lindley called the disagreement between Bayesian and frequentist tests of the same hypothesis a paradox; Jeffreys had already discussed it in 1939.",
+  "themes": [
+   10
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Lindley%27s_paradox",
+  "quote": "after Dennis Lindley called the disagreement a paradox in a 1957 paper"
+ },
+ {
+  "year": 1957,
+  "month": null,
+  "end": null,
+  "title": "Open peer commentary begins in Current Anthropology",
+  "text": "Anthropologist Sol Tax founded Current Anthropology, which published signed expert commentaries alongside articles together with the authors' replies.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Scholarly_peer_review",
+  "quote": "Open peer commentary was first implemented by the anthropologist Sol Tax, who founded the journal Current Anthropology in 1957."
+ },
+ {
+  "year": 1959,
+  "month": null,
+  "end": null,
+  "title": "Publication bias first described",
+  "text": "Statistician Theodore Sterling first discussed how studies with successful results are more likely to be published than others.",
+  "themes": [
+   5,
+   11
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Publication_bias",
+  "quote": "The subject was first discussed in 1959 by statistician Theodore Sterling"
+ },
+ {
+  "year": 1962,
+  "month": null,
+  "end": null,
+  "title": "Low statistical power in psychology first noted",
+  "text": "From 1962 onward it was repeatedly pointed out that most psychological studies have low statistical power, a problem that persisted for about fifty years.",
+  "themes": [
+   14
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "It had been repeatedly pointed out since 1962 that most psychological studies have low power"
+ },
+ {
+  "year": 1964,
+  "month": null,
+  "end": null,
+  "title": "Science Citation Index launched",
+  "text": "Eugene Garfield's Institute for Scientific Information launched the Science Citation Index, which became available online in 1997 under its current name.",
+  "themes": [
+   17
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Science_Citation_Index_Expanded",
+  "quote": "launched in 1964 as Science Citation Index (SCI)"
+ },
+ {
+  "year": 1964,
+  "month": 6,
+  "end": null,
+  "title": "Declaration of Helsinki adopted",
+  "text": "The World Medical Association adopted a set of ethical principles for medical research involving human participants, later revised several times.",
+  "themes": [
+   4,
+   6
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Declaration_of_Helsinki",
+  "quote": "The Declaration was originally adopted in June 1964 in Helsinki, Finland"
+ },
+ {
+  "year": 1972,
+  "month": null,
+  "end": null,
+  "title": "Archie Cochrane's Effectiveness and Efficiency",
+  "text": "Archie Cochrane published a book describing the lack of controlled trials behind many accepted medical practices, inspiring later systematic reviews.",
+  "themes": [
+   0
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Evidence-based_medicine",
+  "quote": "In 1972, Archie Cochrane published Effectiveness and Efficiency, which described the lack of controlled trials supporting many practices that had previously been assumed to be effective."
+ },
+ {
+  "year": 1972,
+  "month": 7,
+  "end": null,
+  "title": "Tuskegee syphilis study exposed",
+  "text": "Press reports exposed the US Public Health Service study of untreated syphilis in African American men, which had run since 1932; the study was then ended.",
+  "themes": [
+   6
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Tuskegee_Syphilis_Study",
+  "quote": "The story broke first in the Washington Star on July 25, 1972"
+ },
+ {
+  "year": 1975,
+  "month": null,
+  "end": null,
+  "title": "Journal impact factors calculated yearly",
+  "text": "Impact factors, devised by Eugene Garfield, began to be calculated every year for journals listed in the Journal Citation Reports.",
+  "themes": [
+   17
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Impact_factor",
+  "quote": "Impact factors began to be calculated yearly starting from 1975 for journals listed in the Journal Citation Reports (JCR)."
+ },
+ {
+  "year": 1976,
+  "month": null,
+  "end": null,
+  "title": "The term meta-analysis is coined",
+  "text": "Statistician Gene V. Glass coined the term meta-analysis for the statistical analysis of results from many studies.",
+  "themes": [
+   11,
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Meta-analysis",
+  "quote": "was coined in 1976 by the statistician Gene V"
+ },
+ {
+  "year": 1978,
+  "month": 9,
+  "end": null,
+  "title": "Belmont Report released",
+  "text": "A US national commission released the Belmont Report, setting out ethical principles and guidelines for the protection of human subjects of research.",
+  "themes": [
+   6
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Belmont_Report",
+  "quote": "On September 30, 1978, the commission's report, Ethical Principles and Guidelines for the Protection of Human Subjects of Research, was released."
+ },
+ {
+  "year": 1979,
+  "month": null,
+  "end": null,
+  "title": "The file drawer problem named",
+  "text": "Psychologist Robert Rosenthal coined the term file drawer problem for studies with null results that remain unpublished.",
+  "themes": [
+   11
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Publication_bias",
+  "quote": "was coined by psychologist Robert Rosenthal in 1979"
+ },
+ {
+  "year": 1981,
+  "month": null,
+  "end": null,
+  "title": "First APACHE intensive care score",
+  "text": "Knaus and colleagues presented the first APACHE model, a score that estimates severity of disease and risk of death in intensive care patients.",
+  "themes": [
+   3
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/APACHE_II",
+  "quote": "The first APACHE model was presented by Knaus et al. in 1981."
+ },
+ {
+  "year": 1991,
+  "month": null,
+  "end": null,
+  "title": "The term evidence-based medicine introduced",
+  "text": "Gordon Guyatt introduced the term evidence-based medicine in an editorial, naming an approach that bases clinical decisions on critically appraised research.",
+  "themes": [
+   0
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Evidence-based_medicine",
+  "quote": "a term first formally introduced in a 1991 editorial in the ACP Journal Club"
+ },
+ {
+  "year": 1991,
+  "month": null,
+  "end": null,
+  "title": "US Common Rule for human subjects",
+  "text": "Fourteen US federal departments and agencies joined the Department of Health and Human Services in adopting a uniform set of rules for protecting human research subjects.",
+  "themes": [
+   6
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Belmont_Report",
+  "quote": "In 1991, 14 other federal departments and agencies joined HHS in adopting a uniform set of rules for the protection of human subjects"
+ },
+ {
+  "year": 1991,
+  "month": 8,
+  "end": null,
+  "title": "arXiv preprint server starts",
+  "text": "Paul Ginsparg created a central repository for physics preprints at Los Alamos National Laboratory, which grew into the arXiv.",
+  "themes": [
+   5
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/ArXiv",
+  "quote": "Begun on August 14, 1991"
+ },
+ {
+  "year": 1992,
+  "month": null,
+  "end": null,
+  "title": "Ottawa ankle rules published",
+  "text": "Emergency doctors in Ottawa published a set of rules to help decide which patients with ankle or foot pain need an X-ray for a possible fracture.",
+  "themes": [
+   3
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Ottawa_ankle_rules",
+  "quote": "This list of rules was published in 1992 by a team of doctors in the emergency department of the Ottawa Civic Hospital in Ottawa, Canada."
+ },
+ {
+  "year": 1992,
+  "month": 5,
+  "end": null,
+  "title": "Office of Research Integrity created in the US",
+  "text": "The US Office of Research Integrity was formed by merging two federal offices that oversaw scientific misconduct investigations in Public Health Service-funded research.",
+  "themes": [
+   2
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/United_States_Office_of_Research_Integrity",
+  "quote": "merged in May 1992"
+ },
+ {
+  "year": 1993,
+  "month": null,
+  "end": null,
+  "title": "Cochrane Collaboration founded",
+  "text": "The Cochrane Collaboration was founded under the leadership of Iain Chalmers to produce systematic reviews of health care evidence.",
+  "themes": [
+   0,
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Cochrane_(organisation)",
+  "quote": "was founded in 1993 under the leadership of Iain Chalmers"
+ },
+ {
+  "year": 1996,
+  "month": null,
+  "end": null,
+  "title": "First CONSORT Statement",
+  "text": "Journal editors, trialists and methodologists published the CONSORT Statement, a consensus checklist for reporting randomised trials, merging two earlier proposals.",
+  "themes": [
+   0
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Consolidated_Standards_of_Reporting_Trials",
+  "quote": "This resulted in the Consolidated Standards of Reporting Trials (CONSORT) Statement, which was first published in 1996."
+ },
+ {
+  "year": 1996,
+  "month": null,
+  "end": null,
+  "title": "Bermuda Principles on genome data release",
+  "text": "Leaders of the Human Genome Project agreed that all DNA sequence data should be released in public databases within 24 hours of generation.",
+  "themes": [
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Bermuda_Principles",
+  "quote": "At a 1996 summit in Bermuda, leaders of the scientific community agreed on a groundbreaking set of principles"
+ },
+ {
+  "year": 1996,
+  "month": 5,
+  "end": null,
+  "title": "Sokal hoax in Social Text",
+  "text": "Physicist Alan Sokal had a nonsense article published in the cultural studies journal Social Text and then revealed it as a hoax.",
+  "themes": [
+   5
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Sokal_affair",
+  "quote": "Three weeks after its publication in May 1996, Sokal revealed in the magazine Lingua Franca that the article was a hoax."
+ },
+ {
+  "year": 1997,
+  "month": null,
+  "end": null,
+  "title": "Committee on Publication Ethics (COPE) founded",
+  "text": "A small group of medical journal editors in the United Kingdom established COPE, which later issued guidance and a code of conduct for journal editors.",
+  "themes": [
+   2
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Committee_on_Publication_Ethics",
+  "quote": "COPE was established in 1997 by a small group of medical journal editors in the United Kingdom."
+ },
+ {
+  "year": 1998,
+  "month": null,
+  "end": null,
+  "title": "Original Framingham Risk Score published",
+  "text": "The first Framingham Risk Score, a model predicting individual risk of coronary heart disease, was published; updated versions followed in 2002 and 2008.",
+  "themes": [
+   3
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Framingham_Risk_Score",
+  "quote": "The original Framingham Risk Score had been published in 1998."
+ },
+ {
+  "year": 1999,
+  "month": null,
+  "end": null,
+  "title": "BMJ moves to open peer review",
+  "text": "The British Medical Journal began revealing reviewers' identities to authors, one of the first large journals to do so.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Open_peer_review",
+  "quote": "Also in 1999, the British Medical Journal moved to an open peer review system"
+ },
+ {
+  "year": 1999,
+  "month": 4,
+  "end": null,
+  "title": "Dutch law on medical research takes effect",
+  "text": "The Dutch Medical Research Involving Human Subjects Act (WMO) came into force, with the CCMO installed to oversee review of research with human participants.",
+  "themes": [
+   4
+  ],
+  "dutch": true,
+  "url": "https://nl.wikipedia.org/wiki/Centrale_Commissie_Mensgebonden_Onderzoek",
+  "quote": "op 1 april 1999 treedt de Wet medisch-wetenschappelijk onderzoek met mensen in werking"
+ },
+ {
+  "year": 2000,
+  "month": null,
+  "end": null,
+  "title": "GRADE working group begins",
+  "text": "Methodologists, guideline developers and clinicians began the GRADE collaboration to rate the certainty of evidence and strength of recommendations.",
+  "themes": [
+   0
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/GRADE_approach",
+  "quote": "The GRADE began in the year 2000 as a collaboration of methodologists"
+ },
+ {
+  "year": 2000,
+  "month": null,
+  "end": null,
+  "title": "Public Library of Science founded",
+  "text": "PLOS began as a petition for free access to research articles and became a nonprofit open access publisher; PLOS Biology appeared in 2003.",
+  "themes": [
+   1
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/PLOS",
+  "quote": "It was founded in 2000 and launched its first journal, PLOS Biology, on October 13, 2003."
+ },
+ {
+  "year": 2000,
+  "month": 2,
+  "end": null,
+  "title": "ClinicalTrials.gov opens to the public",
+  "text": "The US National Library of Medicine launched ClinicalTrials.gov, a public trial registry required by the FDA Modernization Act of 1997.",
+  "themes": [
+   4
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/ClinicalTrials.gov",
+  "quote": "made ClinicalTrials.gov available to the public via the internet on February 29, 2000"
+ },
+ {
+  "year": 2001,
+  "month": 4,
+  "end": null,
+  "title": "EU Clinical Trials Directive adopted",
+  "text": "The European Union adopted Directive 2001/20/EC to harmonise rules and good clinical practice for trials of medicinal products in member states.",
+  "themes": [
+   4
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Clinical_Trials_Directive",
+  "quote": "Directive 2001/20/EC of 4 April 2001"
+ },
+ {
+  "year": 2002,
+  "month": 2,
+  "end": null,
+  "title": "Budapest Open Access Initiative",
+  "text": "A statement of principles arising from a 2001 meeting in Budapest gave one of the first widely used definitions of open access.",
+  "themes": [
+   1
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Budapest_Open_Access_Initiative",
+  "quote": "which was released to the public on February 14, 2002"
+ },
+ {
+  "year": 2002,
+  "month": 9,
+  "end": null,
+  "title": "Bell Labs report on Jan Hendrik Schön",
+  "text": "A Bell Labs investigating committee publicly released its report on physicist Jan Hendrik Schön; journals including Science and Nature later withdrew many of his articles.",
+  "themes": [
+   2
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Sch%C3%B6n_scandal",
+  "quote": "On September 25, 2002, the committee released its report publicly."
+ },
+ {
+  "year": 2003,
+  "month": 10,
+  "end": null,
+  "title": "Berlin Declaration on Open Access",
+  "text": "Following a conference of the Max Planck Society, research organisations signed a declaration supporting open access to knowledge.",
+  "themes": [
+   1
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Berlin_Declaration_on_Open_Access_to_Knowledge_in_the_Sciences_and_Humanities",
+  "quote": "The statement itself was published on October 22, 2003."
+ },
+ {
+  "year": 2004,
+  "month": null,
+  "end": null,
+  "title": "OECD declaration on publicly funded data",
+  "text": "Science ministers of OECD countries declared that publicly funded archive data should be made publicly available; OECD guidelines followed in 2007.",
+  "themes": [
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Open_data",
+  "quote": "In 2004, the Science Ministers of all nations of the Organisation for Economic Co-operation and Development (OECD)"
+ },
+ {
+  "year": 2004,
+  "month": null,
+  "end": null,
+  "title": "Elsevier launches Scopus",
+  "text": "The publisher Elsevier launched Scopus, an abstract and citation database, as a competitor to Web of Science.",
+  "themes": [
+   17
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Scopus",
+  "quote": "launched by the academic publisher Elsevier as a competitor to older Web of Science in 2004"
+ },
+ {
+  "year": 2004,
+  "month": 6,
+  "end": null,
+  "title": "Lawsuit over withheld paroxetine trial data",
+  "text": "New York State Attorney General Eliot Spitzer sued GlaxoSmithKline for withholding clinical trial data on paroxetine in adolescents, including from Study 329.",
+  "themes": [
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Study_329",
+  "quote": "In June 2004 New York State Attorney Eliot Spitzer filed a lawsuit against GSK"
+ },
+ {
+  "year": 2004,
+  "month": 9,
+  "end": null,
+  "title": "Medical journal editors require trial registration",
+  "text": "Editors of leading medical journals announced they would only publish trials registered in a public registry from the start.",
+  "themes": [
+   4,
+   5,
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Publication_bias",
+  "quote": "In September 2004, editors of prominent medical journals"
+ },
+ {
+  "year": 2004,
+  "month": 9,
+  "end": null,
+  "title": "Rofecoxib (Vioxx) withdrawn worldwide",
+  "text": "Merck withdrew rofecoxib after its own trial showed increased cardiovascular risk; disclosures followed that risk information had been withheld for years.",
+  "themes": [
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Rofecoxib",
+  "quote": "Merck publicly announced its voluntary withdrawal of the drug from the market worldwide on September 30, 2004."
+ },
+ {
+  "year": 2004,
+  "month": 11,
+  "end": null,
+  "title": "Google Scholar released",
+  "text": "Google Scholar was released in beta, indexing journals, books, theses, preprints and other scholarly literature.",
+  "themes": [
+   17
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Google_Scholar",
+  "quote": "Released in beta in November 2004"
+ },
+ {
+  "year": 2005,
+  "month": null,
+  "end": null,
+  "title": "Ioannidis: 'Why Most Published Research Findings Are False'",
+  "text": "John Ioannidis published an essay in PLOS Medicine arguing that most published research findings are false; it is considered foundational to metascience.",
+  "themes": [
+   8,
+   11
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Why_Most_Published_Research_Findings_Are_False",
+  "quote": "is a 2005 essay written by John Ioannidis"
+ },
+ {
+  "year": 2005,
+  "month": null,
+  "end": null,
+  "title": "DANS founded",
+  "text": "The Royal Netherlands Academy of Arts and Sciences (KNAW) and the Dutch Research Council (NWO) founded DANS, a national centre for archiving and reusing research data.",
+  "themes": [
+   7
+  ],
+  "dutch": true,
+  "url": "https://nl.wikipedia.org/wiki/Data_Archiving_and_Networked_Services",
+  "quote": "DANS is opgericht in 2005 door de Koninklijke Nederlandse Akademie van Wetenschappen (KNAW) en de Nederlandse Organisatie voor Wetenschappelijk Onderzoek (NWO)."
+ },
+ {
+  "year": 2005,
+  "month": null,
+  "end": null,
+  "title": "Dutch code of conduct on research integrity",
+  "text": "A Dutch code of conduct on research integrity was introduced, setting out standards for scientific practice in the Netherlands.",
+  "themes": [
+   2
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Scientific_integrity",
+  "quote": "the Dutch code of conduct on research integrity, introduced in 2005"
+ },
+ {
+  "year": 2005,
+  "month": null,
+  "end": null,
+  "title": "h-index proposed by Jorge Hirsch",
+  "text": "Physicist Jorge E. Hirsch suggested the h-index as a single number to characterise a researcher's publications and citations.",
+  "themes": [
+   17
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/H-index",
+  "quote": "The index was suggested in 2005 by Jorge E. Hirsch"
+ },
+ {
+  "year": 2005,
+  "month": 5,
+  "end": null,
+  "title": "Dutch universities launch DAREnet",
+  "text": "Sixteen Dutch universities jointly launched DAREnet, an open repository network with over 47,000 research papers, later incorporated into NARCIS.",
+  "themes": [
+   1
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Open_access",
+  "quote": "In May 2005, 16 major Dutch universities cooperatively launched DAREnet"
+ },
+ {
+  "year": 2006,
+  "month": 1,
+  "end": null,
+  "title": "Hwang Woo-suk stem cell papers found fabricated",
+  "text": "Seoul National University announced that Hwang Woo-suk's 2004 and 2005 Science papers on cloned human embryonic stem cells were fabricated. The case also raised concerns about egg donations.",
+  "themes": [
+   2,
+   6
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Hwang_Woo-suk",
+  "quote": "The university announced on January 10, 2006, that Hwang's 2004 and 2005 papers in Science were both fabricated."
+ },
+ {
+  "year": 2006,
+  "month": 6,
+  "end": null,
+  "title": "Nature trials open peer review",
+  "text": "Nature posted some submitted manuscripts online for signed public comment alongside regular anonymous review; few authors took part.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Open_peer_review",
+  "quote": "In June 2006, Nature launched an experiment in parallel open peer review"
+ },
+ {
+  "year": 2007,
+  "month": null,
+  "end": null,
+  "title": "First CWTS Leiden Ranking",
+  "text": "The first edition of the Leiden Ranking, a university ranking based on bibliometric indicators compiled by CWTS at Leiden University, was produced.",
+  "themes": [
+   13,
+   17
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/CWTS_Leiden_Ranking",
+  "quote": "The first edition of the Leiden Ranking was produced in 2007."
+ },
+ {
+  "year": 2007,
+  "month": 9,
+  "end": null,
+  "title": "US FDA Amendments Act mandates trial registration",
+  "text": "The US FDA Amendments Act made registration of applicable trials on ClinicalTrials.gov mandatory, required results reporting and set penalties for non-compliance.",
+  "themes": [
+   4,
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Food_and_Drug_Administration_Amendments_Act_of_2007",
+  "quote": "Bush signed the Food and Drug Administration Amendments Act of 2007 (FDAAA) on September 27, 2007."
+ },
+ {
+  "year": 2007,
+  "month": 10,
+  "end": null,
+  "title": "STROBE reporting guideline published",
+  "text": "The STROBE checklist for reporting observational studies in epidemiology was published simultaneously in several leading biomedical journals.",
+  "themes": [
+   0
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Strengthening_the_reporting_of_observational_studies_in_epidemiology",
+  "quote": "It was published simultaneously in several leading biomedical journals in October and November 2007"
+ },
+ {
+  "year": 2008,
+  "month": null,
+  "end": null,
+  "title": "Beall's List of predatory publishers",
+  "text": "Librarian Jeffrey Beall kept a list of open access publishers he judged predatory, until he removed it in January 2017.",
+  "themes": [
+   5
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Beall%27s_List",
+  "quote": "Originally started as a personal endeavor in 2008"
+ },
+ {
+  "year": 2008,
+  "month": 6,
+  "end": null,
+  "title": "EQUATOR Network launched",
+  "text": "The EQUATOR Network, which collects and promotes reporting guidelines such as CONSORT, STARD and TRIPOD, was formally launched in London.",
+  "themes": [
+   0,
+   3
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/EQUATOR_Network",
+  "quote": "The EQUATOR Network was formally launched on 26 June 2008 at the Royal Society of Medicine in London, UK."
+ },
+ {
+  "year": 2008,
+  "month": 10,
+  "end": null,
+  "title": "Declaration of Helsinki requires trial registration",
+  "text": "The revised Declaration of Helsinki stated that every clinical trial must be registered in a publicly accessible database before the first participant is recruited.",
+  "themes": [
+   4
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Preregistration_(science)",
+  "quote": "Released in October 2008, the revised Declaration of Helsinki"
+ },
+ {
+  "year": 2009,
+  "month": null,
+  "end": null,
+  "title": "PRISMA reporting guideline for meta-analyses",
+  "text": "The QUOROM guideline was updated and renamed PRISMA, the Preferred Reporting Items for Systematic reviews and Meta-Analyses.",
+  "themes": [
+   0,
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Preferred_Reporting_Items_for_Systematic_Reviews_and_Meta-Analyses",
+  "quote": "In 2009, QUOROM was updated to address several conceptual and practical advances in the science of systematic reviews"
+ },
+ {
+  "year": 2009,
+  "month": 12,
+  "end": null,
+  "title": "DataCite founded",
+  "text": "Organisations from six countries, including TU Delft Library, founded DataCite to register persistent identifiers for research data.",
+  "themes": [
+   7
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/DataCite",
+  "quote": "DataCite was subsequently founded in London on 1 December 2009"
+ },
+ {
+  "year": 2010,
+  "month": null,
+  "end": null,
+  "title": "COMET initiative for core outcome sets",
+  "text": "The COMET initiative was launched to support groups developing core outcome sets, agreed minimum outcomes to measure and report in trials.",
+  "themes": [
+   0
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Core_outcome_set",
+  "quote": "COMET was first launched in 2010"
+ },
+ {
+  "year": 2010,
+  "month": null,
+  "end": null,
+  "title": "Unpublished reboxetine trial data revealed",
+  "text": "Germany's IQWiG published a meta-analysis including data on about 3,000 participants that Pfizer had not published, concluding reboxetine was ineffective and potentially harmful.",
+  "themes": [
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Reboxetine",
+  "quote": "In 2010, the German Institute for Quality and Efficiency in Health Care (IQEHC) published results of a meta-analysis of clinical trial data for reboxetine in acute depression"
+ },
+ {
+  "year": 2010,
+  "month": null,
+  "end": null,
+  "title": "Singapore Statement on Research Integrity",
+  "text": "The Singapore Statement on Research Integrity was issued as one of the major international texts on responsible conduct of research.",
+  "themes": [
+   2
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Scientific_integrity",
+  "quote": "the Singapore Statement on Research Integrity (2010)"
+ },
+ {
+  "year": 2010,
+  "month": null,
+  "end": null,
+  "title": "Andrew Wakefield struck off medical register",
+  "text": "Andrew Wakefield was struck off the British medical register for serious professional misconduct linked to his fraudulent 1998 Lancet paper on the MMR vaccine and autism.",
+  "themes": [
+   6
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Andrew_Wakefield",
+  "quote": "he was struck off the British medical register in 2010"
+ },
+ {
+  "year": 2010,
+  "month": null,
+  "end": null,
+  "title": "Term altmetrics proposed",
+  "text": "The term altmetrics was proposed for measures of research impact based on online and social media attention, as a generalisation of article-level metrics.",
+  "themes": [
+   17
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Altmetrics",
+  "quote": "The term altmetrics was proposed in 2010"
+ },
+ {
+  "year": 2010,
+  "month": 2,
+  "end": null,
+  "title": "Panton Principles for open data",
+  "text": "Principles stating that published scientific data should be openly available were launched after being drafted in Cambridge in 2009.",
+  "themes": [
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Panton_Principles",
+  "quote": "officially launched in February 2010"
+ },
+ {
+  "year": 2010,
+  "month": 8,
+  "end": null,
+  "title": "Retraction Watch blog launched",
+  "text": "Science writers Ivan Oransky and Adam Marcus launched Retraction Watch, a blog reporting on retractions; it later built a database of retracted papers.",
+  "themes": [
+   2
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Retraction_Watch",
+  "quote": "The blog was launched in August 2010"
+ },
+ {
+  "year": 2011,
+  "month": null,
+  "end": null,
+  "title": "Bem's 'Feeling the Future' precognition paper",
+  "text": "Daryl Bem reported statistical evidence for precognition in a leading psychology journal; criticism, including Bayes factor reanalyses, fuelled debate about common research practices.",
+  "themes": [
+   10,
+   14
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Daryl_Bem",
+  "quote": "In 2011, Bem published the article"
+ },
+ {
+  "year": 2011,
+  "month": null,
+  "end": null,
+  "title": "Bayer reports low replication of findings",
+  "text": "An analysis by researchers at Bayer found that, at most, a quarter of the company's in-house findings replicated the original published results.",
+  "themes": [
+   11
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "A 2011 analysis by researchers with pharmaceutical company Bayer found that, at most, a quarter of Bayer's in-house findings replicated the original results."
+ },
+ {
+  "year": 2011,
+  "month": null,
+  "end": null,
+  "title": "Sci-Hub founded",
+  "text": "Alexandra Elbakyan started Sci-Hub, a site that gives free access to paywalled research papers regardless of copyright.",
+  "themes": [
+   1
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Sci-Hub",
+  "quote": "Sci-Hub was founded in Kazakhstan by Alexandra Elbakyan in 2011"
+ },
+ {
+  "year": 2011,
+  "month": null,
+  "end": null,
+  "title": "Dutch H5N1 study sparks dual-use debate",
+  "text": "Plans by Dutch researchers to publish how they made a transmissible H5N1 flu strain raised debate on whether some research data should be withheld.",
+  "themes": [
+   9
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Open_science",
+  "quote": "In 2011, Dutch researchers announced their intention to publish a research paper in the journal Science"
+ },
+ {
+  "year": 2011,
+  "month": null,
+  "end": 2017,
+  "title": "European Code of Conduct for Research Integrity",
+  "text": "The European Code of Conduct for Research Integrity was published in 2011 and revised in 2017, setting shared principles for research integrity in Europe.",
+  "themes": [
+   2
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Scientific_integrity",
+  "quote": "The European Code of Conduct for Research Integrity, published in 2011 and revised in 2017"
+ },
+ {
+  "year": 2011,
+  "month": null,
+  "end": 2012,
+  "title": "Erasmus MC investigation of Don Poldermans",
+  "text": "An Erasmus MC committee found that cardiologist Don Poldermans committed misconduct in DECREASE trials, including missing written informed consent and fabricated data. He was dismissed.",
+  "themes": [
+   2,
+   6,
+   11,
+   18
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Don_Poldermans",
+  "quote": "the 2011/2012 investigation"
+ },
+ {
+  "year": 2011,
+  "month": 9,
+  "end": null,
+  "title": "Tilburg University suspends Diederik Stapel",
+  "text": "Tilburg University suspended social psychologist Diederik Stapel for fabricating data, and announced an investigation of his work.",
+  "themes": [
+   2,
+   14
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Diederik_Stapel",
+  "quote": "In September 2011, Tilburg University suspended Stapel due to his fabrication of data used in research publications."
+ },
+ {
+  "year": 2011,
+  "month": 10,
+  "end": null,
+  "title": "'False-Positive Psychology' paper published",
+  "text": "Simmons, Nelson and Simonsohn showed how flexible choices in collecting and analysing data can produce false positive results, using a deliberately absurd example.",
+  "themes": [
+   14
+  ],
+  "dutch": false,
+  "url": "https://nl.wikipedia.org/wiki/Replicatiecrisis",
+  "quote": "Toevallig werd in oktober 2011 het artikel False Positive Psychology gepubliceerd"
+ },
+ {
+  "year": 2012,
+  "month": null,
+  "end": null,
+  "title": "Amgen reports low replication in cancer research",
+  "text": "C. Glenn Begley and Lee Ellis reported that only 11% of 53 preclinical cancer studies had replications that confirmed the original conclusions.",
+  "themes": [
+   8
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "In a 2012 paper, C. Glenn Begley, a biotech consultant working at Amgen, and Lee Ellis"
+ },
+ {
+  "year": 2012,
+  "month": null,
+  "end": null,
+  "title": "Failures to replicate Bem's psi findings published",
+  "text": "The journal that had published Bem's precognition studies published seven experiments that found no evidence for precognition.",
+  "themes": [
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Daryl_Bem",
+  "quote": "In 2012, the same journal that published Bem's original experiments"
+ },
+ {
+  "year": 2012,
+  "month": null,
+  "end": null,
+  "title": "Publons launched",
+  "text": "Publons offered researchers a way to record and receive credit for their peer review work; it later became part of Web of Science.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Publons",
+  "quote": "It was launched in 2012, bought by Clarivate in 2017 and merged into Web of Science in 2022."
+ },
+ {
+  "year": 2012,
+  "month": null,
+  "end": null,
+  "title": "Google Scholar Citations profiles introduced",
+  "text": "Google Scholar allowed individual scholars to create personal citation profiles and started computing an h-index for them.",
+  "themes": [
+   17
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Google_Scholar",
+  "quote": "Google Scholar started computing an h-index in 2012 with the advent of individual Scholar pages."
+ },
+ {
+  "year": 2012,
+  "month": 1,
+  "end": null,
+  "title": "The Cost of Knowledge boycott of Elsevier",
+  "text": "Mathematician Timothy Gowers called for a boycott of Elsevier over prices and bundling; thousands of researchers signed a pledge.",
+  "themes": [
+   5
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/The_Cost_of_Knowledge",
+  "quote": "On 21 January 2012, the mathematician Timothy Gowers called for a boycott of Elsevier"
+ },
+ {
+  "year": 2012,
+  "month": 6,
+  "end": null,
+  "title": "Dirk Smeesters resigns after fraud finding",
+  "text": "Dirk Smeesters, professor of consumer behaviour at Erasmus University Rotterdam, resigned after being found to have committed scientific fraud; he denied the fraud.",
+  "themes": [
+   14
+  ],
+  "dutch": true,
+  "url": "https://nl.wikipedia.org/wiki/Dirk_Smeesters",
+  "quote": "Op 25 juni 2012 nam Smeesters ontslag nadat hij betrapt was op het plegen van wetenschapsfraude."
+ },
+ {
+  "year": 2012,
+  "month": 11,
+  "end": null,
+  "title": "Final report on the Stapel fraud",
+  "text": "The Levelt, Noort and Drenth committees published their joint report on Stapel's fraud, which also criticised the research culture in which it continued.",
+  "themes": [
+   14
+  ],
+  "dutch": true,
+  "url": "https://nl.wikipedia.org/wiki/Commissie-Levelt",
+  "quote": "publiceerden op 28 november 2012 het gezamenlijke eindrapport"
+ },
+ {
+  "year": 2013,
+  "month": null,
+  "end": null,
+  "title": "Registered Reports introduced at Cortex",
+  "text": "Christopher Chambers introduced Registered Reports at the journal Cortex: study plans are peer reviewed and accepted before data are collected.",
+  "themes": [
+   8,
+   14,
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Registered_report",
+  "quote": "introduced at the journal Cortex by Christopher Chambers in 2013"
+ },
+ {
+  "year": 2013,
+  "month": null,
+  "end": null,
+  "title": "Helsinki revision calls for sharing all results",
+  "text": "The 2013 revision of the Declaration of Helsinki stressed the need to disseminate research results, including negative and inconclusive studies.",
+  "themes": [
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Declaration_of_Helsinki",
+  "quote": "The revised declaration of 2013 also highlights the need to disseminate research results, including negative and inconclusive studies"
+ },
+ {
+  "year": 2013,
+  "month": null,
+  "end": null,
+  "title": "F1000Research publishes before open review",
+  "text": "F1000Research published articles first and then added signed peer review reports and revised versions as they came in.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Open_peer_review",
+  "quote": "Starting in 2013 with the launch of F1000Research"
+ },
+ {
+  "year": 2013,
+  "month": null,
+  "end": null,
+  "title": "Science investigates paper buying in China",
+  "text": "Science published an investigation of research misconduct in China, including scholars buying pre-written papers from an online catalogue to use as their own.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Research_paper_mill",
+  "quote": "In 2013, Science published an investigation of various kinds of research misconduct in China"
+ },
+ {
+  "year": 2013,
+  "month": 1,
+  "end": null,
+  "title": "Center for Open Science founded",
+  "text": "Brian Nosek and Jeffrey Spies founded the Center for Open Science, funded mainly by the Laura and John Arnold Foundation.",
+  "themes": [
+   1,
+   8
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Center_for_Open_Science",
+  "quote": "founded the organization in January 2013"
+ },
+ {
+  "year": 2013,
+  "month": 1,
+  "end": null,
+  "title": "AllTrials campaign launched",
+  "text": "Ben Goldacre, the BMJ, Cochrane and others set up AllTrials, which campaigns for all past and current clinical trials to be registered and reported.",
+  "themes": [
+   4,
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Bad_Pharma",
+  "quote": "In January 2013 Goldacre joined the Cochrane Collaboration, British Medical Journal and others in setting up AllTrials"
+ },
+ {
+  "year": 2013,
+  "month": 3,
+  "end": null,
+  "title": "Research Data Alliance started",
+  "text": "Research funders from Europe, the United States and Australia started the RDA to build technical and social bridges for sharing data.",
+  "themes": [
+   7,
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Research_Data_Alliance",
+  "quote": "started in 2013 by the European Commission"
+ },
+ {
+  "year": 2013,
+  "month": 5,
+  "end": null,
+  "title": "Zenodo repository launched",
+  "text": "CERN and OpenAIRE launched Zenodo, a general repository giving persistent identifiers to papers, datasets and software.",
+  "themes": [
+   7
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Zenodo",
+  "quote": "Zenodo was launched on 8 May 2013"
+ },
+ {
+  "year": 2013,
+  "month": 5,
+  "end": null,
+  "title": "San Francisco Declaration on Research Assessment",
+  "text": "DORA, which originated at a December 2012 meeting of the American Society for Cell Biology, was published with recommendations against misuse of journal impact factors in assessment.",
+  "themes": [
+   13,
+   17
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/San_Francisco_Declaration_on_Research_Assessment",
+  "quote": "was published on May 13, 2013"
+ },
+ {
+  "year": 2013,
+  "month": 8,
+  "end": null,
+  "title": "Controlled access to HeLa genome data",
+  "text": "After HeLa genome data were published without the Lacks family's knowledge, the NIH announced a policy of controlled access to the data.",
+  "themes": [
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/HeLa",
+  "quote": "On 7 August 2013, NIH director Francis Collins announced a policy of controlled access to the cell line genome"
+ },
+ {
+  "year": 2013,
+  "month": 10,
+  "end": null,
+  "title": "Bohannon's peer review sting",
+  "text": "Science correspondent John Bohannon sent fake papers with obvious flaws to 304 fee-charging open access journals; about 60% of them accepted the papers.",
+  "themes": [
+   5,
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Who%27s_Afraid_of_Peer_Review%3F",
+  "quote": "The article and associated data were published in the 4 October 2013 issue of Science as open access."
+ },
+ {
+  "year": 2013,
+  "month": 11,
+  "end": null,
+  "title": "bioRxiv preprint server founded",
+  "text": "John Inglis and Richard Sever founded bioRxiv at Cold Spring Harbor Laboratory to share biology preprints before peer review.",
+  "themes": [
+   5
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/BioRxiv",
+  "quote": "co-founded by John Inglis and Richard Sever in November 2013"
+ },
+ {
+  "year": 2014,
+  "month": null,
+  "end": null,
+  "title": "First Registered Reports: special issue of replications",
+  "text": "The first Registered Reports appeared in a special issue of the journal Social Psychology containing preregistered replication studies.",
+  "themes": [
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Registered_report",
+  "quote": "The first Registered Reports were published in 2014 in a special issue of Social Psychology containing preregistered replication studies."
+ },
+ {
+  "year": 2014,
+  "month": null,
+  "end": null,
+  "title": "Cochrane review of oseltamivir (Tamiflu)",
+  "text": "A Cochrane review concluded that oseltamivir does not reduce hospitalisations; health agencies and the manufacturer Roche rejected its conclusions.",
+  "themes": [
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Oseltamivir",
+  "quote": "A 2014 Cochrane Review concluded that oseltamivir does not reduce hospitalizations"
+ },
+ {
+  "year": 2014,
+  "month": 1,
+  "end": null,
+  "title": "FAIR principles formulated in Leiden",
+  "text": "At a workshop at the Lorentz Centre of Leiden University, participants first formulated the FAIR principles for research data.",
+  "themes": [
+   7
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/FAIR_data",
+  "quote": "In January 2014, the Lorentz Centre at Leiden University hosted a workshop"
+ },
+ {
+  "year": 2014,
+  "month": 4,
+  "end": null,
+  "title": "EU Clinical Trials Regulation adopted",
+  "text": "Regulation (EU) No 536/2014 replaced the Clinical Trials Directive with one directly applicable set of EU rules; it took effect in January 2022.",
+  "themes": [
+   4
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Clinical_Trials_Directive",
+  "quote": "This Directive was repealed by Regulation 536/2014, dated 16 April 2014, which took effect on January 31st, 2022."
+ },
+ {
+  "year": 2015,
+  "month": null,
+  "end": null,
+  "title": "Statcheck developed in the Netherlands",
+  "text": "Michèle Nuijten (Tilburg University) and Sacha Epskamp (University of Amsterdam) developed statcheck, software that detects inconsistencies in reported statistical results.",
+  "themes": [
+   14
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Statcheck",
+  "quote": "Statcheck was first developed in 2015 by Michele Nuijten of Tilburg University and Sacha Epskamp of the University of Amsterdam."
+ },
+ {
+  "year": 2015,
+  "month": 4,
+  "end": null,
+  "title": "Leiden Manifesto for Research Metrics",
+  "text": "Ten principles to guide research evaluation were published in Nature, formulated by Diana Hicks, Paul Wouters and colleagues at a 2014 conference in Leiden.",
+  "themes": [
+   13,
+   17
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Leiden_Manifesto_for_Research_Metrics",
+  "quote": "is a 22 April 2015 published comment in Nature"
+ },
+ {
+  "year": 2015,
+  "month": 7,
+  "end": null,
+  "title": "Dutch universities threaten Elsevier boycott",
+  "text": "The Association of Universities in the Netherlands threatened a boycott; Elsevier later agreed to make 30% of Dutch articles open access by 2018.",
+  "themes": [
+   5
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Elsevier",
+  "quote": "In July 2015, the Association of Universities in the Netherlands threatened to boycott Elsevier"
+ },
+ {
+  "year": 2015,
+  "month": 8,
+  "end": null,
+  "title": "Reproducibility Project: Psychology reports results",
+  "text": "A collaboration coordinated by Brian Nosek repeated 100 psychology studies; 36% of replications of significant findings were significant, with effects about half as large.",
+  "themes": [
+   8,
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "In August 2015, the first open empirical study of reproducibility in psychology was published"
+ },
+ {
+  "year": 2015,
+  "month": 9,
+  "end": null,
+  "title": "Study 329 reanalysed",
+  "text": "The BMJ published a reanalysis of Study 329, the paroxetine trial in adolescents whose original 2001 report had been ghostwritten and made false efficacy claims.",
+  "themes": [
+   18
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Study_329",
+  "quote": "In September 2015 the BMJ published a re-analysis of the study."
+ },
+ {
+  "year": 2016,
+  "month": null,
+  "end": null,
+  "title": "American Statistical Association statement on p-values",
+  "text": "The ASA issued a formal statement that p-values do not measure the probability that a hypothesis is true, nor the size or importance of an effect.",
+  "themes": [
+   10,
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/P-value",
+  "quote": "In 2016, the American Statistical Association (ASA) made a formal statement"
+ },
+ {
+  "year": 2016,
+  "month": null,
+  "end": null,
+  "title": "Multi-lab replication finds no ego depletion",
+  "text": "A replication study with 2,141 participants in about two dozen labs, using a single protocol, found no evidence for the ego depletion effect.",
+  "themes": [
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Ego_depletion",
+  "quote": "In 2016, a major multi-lab replication study (2141 participants) carried out at two dozen labs across the world using a single protocol failed to find any evidence for ego depletion."
+ },
+ {
+  "year": 2016,
+  "month": null,
+  "end": null,
+  "title": "Facial feedback study fails to replicate",
+  "text": "A Registered Replication Report in 17 labs, coordinated by Eric-Jan Wagenmakers (University of Amsterdam), did not reproduce a 1988 facial feedback experiment.",
+  "themes": [
+   16
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Facial_feedback_hypothesis",
+  "quote": "In 2016, a large-scale Registered Replication Report was conducted with the purpose of meticulously replicating Strack, Martin, and Stepper's study"
+ },
+ {
+  "year": 2016,
+  "month": null,
+  "end": null,
+  "title": "Lead author abandons power posing",
+  "text": "After several failed replications, Dana Carney, lead author of the original 2010 power posing paper, issued a statement abandoning the theory.",
+  "themes": [
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Power_posing",
+  "quote": "in 2016, Carney issued a statement abandoning the theory"
+ },
+ {
+  "year": 2016,
+  "month": 3,
+  "end": null,
+  "title": "FAIR Guiding Principles published",
+  "text": "After refinement by a FORCE11 working group, the FAIR principles for findable, accessible, interoperable and reusable data were published in Scientific Data.",
+  "themes": [
+   7
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/FAIR_data",
+  "quote": "They were published in the March 2016 issue of Scientific Data."
+ },
+ {
+  "year": 2016,
+  "month": 4,
+  "end": null,
+  "title": "Amsterdam Call for Action on Open Science",
+  "text": "During the Dutch EU Presidency, a conference in Amsterdam presented a call for concrete steps towards open science in Europe.",
+  "themes": [
+   1
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Open_science",
+  "quote": "The Dutch Presidency of the Council of the European Union called out for action in April 2016"
+ },
+ {
+  "year": 2016,
+  "month": 4,
+  "end": null,
+  "title": "EU adopts the GDPR",
+  "text": "The European Union adopted the General Data Protection Regulation, which took effect in May 2018 and governs the processing of personal data.",
+  "themes": [
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/General_Data_Protection_Regulation",
+  "quote": "adopted the GDPR on 14 April 2016"
+ },
+ {
+  "year": 2016,
+  "month": 6,
+  "end": null,
+  "title": "Society for the Improvement of Psychological Science founded",
+  "text": "The Society for the Improvement of Psychological Science (SIPS) was founded at its first meeting, held at the Center for Open Science in Charlottesville.",
+  "themes": [
+   14
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Society_for_the_Improvement_of_Psychological_Science",
+  "quote": "It was founded at its inaugural meeting that took place June 6-8th, 2016 at Center for Open Science in Charlottesville."
+ },
+ {
+  "year": 2016,
+  "month": 7,
+  "end": null,
+  "title": "NWO funds replication studies",
+  "text": "The Netherlands Organisation for Scientific Research (NWO) made 3 million euro available for replication studies in social sciences, health research and healthcare innovation.",
+  "themes": [
+   8,
+   16
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "In July 2016, the Netherlands Organisation for Scientific Research made €3 million available for replication studies."
+ },
+ {
+  "year": 2017,
+  "month": null,
+  "end": null,
+  "title": "Proposal to redefine significance as p < 0.005",
+  "text": "A group of 72 authors proposed lowering the threshold for statistical significance from 0.05 to 0.005; others proposed justifying thresholds before collecting data instead.",
+  "themes": [
+   10,
+   12
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Statistical_significance",
+  "quote": "In 2017, a group of 72 authors proposed to enhance reproducibility by changing the p-value threshold"
+ },
+ {
+  "year": 2017,
+  "month": null,
+  "end": null,
+  "title": "GO FAIR office established",
+  "text": "Germany, the Netherlands and France agreed to set up an international office to support putting the FAIR principles into practice.",
+  "themes": [
+   7
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/FAIR_data",
+  "quote": "In 2017, Germany, Netherlands and France agreed to establish"
+ },
+ {
+  "year": 2017,
+  "month": null,
+  "end": null,
+  "title": "PREreview platform launched",
+  "text": "PREreview was launched to train and involve early-career and underrepresented researchers in open peer review of preprints.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Open_peer_review",
+  "quote": "In 2017, the platform PREreview was launched"
+ },
+ {
+  "year": 2018,
+  "month": null,
+  "end": null,
+  "title": "Nature and Science social science papers replicated",
+  "text": "A project replicated 21 social and behavioural science papers published in Nature and Science; about 62% reproduced the original results.",
+  "themes": [
+   8,
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "A study published in 2018 in Nature Human Behaviour replicated 21 social and behavioral science papers from Nature and Science"
+ },
+ {
+  "year": 2018,
+  "month": 9,
+  "end": null,
+  "title": "Plan S launched",
+  "text": "Eleven research funders, including the Dutch Research Council (NWO), launched Plan S, requiring research they fund to be freely accessible immediately from 2020.",
+  "themes": [
+   1
+  ],
+  "dutch": false,
+  "url": "https://nl.wikipedia.org/wiki/Open_access_%28publiceren%29",
+  "quote": "In september 2018 lanceerden 11 fondsen voor wetenschappelijk onderzoek, waaronder de Nederlandse Organisatie voor Wetenschappelijk Onderzoek"
+ },
+ {
+  "year": 2018,
+  "month": 11,
+  "end": null,
+  "title": "European Open Science Cloud launched",
+  "text": "The European Commission's EOSC, started in 2015, officially launched with a portal giving access to research services.",
+  "themes": [
+   7,
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/European_Open_Science_Cloud",
+  "quote": "The European Open Science Cloud officially launched in November 2018"
+ },
+ {
+  "year": 2019,
+  "month": 11,
+  "end": null,
+  "title": "Dutch recognition and rewards system announced",
+  "text": "Dutch universities and research funders announced a new system of research recognition and reward based on the DORA principles.",
+  "themes": [
+   13
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/San_Francisco_Declaration_on_Research_Assessment",
+  "quote": "In November 2019, Dutch universities and research funders announced the introduction of a new system of research recognition and reward, based on the DORA principles."
+ },
+ {
+  "year": 2020,
+  "month": null,
+  "end": null,
+  "title": "Dutch transformative agreement with Elsevier",
+  "text": "Dutch research organisations signed a four-year transformative agreement with the publisher Elsevier.",
+  "themes": [
+   1
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/Open_access_in_the_Netherlands",
+  "quote": "In 2020, the Dutch research organised signed a four year transformative agreement with publishers Elsevier."
+ },
+ {
+  "year": 2020,
+  "month": 2,
+  "end": null,
+  "title": "Bik identifies hundreds of paper-mill articles",
+  "text": "Science reported that Elisabeth Bik had identified over 400 papers published in China that apparently all came from the same paper mill company.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Elisabeth_Bik",
+  "quote": "In February 2020, Science reported that Bik had identified over 400 research papers published in China"
+ },
+ {
+  "year": 2020,
+  "month": 5,
+  "end": null,
+  "title": "Springer Nature signs DORA",
+  "text": "Springer Nature became the largest research publisher to sign the San Francisco Declaration on Research Assessment.",
+  "themes": [
+   13
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/San_Francisco_Declaration_on_Research_Assessment",
+  "quote": "On 20 May 2020 Springer Nature became the largest research publisher to sign the declaration."
+ },
+ {
+  "year": 2020,
+  "month": 7,
+  "end": null,
+  "title": "Hong Kong Principles for assessing researchers",
+  "text": "The Hong Kong Principles for assessing researchers were adopted, naming open science as one of five pillars of research integrity to reward in assessment.",
+  "themes": [
+   13
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Scientific_integrity",
+  "quote": "First adopted in July 2020, the Hong Kong principles for assessing researchers"
+ },
+ {
+  "year": 2021,
+  "month": null,
+  "end": null,
+  "title": "Reproducibility Project: Cancer Biology reports",
+  "text": "The project examined 193 experiments from 53 top cancer papers; replicated effect sizes were on average 85% smaller than in the original papers.",
+  "themes": [
+   8,
+   11
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Reproducibility_Project",
+  "quote": "In 2021, the project showed that of 193 experiments from 53 top papers about cancer"
+ },
+ {
+  "year": 2021,
+  "month": null,
+  "end": null,
+  "title": "Nature reports thousands of paper-mill papers",
+  "text": "A report in Nature stated that thousands of journal papers had been traced to paper mills, and some journals were revising their review processes.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Research_paper_mill",
+  "quote": "According to a 2021 report in Nature, thousands of papers in academic journals had been traced to paper mills"
+ },
+ {
+  "year": 2021,
+  "month": 6,
+  "end": null,
+  "title": "Utrecht University drops impact factor",
+  "text": "Utrecht University announced it would no longer use the journal impact factor in hiring and promotion decisions, partly inspired by DORA.",
+  "themes": [
+   13
+  ],
+  "dutch": true,
+  "url": "https://en.wikipedia.org/wiki/San_Francisco_Declaration_on_Research_Assessment",
+  "quote": "In June 2021, Utrecht University announced that it would no longer use the impact factor in hiring and promotion decisions."
+ },
+ {
+  "year": 2021,
+  "month": 11,
+  "end": null,
+  "title": "UNESCO Recommendation on Open Science",
+  "text": "UNESCO member states adopted the first international standard-setting instrument on open science, which is not legally binding.",
+  "themes": [
+   1,
+   9
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Open_science",
+  "quote": "The Recommendation was adopted at the 41st session of the General Conference on 23 November 2021"
+ },
+ {
+  "year": 2022,
+  "month": null,
+  "end": null,
+  "title": "AI-generated Western blot images flagged",
+  "text": "At the European Hematology Association Congress, Elisabeth Bik presented information about artificial intelligence being used to fraudulently generate Western blot images.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Elisabeth_Bik",
+  "quote": "During a session of the 2022 European Hematology Association Congress, Bik presented information about artificial intelligence being used to fraudulently generate Western blot images."
+ },
+ {
+  "year": 2022,
+  "month": 10,
+  "end": null,
+  "title": "eLife drops accept/reject decisions",
+  "text": "eLife announced it would publish all reviewed papers as preprints with public reviews and an assessment, instead of accepting or rejecting them.",
+  "themes": [
+   15
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/ELife",
+  "quote": "On October 20, 2022, eLife announced"
+ },
+ {
+  "year": 2022,
+  "month": 11,
+  "end": null,
+  "title": "ChatGPT released",
+  "text": "OpenAI released ChatGPT, a chatbot based on a large language model whose capabilities were described at the time as unprecedented.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/ChatGPT",
+  "quote": "The original version of ChatGPT, released in November 2022"
+ },
+ {
+  "year": 2023,
+  "month": null,
+  "end": null,
+  "title": "Large preregistered replication finds no precognition",
+  "text": "A large preregistered replication, designed together with Bem and other proponents of extrasensory perception, found no evidence for precognition.",
+  "themes": [
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Daryl_Bem",
+  "quote": "A large-scale pre-registered replication in 2023"
+ },
+ {
+  "year": 2023,
+  "month": 1,
+  "end": null,
+  "title": "ChatGPT listed as co-author on papers",
+  "text": "Nature reported that at least four preprints or papers had listed ChatGPT as a co-author; Nature and JAMA Network prohibit listing a chatbot as co-author.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/ChatGPT",
+  "quote": "In January 2023, Nature reported that at least four academic preprints or published papers had listed ChatGPT as a co-author."
+ },
+ {
+  "year": 2024,
+  "month": null,
+  "end": null,
+  "title": "AI-generated figures in retracted Frontiers paper",
+  "text": "A paper in Frontiers in Cell and Developmental Biology, later retracted, was criticised for figures generated with the image tool Midjourney.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Frontiers_Media",
+  "quote": "A now-retracted 2024 paper published in Frontiers in Cell and Developmental Biology was criticized for having figures AI generated with Midjourney"
+ },
+ {
+  "year": 2024,
+  "month": 3,
+  "end": null,
+  "title": "Harvard finds Francesca Gino falsified data",
+  "text": "A Harvard Business School committee found that Francesca Gino had falsified data in four published studies, after problems were raised by the Data Colada bloggers.",
+  "themes": [
+   14
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "In March 2024, Harvard Business School's investigative committee"
+ },
+ {
+  "year": 2024,
+  "month": 5,
+  "end": null,
+  "title": "Wiley retracts papers linked to Hindawi",
+  "text": "The Wall Street Journal reported that more than 11,300 papers were retracted and 19 journals closed after fake studies affected Wiley's Hindawi journals.",
+  "themes": [
+   19
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Research_paper_mill",
+  "quote": "In May 2024, the Wall Street Journal published a report on fake studies that affected New Jersey publisher Wiley."
+ },
+ {
+  "year": 2025,
+  "month": 4,
+  "end": null,
+  "title": "CONSORT 2025 statement",
+  "text": "The CONSORT group issued an updated checklist replacing the 2010 version, adding an open-science section on trial registration, protocol access and data sharing.",
+  "themes": [
+   0,
+   4
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Consolidated_Standards_of_Reporting_Trials",
+  "quote": "In April 2025 the CONSORT group issued an updated 'CONSORT 2025' checklist"
+ },
+ {
+  "year": 2026,
+  "month": null,
+  "end": null,
+  "title": "SCORE project reports replicability of social science",
+  "text": "The SCORE project studied 3,900 social-science papers published between 2009 and 2018 and found that only about half of the results could be replicated.",
+  "themes": [
+   8,
+   16
+  ],
+  "dutch": false,
+  "url": "https://en.wikipedia.org/wiki/Replication_crisis",
+  "quote": "In 2026, the SCORE Project study of 3,900 social-science papers between 2009 and 2018 found that only about half the results could be replicated."
+ }
+]

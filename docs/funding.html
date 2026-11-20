@@ -32,6 +32,7 @@
     <a href="people.html">People</a>
     <a href="themes.html">Themes</a>
     <a href="time.html">Over time</a>
+    <a href="history.html">History</a>
     <a href="places.html">Places</a>
     <a href="funding.html" aria-current="page">Funding</a>
     <a href="inferences.html">Inferences</a>
@@ -161,7 +162,7 @@ Promise.all([load("funding"), load("people")]).then(([F, people]) => {
     const q = document.getElementById("tlq").value.trim().toLowerCase();
     let ps = projects.filter((p) => (tlscope === "meta" ? p.m : p.ppl.some((x) => x.id)));
     if (tlPerson) ps = projects.filter((p) => p.ppl.some((x) => x.id === tlPerson));
-    if (q) ps = ps.filter((p) => p.t.toLowerCase().includes(q) || p.ppl.some((x) => (x.n || "").toLowerCase().includes(q)));
+    if (q) ps = ps.filter((p) => textMatches(q, p.t) || p.ppl.some((x) => textMatches(q, x.n || "")));
     ps = ps.map((p) => { const b = parse(p.b), e = p.e ? parse(p.e) : null;
       return Object.assign({}, p, { B: b, E: e && e > b ? e : d3.timeYear.offset(b, 1), noEnd: !e }); })
       .filter((p) => p.B).sort((a, b) => a.B - b.B);
@@ -223,7 +224,7 @@ Promise.all([load("funding"), load("people")]).then(([F, people]) => {
   const cols = [["n", "Researcher"], ["led", "Led"], ["co", "Co-applicant"], ["res", "Researcher on"], ["meta", "Metascience-related"], ["amt", "Amount led"], ["first", "First grant"]];
   function drawTable() {
     const q = document.getElementById("pq").value.trim().toLowerCase(), only = document.getElementById("ponly").checked;
-    const rs = rows.filter((r) => (!q || r.n.toLowerCase().includes(q)) && (!only || byP[r.id].k >= 2))
+    const rs = rows.filter((r) => textMatches(q, r.n) && (!only || byP[r.id].k >= 2))
       .sort((a, b) => (typeof a[sortKey] === "string" ? a[sortKey].localeCompare(b[sortKey]) : a[sortKey] - b[sortKey]) * sortDir || b.led - a.led);
     document.getElementById("pcount").textContent = `${fmt(rs.length)} researchers`;
     document.getElementById("ptable").innerHTML = `<thead><tr>${cols.map(([k, l]) => `<th class="sortable${k === "n" ? "" : " num"}" data-k="${k}">${l}${k === sortKey ? (sortDir < 0 ? " ▼" : " ▲") : ""}</th>`).join("")}<th></th></tr></thead><tbody>` +

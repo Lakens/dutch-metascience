@@ -18,6 +18,7 @@
     <a href="people.html">People</a>
     <a href="themes.html">Themes</a>
     <a href="time.html">Over time</a>
+    <a href="history.html">History</a>
     <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
     <a href="inferences.html">Inferences</a>
@@ -37,8 +38,7 @@
       <option value="comm" selected>research community</option>
       <option value="inst">main institution</option></select></label>
     <label><input type="checkbox" id="labels" checked> names</label>
-    <input type="search" id="search" list="names" placeholder="Find a person…">
-    <datalist id="names"></datalist>
+    <input type="search" id="search" placeholder="Find a person…" aria-label="Find a person">
     <span class="muted small" id="count"></span>
   </div>
   <div class="legend" id="legend"></div>
@@ -63,7 +63,6 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
   const neighborsAll = {}; edges.forEach(([a, b, w]) => {
     (neighborsAll[a] = neighborsAll[a] || []).push([b, w]); (neighborsAll[b] = neighborsAll[b] || []).push([a, w]);
   });
-  document.getElementById("names").innerHTML = people.map((p) => `<option value="${esc(p.n)}">`).join("");
 
   // colour groups: top 7 communities / institutions get a colour, the rest is "other"
   const commSize = {}; people.forEach((p) => (commSize[p.cm] = (commSize[p.cm] || 0) + 1));
@@ -236,10 +235,7 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
   });
   canvas.addEventListener("mouseleave", () => { Tip.hide(); hovered = null; draw(); });
   canvas.addEventListener("click", (ev) => { const n = nodeAt(ev); select(n ? n.id : null, false); });
-  document.getElementById("search").addEventListener("change", (e) => {
-    const p = people.find((x) => x.n.toLowerCase() === e.target.value.toLowerCase());
-    if (p) select(p.id, true);
-  });
+  nameSearch(document.getElementById("search"), () => people, (p) => select(p.id, true));
   document.getElementById("minp").addEventListener("change", () => { build(); });
   document.getElementById("colorby").addEventListener("change", () => { legend(); draw(); });
   document.getElementById("labels").addEventListener("change", draw);

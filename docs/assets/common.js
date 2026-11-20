@@ -154,3 +154,100 @@ document.addEventListener("DOMContentLoaded", () => {
   nav.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
 });
+
+// ---- name search: suggestions while typing; case, accents and word order do not matter ----
+// foldText("Daniël Lakens") -> "daniel lakens"
+const _FOLD = { "ø": "o", "æ": "ae", "œ": "oe", "ß": "ss", "ł": "l", "đ": "d", "ı": "i", "þ": "th" };
+function foldText(s) {
+  return String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+    .replace(/[øæœßłđıþ]/g, (c) => _FOLD[c]).replace(/[^a-z0-9]+/g, " ").trim();
+}
+// Does text contain every word of the query (anywhere)? For simple filters.
+function textMatches(query, text) {
+  const q = foldText(query);
+  if (!q) return true;
+  const t = foldText(text);
+  return q.split(" ").every((w) => t.includes(w));
+}
+// Score of a name for a query: every query word must occur in the name; words that start a name word count more.
+function nameScore(qWords, folded) {
+  const words = folded.split(" ");
+  let score = 0;
+  for (const w of qWords) {
+    if (words.some((x) => x === w)) score += 4;
+    else if (words.some((x) => x.startsWith(w))) score += 3;
+    else if (folded.includes(w)) score += 1;
+    else return -1;
+  }
+  if (folded.startsWith(qWords.join(" "))) score += 2;
+  return score;
+}
+// Attach suggestions to an <input>. getItems() returns [{id, n, k, y0, y1, l}] (people.json records work as is);
+// onPick(item) is called when a suggestion is chosen (click, tap, or Enter; Enter alone takes the first suggestion).
+function nameSearch(input, getItems, onPick, max = 10) {
+  input.removeAttribute("list");
+  input.setAttribute("autocomplete", "off");
+  input.setAttribute("role", "combobox");
+  input.setAttribute("aria-autocomplete", "list");
+  input.setAttribute("aria-expanded", "false");
+  const wrap = document.createElement("span");
+  wrap.className = "ns-wrap";
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  const list = document.createElement("ul");
+  list.className = "ns-list"; list.id = (input.id || "ns") + "-suggestions"; list.setAttribute("role", "listbox");
+  wrap.appendChild(list);
+  input.setAttribute("aria-controls", list.id);
+  const folded = new WeakMap();
+  let shown = [], active = -1;
+  function close() { list.style.display = "none"; input.setAttribute("aria-expanded", "false"); shown = []; active = -1; }
+  function render() {
+    list.innerHTML = shown.map((p, i) => `<li role="option" id="${list.id}-${i}" data-i="${i}"${i === active ? ' aria-selected="true"' : ""}>
+      <span class="ns-n">${esc(p.n)}</span>${p.l ? ' <span class="badge listed">reviewed list</span>' : ""}
+      <span class="ns-s">${p.k != null ? `${fmt(p.k)} paper${p.k === 1 ? "" : "s"}` : ""}${p.y0 ? ` · ${p.y0}${p.y1 && p.y1 !== p.y0 ? "–" + p.y1 : ""}` : ""}</span></li>`).join("");
+    list.style.display = shown.length ? "block" : "none";
+    input.setAttribute("aria-expanded", String(shown.length > 0));
+    if (active >= 0) input.setAttribute("aria-activedescendant", `${list.id}-${active}`);
+    else input.removeAttribute("aria-activedescendant");
+  }
+  function update() {
+    const q = foldText(input.value);
+    if (!q) { close(); return; }
+    const qw = q.split(" ");
+    const scored = [];
+    for (const p of getItems()) {
+      let f = folded.get(p);
+      if (f === undefined) { f = foldText(p.n); folded.set(p, f); }
+      const s = nameScore(qw, f);
+      if (s >= 0) scored.push([s, p]);
+    }
+    scored.sort((a, b) => b[0] - a[0] || (b[1].k || 0) - (a[1].k || 0) || a[1].n.localeCompare(b[1].n));
+    shown = scored.slice(0, max).map((x) => x[1]); active = -1;
+    if (!shown.length) { list.innerHTML = `<li class="ns-none">No one found</li>`; list.style.display = "block"; return; }
+    render();
+  }
+  function pick(p) { if (!p) return; input.value = p.n; close(); onPick(p); }
+  input.addEventListener("input", update);
+  input.addEventListener("focus", () => { if (input.value) update(); });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (!shown.length) update();
+      if (!shown.length) return;
+      e.preventDefault();
+      active = (active + (e.key === "ArrowDown" ? 1 : -1) + shown.length) % shown.length;
+      render();
+      const li = list.children[active]; if (li) li.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (!shown.length) update();
+      pick(shown[Math.max(0, active)]);
+    } else if (e.key === "Escape") close();
+  });
+  // mousedown (not click) so that the choice is made before the input loses focus
+  list.addEventListener("mousedown", (e) => {
+    const li = e.target.closest("li[data-i]");
+    if (li) { e.preventDefault(); pick(shown[+li.dataset.i]); }
+  });
+  input.addEventListener("blur", () => setTimeout(close, 150));
+  return { update, close };
+}

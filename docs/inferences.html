@@ -34,6 +34,7 @@
     <a href="people.html">People</a>
     <a href="themes.html">Themes</a>
     <a href="time.html">Over time</a>
+    <a href="history.html">History</a>
     <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
     <a href="inferences.html" aria-current="page">Inferences</a>
@@ -54,8 +55,7 @@
     these data. "Closest in content" uses the same text fingerprints as the map on the Themes page; each suggestion
     shows the clusters both work in and the two papers (one of each) that are most alike.</p>
     <div class="controls">
-      <input type="search" id="who" list="activenames" placeholder="Type a name…" style="min-width:260px">
-      <datalist id="activenames"></datalist>
+      <input type="search" id="who" placeholder="Type part of a name…" aria-label="Find a person" style="min-width:260px">
       <span class="muted small" id="whohint">Or look at the strongest pairs below.</span>
     </div>
     <div id="suggest" class="sugg"></div>
@@ -130,7 +130,6 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
 
   // ---- suggestions ----
   const active = Object.keys(inf.suggest).filter((id) => byP[id]).sort((a, b) => byP[a].n.localeCompare(byP[b].n));
-  document.getElementById("activenames").innerHTML = active.map((id) => `<option value="${esc(byP[id].n)}">`).join("");
   const card = (a, s) => {
     const [pa, pb] = s.pp || [];
     return `<div class="c"><h3>${personLink(s.id)}</h3>
@@ -144,10 +143,8 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
     document.getElementById("whohint").innerHTML = `Suggestions for ${personLink(id)}:`;
     document.getElementById("suggest").innerHTML = s.map((x) => card(id, x)).join("") || "<p class='muted'>No suggestions.</p>";
   }
-  document.getElementById("who").addEventListener("change", (e) => {
-    const id = active.find((x) => byP[x].n.toLowerCase() === e.target.value.trim().toLowerCase());
-    if (id) showPerson(id);
-  });
+  const activePeople = active.map((id) => byP[id]);
+  nameSearch(document.getElementById("who"), () => activePeople, (p) => showPerson(p.id));
   document.getElementById("toppairs").innerHTML = inf.top_pairs.map((t) => {
     const [pa, pb] = t.pp;
     return `<div class="c"><h3>${personLink(t.a)} &amp; ${personLink(t.b)}</h3>

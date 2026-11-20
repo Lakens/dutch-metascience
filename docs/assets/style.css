@@ -159,3 +159,15 @@ label { max-width: 100%; }
   header.site.open nav { display: flex; }
   header.site nav a { padding: 12px 10px; font-size: 1rem; }
 }
+
+/* ---- name search suggestions ---- */
+.ns-wrap { position: relative; display: inline-block; max-width: 100%; }
+.ns-list { position: absolute; z-index: 40; left: 0; top: calc(100% + 4px); min-width: 100%; width: max-content;
+  max-width: min(420px, 92vw); max-height: 340px; overflow: auto; margin: 0; padding: 4px 0; list-style: none;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14); display: none; }
+.ns-list li { padding: 7px 12px; cursor: pointer; font-size: 0.9rem; line-height: 1.3; }
+.ns-list li:hover, .ns-list li[aria-selected="true"] { background: var(--surface-2); }
+.ns-list .ns-s { display: block; color: var(--text-muted); font-size: 0.8rem; }
+.ns-list .ns-n { color: var(--text-primary); }
+.ns-list li.ns-none { color: var(--text-muted); cursor: default; }

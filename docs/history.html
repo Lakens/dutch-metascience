@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metascience History</title>
+<meta name="description" content="A history-book timeline of metascience per theme: historical events from Wikipedia and the landmark papers that Dutch metascientists cite most.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+<style>
+  .hist-wrap { position: relative; overflow-x: auto; overflow-y: hidden; border: 1px solid var(--border);
+               border-radius: 8px; background: var(--surface-1); -webkit-overflow-scrolling: touch; }
+  .hist { position: relative; }
+  .hist .axis { position: absolute; left: 0; right: 0; height: 2px; background: var(--axis); }
+  .hist .tick { position: absolute; transform: translateX(-50%); font-size: 0.75rem; color: var(--text-muted);
+                font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .hist .tick::before { content: ""; position: absolute; left: 50%; top: -9px; width: 1px; height: 6px; background: var(--axis); }
+  .hist .gap { position: absolute; font-size: 0.72rem; color: var(--text-muted); transform: translateX(-50%); }
+  .hist .stem { position: absolute; width: 1px; background: var(--grid); }
+  .hist .dot { position: absolute; width: 9px; height: 9px; border-radius: 50%; transform: translate(-50%, -50%);
+               border: 2px solid var(--surface-1); }
+  .hist .dot.ev { background: var(--series-3); border-radius: 2px; }
+  .hist .dot.pa { background: var(--series-1); }
+  .hist .item { position: absolute; width: var(--cw); box-sizing: border-box; padding: 6px 8px; border-radius: 6px;
+                background: var(--page); border: 1px solid var(--border); font-size: 0.78rem; line-height: 1.25;
+                cursor: pointer; overflow: hidden; }
+  .hist .item:hover, .hist .item.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .hist .item.ev { border-top: 3px solid var(--series-3); }
+  .hist .item.pa { border-top: 3px solid var(--series-1); }
+  .hist .item .y { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .hist .item .t { color: var(--text-primary); font-weight: 600; display: -webkit-box; -webkit-line-clamp: 3;
+                   -webkit-box-orient: vertical; overflow: hidden; }
+  .hist .item .a { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nl { display: inline-block; font-size: 0.66rem; font-weight: 700; padding: 0 5px; border-radius: 4px; margin-left: 4px;
+        background: var(--series-2); color: #fff; vertical-align: 1px; }
+  .hist .band { position: absolute; left: 8px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+                color: var(--text-muted); position: sticky; }
+  .hist-detail { margin-top: 12px; min-height: 64px; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+                 background: var(--surface-1); font-size: 0.92rem; }
+  .hist-detail h3 { margin: 0 0 4px; font-size: 1rem; }
+  .hist-detail .meta { color: var(--text-secondary); font-size: 0.85rem; margin: 2px 0 6px; }
+  .hist-detail blockquote { margin: 6px 0; padding-left: 10px; border-left: 3px solid var(--grid); color: var(--text-secondary);
+                            font-size: 0.85rem; }
+  .key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; color: var(--text-secondary); margin: 4px 0 10px; }
+  .key span { display: inline-flex; align-items: center; gap: 6px; }
+  .key i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; }
+  table.hlist { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  table.hlist td, table.hlist th { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  table.hlist th { color: var(--text-secondary); font-weight: 600; }
+  table.hlist td.yr { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-secondary); }
+  details.listview summary { cursor: pointer; color: var(--accent); margin: 12px 0 6px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html">Who works with whom</a>
+    <a href="people.html">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="history.html" aria-current="page">History</a>
+    <a href="places.html">Places</a>
+    <a href="funding.html">Funding</a>
+    <a href="inferences.html">Inferences</a>
+    <a href="about.html">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>History</h1>
+  <p class="lede">A timeline of metascience as in a history book: events above the line, landmark papers below it.
+  Events come from Wikipedia; papers are the works that Dutch metascience papers cite most, chosen as explained below.
+  Choose one of the 20 themes, or see the combined timeline of all themes.</p>
+
+  <section class="card">
+    <div class="controls">
+      <label>Theme <select id="theme"></select></label>
+      <label>Events <select id="evf"><option value="all">all</option><option value="nl">Dutch only</option><option value="none">none</option></select></label>
+      <div class="seg" id="zoom"><button aria-pressed="false" data-v="0.7">Compact</button><button aria-pressed="true" data-v="1">Normal</button><button aria-pressed="false" data-v="1.6">Wide</button></div>
+    </div>
+    <div class="key">
+      <span><i style="border-color:var(--series-3)"></i>Event (Wikipedia)</span>
+      <span><i style="border-color:var(--series-1)"></i>Landmark paper</span>
+      <span><span class="nl" style="margin:0">NL</span>Dutch event, or paper with a Dutch author</span>
+      <span class="muted">Scroll sideways; click an item for details. Years with more events and papers take more room, so the spacing of years varies.</span>
+    </div>
+    <p class="sub" id="note" style="margin:0 0 8px"></p>
+    <div class="hist-wrap" id="wrap"><div class="hist" id="hist"></div></div>
+    <div class="hist-detail" id="detail"><span class="muted">Click an event or paper for details.</span></div>
+    <details class="listview"><summary>Show the timeline as a list</summary><div id="list"></div></details>
+  </section>
+
+  <section class="card">
+    <h2>How the papers were chosen</h2>
+    <p class="sub" id="method"></p>
+  </section>
+</main>
+<footer>Events: Wikipedia (CC BY-SA), each linked to its article; every event's date was checked automatically
+against the article text. Papers and reference lists: OpenAlex (CC0). Event texts written by Claude (Anthropic).</footer>
+
+<script>
+load("history").then((H) => {
+  const W = H.works;
+  const themeSel = document.getElementById("theme"), evSel = document.getElementById("evf");
+  themeSel.innerHTML = `<option value="all">All themes combined</option>` +
+    H.themes.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join("");
+  const themeName = Object.fromEntries(H.themes.map((t) => [t.id, t.name]));
+  let zoom = 1, selected = null;
+
+  // ---- year scale: each year gets the width its items need (about ROWS rows of cards), with a small minimum ----
+  const ROWS = 3;
+  function minPx(y) { return y < 1900 ? 0.5 : y < 1990 ? 4 : 30; }
+  function makeScale(its, k, cardW) {
+    const y0 = Math.min(...its.map((d) => d.year), 1990), y1 = 2027;
+    const nEv = {}, nPa = {};
+    for (const d of its) (d.kind === "ev" ? nEv : nPa)[d.year] = ((d.kind === "ev" ? nEv : nPa)[d.year] || 0) + 1;
+    const start = {}; let x = 40;
+    for (let y = y0; y <= y1; y++) {
+      start[y] = x;
+      const n = Math.max(nEv[y] || 0, nPa[y] || 0);
+      x += Math.max(minPx(y), n * cardW / ROWS) * k;
+    }
+    start[y1 + 1] = x;
+    const X = (v) => { const y = Math.floor(v); const a = start[Math.max(y0, Math.min(y1, y))]; const b = start[Math.max(y0, Math.min(y1, y)) + 1]; return a + (b - a) * (v - y); };
+    return { X, y0, y1 };
+  }
+
+  function items() {
+    const th = themeSel.value, ev = evSel.value;
+    let papers, events;
+    if (th === "all") {
+      papers = H.combined.map((c) => ({ id: c.id, th: c.th }));
+      events = H.events.filter((e) => ev === "all" ? (e.themes.length >= 2 || e.dutch) : ev === "nl" ? e.dutch : false);
+    } else {
+      const t = H.themes.find((x) => String(x.id) === th);
+      papers = t.papers.map((id) => ({ id, th: [t.id] }));
+      events = H.events.filter((e) => e.themes.includes(+th) && (ev === "all" || (ev === "nl" && e.dutch)));
+    }
+    document.getElementById("note").textContent = th === "all"
+      ? `Combined timeline: the ${H.settings.n_combined} strongest papers of each theme, the events that concern at least two themes, and all Dutch events. ${papers.length} papers, ${events.length} events.`
+      : `${themeName[+th]}: ${papers.length} ${papers.length === 1 ? "paper" : "papers"} and ${events.length} ${events.length === 1 ? "event" : "events"}.`;
+    const out = [];
+    for (const e of events) out.push({ kind: "ev", y: e.year + ((e.month || 6) - 0.5) / 12, year: e.year, e });
+    for (const p of papers) {
+      const w = W[p.id];
+      out.push({ kind: "pa", y: w.y + 0.5, year: w.y, w, id: p.id, th: p.th });
+    }
+    return out;
+  }
+
+  function firstAuthor(w) {
+    if (!w.a || !w.a.length) return "";
+    if (/group|collaboration|committee|consortium|community|board|unesco/i.test(w.a[0])) return w.a[0];
+    const last = w.a[0].split(" ").slice(-1)[0];
+    return w.na > 2 ? `${last} et al.` : w.na === 2 ? `${last} & ${w.a[1].split(" ").slice(-1)[0]}` : last;
+  }
+
+  function draw() {
+    const its = items();
+    const host = document.getElementById("hist"), wrap = document.getElementById("wrap");
+    const k = zoom * (window.innerWidth < 700 ? 0.8 : 1);
+    const CW = window.innerWidth < 700 ? 150 : 172, CH = 74, GAP = 8, LANE = CH + 10;
+    host.style.setProperty("--cw", CW + "px");
+    const sc = makeScale(its, k, CW + GAP), X = sc.X, maxY = 2026;
+    // lanes: greedy, left to right; events stack upward, papers downward
+    function lanes(list) {
+      const ends = [];
+      list.sort((a, b) => a.y - b.y);
+      // a card may move right by up to 45% of its width (it still covers its own year) before a new row starts
+      for (const d of list) {
+        d.x = X(d.y);
+        const ideal = Math.max(4, d.x - CW / 2);
+        let lane = ends.findIndex((e) => Math.max(ideal, e + GAP) - ideal <= 0.45 * CW);
+        if (lane < 0) { lane = ends.length; ends.push(-1e9); }
+        d.left = Math.max(ideal, ends[lane] + GAP);
+        ends[lane] = d.left + CW; d.lane = lane;
+      }
+      return ends.length;
+    }
+    const evs = its.filter((d) => d.kind === "ev"), pas = its.filter((d) => d.kind === "pa");
+    const nUp = Math.max(1, lanes(evs)), nDown = Math.max(1, lanes(pas));
+    const axisY = 14 + nUp * LANE + 18;
+    const width = Math.max(X(maxY + 1) + 20, ...its.map((d) => d.left + CW + 12), wrap.clientWidth);
+    const height = axisY + 26 + nDown * LANE + 10;
+    host.style.width = width + "px"; host.style.height = height + "px";
+    let html = `<div class="axis" style="top:${axisY}px"></div>`;
+    // ticks: round years (every 100, 50, 10, 5 or 1 years) that are at least 46 px apart; years with items first
+    const ticks = []; let lastX = -1e9;
+    const stepOf = (y) => y < 1900 ? 50 : y < 1990 ? 10 : 1;
+    const itemYears = new Set(its.map((d) => d.year));
+    for (let y = sc.y0; y <= maxY; y++) {
+      const wanted = y % stepOf(y) === 0 && (y >= 1990 ? (y % 5 === 0 || itemYears.has(y)) : true);
+      if (wanted && X(y) - lastX >= 46) { ticks.push(y); lastX = X(y); }
+    }
+    for (const y of ticks) html += `<div class="tick" style="left:${X(y)}px;top:${axisY + 10}px">${y}</div>`;
+    // stems and dots first, cards after them, so that cards cover the stems of items further from the axis
+    for (const d of its) {
+      const up = d.kind === "ev";
+      d.top = up ? axisY - 18 - (d.lane + 1) * LANE + 10 : axisY + 30 + d.lane * LANE;
+      const stemTop = up ? d.top + CH : axisY, stemH = up ? axisY - (d.top + CH) : d.top - axisY;
+      html += `<div class="stem" style="left:${d.x}px;top:${stemTop}px;height:${Math.max(0, stemH)}px"></div>`;
+      html += `<div class="dot ${d.kind}" style="left:${d.x}px;top:${axisY + 1}px"></div>`;
+    }
+    for (const d of its) {
+      const top = d.top;
+      const left = d.left;
+      const key = d.kind === "ev" ? "e:" + d.e.url + d.e.year : "p:" + d.id;
+      d.key = key;
+      if (d.kind === "ev") {
+        html += `<div class="item ev${selected === key ? " on" : ""}" data-key="${esc(key)}" style="left:${left}px;top:${top}px;height:${CH}px">
+          <div class="y">${d.e.year}${d.e.end ? "–" + d.e.end : ""}${d.e.dutch ? '<span class="nl">NL</span>' : ""}</div>
+          <div class="t">${esc(d.e.title)}</div></div>`;
+      } else {
+        html += `<div class="item pa${selected === key ? " on" : ""}" data-key="${esc(key)}" style="left:${left}px;top:${top}px;height:${CH}px">
+          <div class="y">${d.w.y}${d.w.nl ? '<span class="nl">NL</span>' : ""}</div>
+          <div class="t" style="-webkit-line-clamp:2">${esc(d.w.t)}</div><div class="a">${esc(firstAuthor(d.w))}</div></div>`;
+      }
+    }
+    host.innerHTML = html;
+    const byKey = Object.fromEntries(its.map((d) => [d.key, d]));
+    host.querySelectorAll(".item").forEach((el) => el.addEventListener("click", () => {
+      selected = el.dataset.key;
+      host.querySelectorAll(".item.on").forEach((x) => x.classList.remove("on"));
+      el.classList.add("on");
+      showDetail(byKey[selected]);
+    }));
+    drawList(its);
+    return its;
+  }
+
+  function showDetail(d) {
+    const el = document.getElementById("detail");
+    if (!d) { el.innerHTML = `<span class="muted">Click an event or paper for details.</span>`; return; }
+    if (d.kind === "ev") {
+      const e = d.e;
+      const lang = e.url.includes("nl.wikipedia") ? "Dutch Wikipedia" : "Wikipedia";
+      el.innerHTML = `<h3>${esc(e.title)}${e.dutch ? '<span class="nl">NL</span>' : ""}</h3>
+        <div class="meta">${e.year}${e.end ? "–" + e.end : ""} · Event · themes: ${e.themes.map((t) => esc(themeName[t])).join("; ")}</div>
+        <div>${esc(e.text)}</div>
+        <blockquote>“${esc(e.quote)}”</blockquote>
+        <a href="${esc(e.url)}" target="_blank" rel="noopener">Read the ${lang} article</a>`;
+    } else {
+      const w = d.w;
+      const auth = (w.a || []).join(", ") + (w.na > 3 ? ` and ${w.na - 3} more` : "");
+      const rows = Object.entries(w.th).map(([t, s]) =>
+        `<li>${esc(themeName[t])}: cited by ${fmt(s.n)} of the theme's papers (${Math.round(s.sh * 100)}%)</li>`).join("");
+      el.innerHTML = `<h3>${esc(w.t)}${w.nl ? '<span class="nl">NL</span>' : ""}</h3>
+        <div class="meta">${esc(auth)} · ${w.y}${w.v ? " · " + esc(w.v) : ""}</div>
+        <div>Cited by ${fmt(w.k)} metascience papers on this site and ${fmt(w.c)} works in total
+        (${w.fwci ? fmt(w.fwci) + " times the average for its field and year" : "field-weighted impact not available"}).
+        ${w.nl ? "A Dutch author is on this paper (it is on this site)." : ""}</div>
+        <ul style="margin:6px 0">${rows}</ul>
+        <a href="${w.doi ? "https://doi.org/" + esc(w.doi) : "https://openalex.org/" + d.id}" target="_blank" rel="noopener">Open the paper</a>`;
+    }
+  }
+
+  function drawList(its) {
+    const rows = its.slice().sort((a, b) => a.y - b.y).map((d) => d.kind === "ev"
+      ? `<tr><td class="yr">${d.e.year}${d.e.end ? "–" + d.e.end : ""}</td><td>Event</td><td><a href="${esc(d.e.url)}" target="_blank" rel="noopener">${esc(d.e.title)}</a>${d.e.dutch ? '<span class="nl">NL</span>' : ""}<br><span class="muted small">${esc(d.e.text)}</span></td></tr>`
+      : `<tr><td class="yr">${d.w.y}</td><td>Paper</td><td><a href="${d.w.doi ? "https://doi.org/" + esc(d.w.doi) : "https://openalex.org/" + d.id}" target="_blank" rel="noopener">${esc(d.w.t)}</a>${d.w.nl ? '<span class="nl">NL</span>' : ""}<br><span class="muted small">${esc((d.w.a || []).join(", "))}${d.w.na > 3 ? " et al." : ""} · cited by ${fmt(d.w.k)} papers on this site</span></td></tr>`);
+    document.getElementById("list").innerHTML = `<table class="hlist"><thead><tr><th>Year</th><th>Type</th><th>What</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+  }
+
+  const s = H.settings;
+  document.getElementById("method").innerHTML = `We downloaded the reference lists of the ${fmt(H.n_papers)} papers on
+    this site from OpenAlex (${fmt(H.n_with_refs)} have one; together they cite ${fmt(H.n_cited)} different works; the ${fmt(H.n_cited_min_k)} works cited by at least
+    ${s.min_k} of them were considered).
+    For each theme, a cited work scores on two things: how many of the theme's papers cite it (importance inside
+    metascience), and how often the whole of science cites it compared with other works of the same field and year
+    (OpenAlex's field-weighted citation impact: importance outside metascience). A work must do well on both.
+    To avoid timelines full of one kind of paper: software and general methods that all of science cites as a tool
+    are left out; when two works are cited by mostly the same papers, only the stronger one is kept; papers from one
+    family (versions of one guideline, one journal series, one author's papers on one method) count once; at most
+    ${s.max_guidelines} reporting guidelines or statements per theme; and a classic cited everywhere is shown only in
+    the ${s.max_themes} themes where the largest share of papers cite it. Each theme shows at most ${s.n_per_theme}
+    papers, fewer when it has no more clear landmarks; the combined timeline shows the ${s.n_combined} strongest of
+    each theme. The selection reflects what Dutch metascience papers cite, not a judgement of quality.`;
+
+  document.querySelectorAll("#zoom button").forEach((b) => b.addEventListener("click", () => {
+    zoom = +b.dataset.v;
+    document.querySelectorAll("#zoom button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    draw();
+  }));
+  // start where the items begin (older empty years are skipped)
+  function reset() {
+    selected = null; showDetail(null);
+    const its = draw();
+    const first = Math.min(...its.map((d) => d.x));
+    document.getElementById("wrap").scrollLeft = Math.max(0, first - 120);
+  }
+  themeSel.addEventListener("change", reset);
+  evSel.addEventListener("change", () => { draw(); });
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(draw, 150); });
+  reset();
+}).catch((e) => failed(document.getElementById("hist"), e));
+</script>
+</body>
+</html>

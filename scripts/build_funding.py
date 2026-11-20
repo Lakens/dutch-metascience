@@ -134,6 +134,10 @@ def family(scheme):
 
 def org_short(o):
     return (o or "").split("||")[0]
+EMAIL = re.compile(r"([A-Za-z0-9._%+-]+)@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+def no_email(s):
+    """NWO's data has an email address in at least one name field; keep only the part before the @, dots as spaces."""
+    return EMAIL.sub(lambda m: m.group(1).replace(".", " "), s or "")
 out_projects, people_funding = [], collections.defaultdict(list)
 for p in projects:
     ms = [m for m in p["project_members"]]
@@ -146,13 +150,13 @@ for p in projects:
         key = (m["member_id"], m["role"])
         if key in seen:
             continue
-        seen[key] = dict(id=match.get(m["member_id"]), n=" ".join(x for x in (m.get("first_name") or m.get("initials") or "",
-                                                                              m.get("prefix") or "", m.get("last_name") or "") if x),
+        seen[key] = dict(id=match.get(m["member_id"]), n=no_email(" ".join(x for x in (m.get("first_name") or m.get("initials") or "",
+                                                                              m.get("prefix") or "", m.get("last_name") or "") if x)),
                          r=m["role"], o=org_short(m.get("organisation")))
     rec = dict(id=p["project_id"], t=p["title"], s=p.get("funding_scheme") or "", f=family(p.get("funding_scheme")),
                b=(p.get("start_date") or "")[:10], e=(p.get("end_date") or "")[:10], a=p.get("award_amount"),
                m=1 if meta else 0, ppl=list(seen.values()),
-               sum=((p.get("summary_en") or p.get("summary_nl") or "").strip()[:400]))
+               sum=no_email((p.get("summary_en") or p.get("summary_nl") or "").strip()[:400]))
     out_projects.append(rec)
     for x in rec["ppl"]:
         if x["id"]:

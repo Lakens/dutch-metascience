@@ -19,6 +19,7 @@
     <a href="people.html" aria-current="page">People</a>
     <a href="themes.html">Themes</a>
     <a href="time.html">Over time</a>
+    <a href="history.html">History</a>
     <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
     <a href="inferences.html">Inferences</a>
@@ -31,8 +32,7 @@
   <p class="lede">Pick anyone who wrote a metascience paper at a Dutch institution. "Reviewed list" marks people on our
   hand-checked list of Dutch metascientists; the others were found as authors and have not been reviewed.</p>
   <div class="controls">
-    <input type="search" id="search" list="names" placeholder="Type a name…">
-    <datalist id="names"></datalist>
+    <input type="search" id="search" placeholder="Type part of a name…" aria-label="Find a person">
     <label><input type="checkbox" id="onlylisted"> reviewed list only (in the search)</label>
   </div>
 
@@ -80,16 +80,10 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
   const nbr = {}; edges.forEach(([a, b, w]) => { (nbr[a] = nbr[a] || {})[b] = w; (nbr[b] = nbr[b] || {})[a] = w; });
   let current = null;
 
-  function fillNames() {
-    const only = document.getElementById("onlylisted").checked;
-    document.getElementById("names").innerHTML = people.filter((p) => !only || p.l).map((p) => `<option value="${esc(p.n)}">`).join("");
-  }
-  fillNames();
-  document.getElementById("onlylisted").addEventListener("change", fillNames);
-  document.getElementById("search").addEventListener("change", (e) => {
-    const p = people.find((x) => x.n.toLowerCase() === e.target.value.toLowerCase());
-    if (p) { location.hash = encodeURIComponent(p.id); }
-  });
+  const search = nameSearch(document.getElementById("search"),
+    () => document.getElementById("onlylisted").checked ? people.filter((p) => p.l) : people,
+    (p) => { location.hash = encodeURIComponent(p.id); });
+  document.getElementById("onlylisted").addEventListener("change", () => search.update());
   window.addEventListener("hashchange", fromHash);
 
   function fromHash() {
