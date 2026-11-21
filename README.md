@@ -25,7 +25,7 @@ which themes, at which institutions, and how the literature developed over time.
 ## How the data were made
 
 1. A hand-reviewed list of Dutch metascientists; their ORCID and OpenAlex records (`find_orcids.py`).
-2. Their papers from OpenAlex (`openalex_works.py`) and Crossref (`crossref_works.py`, `crossref_lookup.py`),
+2. Their papers from OpenAlex (`openalex_works.py`; full author lists of papers with more than 100 authors, which OpenAlex cuts off in bulk requests: `fetch_full_authors.py`) and Crossref (`crossref_works.py`, `crossref_lookup.py`),
    cleaned to scientific papers (`build_clean.py`).
 3. An OpenAlex search for papers since 2005 with a Dutch author and metascience terms (`terms.py`, `fetch_search.py`).
 4. Every paper judged as metascience or not, with one of eight themes, by `gpt-oss:20b` in Ollama on a SURF Research

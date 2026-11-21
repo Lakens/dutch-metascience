@@ -172,6 +172,41 @@ for group in by_title.values():
         dropped.update(p["id"] for p in copies)
         copy_of.update((p["id"], keep["id"]) for p in copies)
         rest = [p for p in rest if p not in copies]
+n_exact_copies = len(dropped)
+# a preprint and its journal version whose titles differ slightly ("Across Samples and Settings" and "Across Sample
+# and Setting"): at least one of the two is a preprint, they share a person, both titles have at least 5 words, the
+# titles are at least 96% the same (difflib ratio, letters, digits and spaces only) and contain the same numbers. A
+# check of all pairs from 85% on (21 Nov 2026) showed that without these conditions different papers are joined:
+# "(part 1)" and "(Part 2)", "Transcript 1" and "Transcript 2", and two GIScience papers at 95%.
+import difflib
+def norm_words(t):
+    return re.sub(r"[^a-z0-9 ]", "", (t or "").lower()).strip()
+pref = lambda p: (p["ty"] == "preprint", -p["c"], p["id"])
+by_person = collections.defaultdict(list)
+for p in papers:
+    if p["id"] not in dropped and len((p["t"] or "").split()) >= 5:
+        for pk in p["p"]:
+            by_person[pk].append(p)
+pairs = set()
+for plist in by_person.values():
+    for a, b in itertools.combinations(plist, 2):
+        if "preprint" not in (a["ty"], b["ty"]) or re.findall(r"\d+", a["t"]) != re.findall(r"\d+", b["t"]):
+            continue
+        sm = difflib.SequenceMatcher(None, norm_words(a["t"]), norm_words(b["t"]))
+        if sm.real_quick_ratio() >= 0.96 and sm.quick_ratio() >= 0.96 and sm.ratio() >= 0.96:
+            pairs.add(tuple(sorted((a["id"], b["id"]))))
+byid = {p["id"]: p for p in papers}
+for a, b in sorted(pairs):
+    keep, copy = sorted((byid[a], byid[b]), key=pref)
+    if copy["id"] not in dropped:
+        dropped.add(copy["id"]); copy_of[copy["id"]] = keep["id"]
+# a kept paper may itself be a copy of another (chains): point every copy to the paper that is finally kept
+for c in list(copy_of):
+    k, seen = copy_of[c], {c}
+    while k in copy_of and k not in seen:
+        seen.add(k); k = copy_of[k]
+    copy_of[c] = k
+print(f"copies with slightly different titles: {len(dropped) - n_exact_copies}")
 papers = [p for p in papers if p["id"] not in dropped]
 for wid in dropped:
     del paper_people[wid], paper_nl_insts[wid], paper_countries[wid]
