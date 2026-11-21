@@ -38,7 +38,7 @@
   <section class="card" id="find">
     <h2>Find yourself</h2>
     <p class="sub">Work on metascience in the Netherlands? Choose your name to see the whole site from your position: your
-    papers, co-authors, subfield, institutions and grants are highlighted on every page. The choice is kept only in this
+    papers, co-authors, subfield, institution and grants are highlighted on every page. The choice is kept only in this
     browser; nothing is sent anywhere. All data on this site are public, so you can also choose anyone else.</p>
     <div class="controls"><input type="search" id="findme" placeholder="Type part of your name…" aria-label="Find yourself"></div>
     <div id="mecard"></div>
@@ -104,7 +104,7 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
         <div class="tile"><div class="v">${fmt(p.deg || 0)}</div><div class="l">co-authors on this site</div></div>
         <div class="tile"><div class="v">${fmt(cites)}</div><div class="l">citations of these papers</div></div></div>
       <p><b>Your subfield</b> (the clusters with most of your papers): ${me.fieldNames.map(esc).join("; ")}.
-      ${ins.length ? `<br><b>Institutions:</b> ${ins.map(esc).join(" · ")}.` : ""}</p>
+      ${ins.length ? `<br><b>Institution:</b> ${ins.map(esc).join(" · ")}.` : ""}</p>
       <p><b>Your view of the site:</b></p>
       <ul class="small">
         <li><a href="people.html${q}#${encodeURIComponent(me.id)}">Your profile</a>: themes, timeline, co-authors and papers.</li>
@@ -112,7 +112,7 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
         <li><a href="themes.html${q}">Themes</a>: your papers (or your subfield) on the map of all papers.</li>
         <li><a href="time.html${q}">Over time</a>: your papers among all citations.</li>
         <li><a href="history.html${q}">History</a>: the timeline of your subfield, with the landmark papers you cite.</li>
-        <li><a href="places.html${q}">Places</a>: your institutions.</li>
+        <li><a href="places.html${q}">Places</a>: your institution.</li>
         <li><a href="funding.html${q}">Funding</a>: your NWO grants.</li>
         <li><a href="inferences.html${q}">Inferences</a>: who you could work with.</li>
       </ul>

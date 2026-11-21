@@ -73,7 +73,7 @@ Promise.all([load("institutions"), load("countries"), load("meta"), Me.ready]).t
   const slider = document.getElementById("yr");
   slider.min = years[0]; slider.max = years[years.length - 1]; slider.value = slider.max;
   const maxK = d3.max(geo, (i) => i.k) || 1;
-  const myIns = new Set(me ? me.ins : []);   // personal view: the person's institutions get a dark ring
+  const myIns = new Set(me ? me.ins : []);   // personal view: the person's institution gets a dark ring
 
   function drawMap() {
     const Y = +slider.value; document.getElementById("yrlab").textContent = `up to ${Y}`;

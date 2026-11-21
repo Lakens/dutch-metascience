@@ -167,7 +167,10 @@ for pk, plist in pp.items():
         y0=min(years) if years else None, y1=max(years) if years else None,
         cats=dict(collections.Counter(p["cat"] for p in plist)),
         cls=dict(collections.Counter(str(p["cl"]) for p in plist if p["cl"] is not None)),
-        ins=[i for i, _ in person_inst[pk].most_common(3)],
+        # only the institution on most of the person's papers: OpenAlex sometimes gives an author a co-author's
+        # institution (when the publisher's affiliation text runs two addresses together), so a second institution
+        # is often wrong
+        ins=[i for i, _ in person_inst[pk].most_common(1)],
         kw=[k for k, _ in kws.most_common(8)], cm=comm_of.get(pk, -1),
         deg=G.degree(pk) if pk in G else 0))
 people_out.sort(key=lambda r: -r["k"])
