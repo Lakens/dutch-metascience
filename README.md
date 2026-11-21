@@ -56,7 +56,8 @@ which themes, at which institutions, and how the literature developed over time.
     Claude agents, each with the article's own words for the date, and kept only when a script finds those words and
     the year in the current article (`check_events.py`, result in `history_events.json`); and debates from the
     [Open Science Blogs Archive](https://github.com/Lakens/open_science_blogs): candidate episodes from shared links and
-    bursts of names across bloggers (`export_blogs.R`, `blog_candidates.py`), read and summarised by Claude agents, and
+    bursts of names across bloggers (`export_blogs.R`, `blog_candidates.py`), read and summarised by Claude agents; more
+    posts about each event found by searching the archive for its names and checked by Claude agents (`blog_expand.py`);
     kept only with at least 5 bloggers and working links (`check_blog_events.py`, result in `blog_events.json`).
 
 The scripts read API keys from environment variables (`OPENALEX_API_KEY`, `SRC_API_KEY`, and `SURF_GPU_*` for the

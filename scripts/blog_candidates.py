@@ -13,7 +13,13 @@ Two signals, joined into episodes:
     Only the TOP_TERMS most surprising bursts are used, and only terms used in at most MAX_DOC_SHARE of all posts.
 Candidates are joined into one episode when at least half of the posts of the smaller one are also in the other.
 Counting different bloggers (not posts) keeps a very active blogger from creating events alone.
-Episodes with at least MIN_BLOGGERS different bloggers are written out, with all their posts.
+Episodes are written out, with all their posts, when they have at least MIN_BLOGGERS different bloggers, or when they
+contain a shared link and have at least LINK_MIN_AUTHORS bloggers (a link shared by 3 bloggers is a much stronger sign
+of one event than a word used by 3 bloggers). The agents can join small episodes about the same event, and
+blog_expand.py later searches the whole archive for each event's names, so a small episode can still reach the minimum
+number of bloggers that check_blog_events.py asks for.
+Episodes are numbered by number of bloggers, then date, so the episodes with at least MIN_BLOGGERS bloggers keep the
+numbers they had before small link episodes were added.
 """
 import sys, json, re, math, collections, datetime as dt
 from urllib.parse import urlsplit, unquote
@@ -175,7 +181,7 @@ episodes = []
 for g in groups.values():
     ps = sorted(set().union(*(c["posts"] for c in g)), key=lambda x: pid[x]["date"])
     au = sorted({pid[x]["a"] for x in ps})
-    if len(au) < MIN_BLOGGERS:
+    if len(au) < (LINK_MIN_AUTHORS if any(c["kind"] == "link" for c in g) else MIN_BLOGGERS):
         continue
     episodes.append(dict(
         n_bloggers=len(au), start=pid[ps[0]]["d"], end=pid[ps[-1]]["d"], bloggers=au,
@@ -189,7 +195,8 @@ json.dump(dict(settings=dict(link_window=LINK_WINDOW, link_min_authors=LINK_MIN_
                              max_doc_share=MAX_DOC_SHARE, top_terms=TOP_TERMS, min_bloggers=MIN_BLOGGERS),
                n_posts=len(posts), n_bloggers=len({p["a"] for p in posts}), episodes=episodes),
           open(out_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-print(f"{len(episodes)} episodes with at least {MIN_BLOGGERS} bloggers")
+print(f"{len(episodes)} episodes: {sum(e['n_bloggers'] >= MIN_BLOGGERS for e in episodes)} with at least {MIN_BLOGGERS} bloggers, "
+      f"the others with a shared link and at least {LINK_MIN_AUTHORS}")
 for e in episodes:
     print(f"  {e['episode']:2d}. {e['n_bloggers']:2d} bloggers {e['start']}..{e['end']}  {' · '.join(e['terms'][:5])}  "
           f"{' · '.join(l['link'][:50] for l in e['links'][:1])}")

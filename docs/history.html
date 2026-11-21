@@ -340,11 +340,15 @@ Promise.all([load("history"), Me.ready])
     <br><br>Blog debates come from the <a href="https://github.com/Lakens/open_science_blogs">Open Science Blogs Archive</a>
     (3,530 posts by 54 bloggers or groups, 2008–2025, mostly in psychology). A script looked for moments when several
     different bloggers wrote about the same thing at the same time: the same link (a paper, project, column or blog post)
-    in posts by at least 3 bloggers within 60 days, or a name or phrase suddenly used by many more bloggers than usual.
-    Claude (Anthropic) read the posts of each candidate, rejected chance word bursts and topics outside metascience, and
-    wrote the title and summary; a debate is shown only when at least 5 different bloggers wrote about it. Its date runs
-    from the first to the last post about it. Debates that ran for years (Stapel, Bem, Registered Reports) have no burst
-    and are not found this way; the archive covers mostly psychology, so other themes have few or no blog debates.`;
+    in posts by at least 3 bloggers within 60 days, or a name or phrase suddenly used by many more bloggers than usual
+    (at least 5 bloggers). Claude (Anthropic) read the posts of each candidate, rejected chance word bursts, commonly cited
+    pages and topics outside metascience, joined candidates about the same event, and wrote the title and summary. Because
+    many posts about a debate share neither the link nor the burst, a script then searched the whole archive for each
+    event's names (for example "Wansink" or "Bargh"), from a month before the event to a year after it, and Claude kept
+    the posts that are about the event. A debate is shown only when at least 5 different bloggers wrote about it, with one
+    exception added by hand: the Förster case (4 bloggers), because it concerns a Dutch university. Its date
+    runs from the first to the last post about it. Debates that began before most of these blogs existed (Stapel, Bem)
+    are not found; the archive covers mostly psychology, so other themes have few or no blog debates.`;
 
   document.querySelectorAll("#zoom button").forEach((b) => b.addEventListener("click", () => {
     zoom = +b.dataset.v;
