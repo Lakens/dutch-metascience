@@ -248,6 +248,25 @@ if goals_path and os.path.exists(goals_path):
     for q in [q for c in goals.get("clusters", []) for q in c.get("questions", [])] + goals.get("goals", []):
         if "papers" in q:
             q["papers"] = list(dict.fromkeys(copy_of.get(x, x) for x in q["papers"]))
+    # papers and people that are no longer on the site (for example Zenodo deposits, left out since goals.json was
+    # written) are dropped from the statements; statements left with fewer than 3 papers are reported
+    names = {p["n"] for p in people}
+    n_gone_p = n_gone_n = 0
+    for q in [q for c in goals.get("clusters", []) for q in c.get("questions", [])] + goals.get("goals", []):
+        keep = [x for x in q.get("papers", []) if x in pid]
+        n_gone_p += len(q.get("papers", [])) - len(keep)
+        q["papers"] = keep
+        if "people" in q:
+            kp = [x for x in q["people"] if x in names]
+            n_gone_n += len(q["people"]) - len(kp)
+            q["people"] = kp
+        if len(keep) < 3:
+            print(f"  left out: statement now rests on {len(keep)} papers: {(q.get('question') or q.get('goal'))[:90]}")
+    # a statement that rests on fewer than 3 papers on the site is left out
+    for c in goals.get("clusters", []):
+        c["questions"] = [q for q in c.get("questions", []) if len(q.get("papers", [])) >= 3]
+    goals["goals"] = [g for g in goals.get("goals", []) if len(g.get("papers", [])) >= 3]
+    print(f"goals.json: {n_gone_p} cited papers and {n_gone_n} named people are no longer on the site and were dropped")
     cited = [x for c in goals.get("clusters", []) for q in c.get("questions", []) for x in q.get("papers", [])] + \
             [x for g in goals.get("goals", []) for x in g.get("papers", [])]
     missing = [x for x in cited if x not in pid]

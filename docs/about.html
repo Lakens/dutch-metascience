@@ -41,7 +41,9 @@
       <li><b>Their papers</b> came from <a href="https://openalex.org">OpenAlex</a> (all papers on their author
       profiles) and <a href="https://www.crossref.org">Crossref</a> (papers where the publisher recorded their ORCID).
       Only scientific papers were kept: journal articles, reviews, preprints with a DOI, books, chapters, conference
-      papers, editorials and letters; not blog posts, OSF project pages, datasets or peer reviews.</li>
+      papers, editorials and letters; not blog posts, OSF project pages, deposits on Zenodo or Figshare (such as
+      project deliverables and slides), datasets or peer reviews. The same rule applies to the papers found by the
+      search below (<span id="nnotpaper">some</span> items left out).</li>
       <li><b>A search of OpenAlex</b> added every paper since 2005 with an author at a Dutch institution whose title or
       abstract uses metascience terms (such as replicability, preregistration, publication bias, research integrity,
       Bayes factor, scientometrics, research assessment).</li>
@@ -62,7 +64,7 @@
       and everyone at a Dutch institution on at least one of them. Papers by people on the starting list are shown
       only when they have a Dutch institution, or when OpenAlex has no institution for that person on that paper
       (mostly Dutch preprints and theses); <span id="nabroad">some</span> papers from before or after their time in
-      the Netherlands were left out. Some publishers give all authors one shared address text, such as "From
+      the Netherlands were left out. Some publishers give all authors one shared (or nearly the same) address text, such as "From
       University of Oxford … and University Medical Center Utrecht", and OpenAlex then gives every author all those
       institutions; such a paper alone does not make anyone Dutch. A paper that appears more than once (a preprint and
       its journal version, or a statement published in several journals) is shown once: as the journal version, with
@@ -111,7 +113,9 @@
       <li><b>"Dutch"</b> means: an institution in the Netherlands on that paper. People who moved abroad still appear
       with their Dutch papers; Dutch researchers working abroad do not. Each person is shown with one institution: the
       Dutch institution on most of their papers. OpenAlex sometimes gives an author the institution of a co-author, so
-      a second institution was often wrong.</li>
+      a second institution was often wrong. When two institutions are on equally many papers, a medical centre wins
+      over the university in the same city (addresses such as "University Medical Center Groningen, University of
+      Groningen" name both); otherwise the institution on the most recent paper is shown.</li>
       <li><b>Everyone with a metascience paper is on the site.</b> Writing one paper on a metascience topic does not
       make someone a metascientist; the number of papers shows how much of a person's work is metascience.</li>
       <li><b>Missing abstracts</b>: for <span id="noabs">some</span> of the metascience papers OpenAlex has no abstract,
@@ -144,6 +148,7 @@ load("meta").then((m) => {
   if (m.n_papers) document.getElementById("npapers").textContent = fmt(m.n_papers);
   if (m.n_excluded_by_hand != null) document.getElementById("nexcl").textContent = fmt(m.n_excluded_by_hand);
   if (m.n_abroad != null) document.getElementById("nabroad").textContent = fmt(m.n_abroad);
+  if (m.n_not_paper != null) document.getElementById("nnotpaper").textContent = fmt(m.n_not_paper);
   if (m.n_copies != null) document.getElementById("ncopies").textContent = fmt(m.n_copies);
   if (m.n_no_abstract != null) document.getElementById("noabs").textContent =
     `${fmt(m.n_no_abstract)} of the ${fmt(m.n_papers)} (${Math.round(100 * m.n_no_abstract / m.n_papers)}%)`;

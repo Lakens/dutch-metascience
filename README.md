@@ -42,7 +42,7 @@ which themes, at which institutions, and how the literature developed over time.
    `build_site_data.py`).
 7. The JSON files for the website (`build_site_data.py`, output in `docs/data/`). A paper is shown when it has an
    author at a Dutch institution, or an author from the starting list without a known institution on it; a shared
-   affiliation text that names the Netherlands and other countries does not make an author Dutch on its own; copies
+   affiliation text (or a combined address block starting with "From") that names the Netherlands and other countries does not make an author Dutch on its own; Zenodo, Figshare and OSF deposits are left out, as in `build_clean.py`; copies
    of one paper (same title and a shared author) are shown once, as the journal version (`copies.json` lists them).
 8. The Inferences page (`build_inferences.py`): collaboration suggestions from the paper embeddings; rising themes
    from a multinomial logistic regression of each paper's cluster on year (natural spline, chosen by QAIC, intervals

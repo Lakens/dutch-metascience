@@ -47,7 +47,21 @@ EXCLUDED = {r["work_id"] for r in csv.DictReader(open(os.path.join(os.path.dirna
                                                                    "excluded_by_hand.csv"), encoding="utf-8"))}
 n_before = len(cands)
 cands = [c for c in cands if c[0] not in EXCLUDED]
-print(f"left out by hand check: {n_before - len(cands)} papers")
+n_excluded_by_hand = n_before - len(cands)
+print(f"left out by hand check: {n_excluded_by_hand} papers")
+# only scientific papers: the same rules as build_clean.py (SCIENTIFIC), which the publication lists of the people on
+# our list already passed; papers found by the OpenAlex search must pass them too
+KEEP_TYPES = ("article", "review", "preprint", "book", "book-chapter", "conference-paper", "editorial", "letter")
+def is_scientific(wtype, doi, venue):
+    doi, venue = (doi or "").lower(), venue or ""
+    return (wtype in KEEP_TYPES
+            and not doi.startswith(("10.17605/", "10.5281/", "10.6084/"))      # OSF pages, Zenodo and Figshare deposits
+            and not venue.startswith(("Zenodo", "Figshare")) and venue != "Open Science Framework"
+            and not (wtype == "preprint" and not doi))                       # OSF pages listed as preprints have no DOI
+n_before_sci = len(cands)
+cands = [c for c in cands if is_scientific(c[7], c[4], c[3])]
+n_not_paper = n_before_sci - len(cands)
+print(f"left out as not a scientific paper (deposits, reports, datasets and the like): {n_not_paper}")
 
 auth_rows = collections.defaultdict(list)
 raw_aff = {}                                # (work, position) -> the affiliation text as the publisher gave it
@@ -80,12 +94,30 @@ def shared_mixed(wid):
 def is_dutch_inst(i):
     return inst_meta.get(i, {}).get("country") == "NL"
 
-# authors who are at a Dutch institution on at least one paper with their own affiliation text; a Dutch institution
-# from a shared text (shared_mixed) counts only for them
+def combined_block(wid):
+    """Authorships with a combined address block in the style of some medical journals: the text starts with "From",
+    at least two authors have a text that starts the same way (first 80 characters), and the institutions OpenAlex
+    took from it are in the Netherlands and other countries. The texts can differ slightly between authors, so
+    shared_mixed misses them (Journal of Clinical Oncology 2010: "From the Memorial Sloan-Kettering Cancer Center,
+    New York, NY; Lund University ...; and Erasmus Medical Center, Rotterdam" for all 9 authors)."""
+    rows = auth_rows.get(wid, [])
+    starts = collections.Counter(raw_aff.get((wid, r[0]), "")[:80] for r in rows)
+    out = set()
+    for r in rows:
+        t = raw_aff.get((wid, r[0]), "")
+        ctys = {inst_meta.get(i, {}).get("country") for i in inst_rows.get((wid, r[0]), [])}
+        if t.startswith("From ") and starts[t[:80]] >= 2 and "NL" in ctys and len(ctys - {"NL", None}) > 0:
+            out.add((wid, r[0]))
+    return out
+
+# authorships whose Dutch institution may belong to a co-author (shared_mixed or combined_block); such a Dutch
+# institution counts only for authors who are at a Dutch institution on another paper with their own text
 mixed_papers = {c[0] for c in cands if shared_mixed(c[0])}
-dutch_on_own_text = {aid for c in cands if c[0] not in mixed_papers for pos, aid, *_ in auth_rows.get(c[0], [])
-                     if aid and any(is_dutch_inst(i) for i in inst_rows.get((c[0], pos), []))}
-print(f"papers with one shared affiliation text naming the Netherlands and other countries: {len(mixed_papers)}")
+weak = {(w, r[0]) for w in mixed_papers for r in auth_rows.get(w, [])} | {a for c in cands for a in combined_block(c[0])}
+dutch_on_own_text = {aid for c in cands for pos, aid, *_ in auth_rows.get(c[0], [])
+                     if aid and (c[0], pos) not in weak and any(is_dutch_inst(i) for i in inst_rows.get((c[0], pos), []))}
+print(f"papers with one shared affiliation text naming the Netherlands and other countries: {len(mixed_papers)}; "
+      f"papers with such authorships (also combined blocks starting with 'From'): {len({w for w, _ in weak})}")
 
 papers, paper_people, paper_nl_insts, paper_countries = [], {}, {}, {}
 n_abroad = 0
@@ -99,7 +131,7 @@ for (wid, title, year, venue, doi, n_auth, cited, wtype, kw, field, topic, cat, 
         countries.update(c for c in ctry.split("; ") if c)
         nl_insts.update(i for i in insts if is_dutch_inst(i))
         pk = listed.get(aid)
-        if pk is None and dutch_here and aid and (wid not in mixed_papers or aid in dutch_on_own_text):
+        if pk is None and dutch_here and aid and ((wid, pos) not in weak or aid in dutch_on_own_text):
             pk = "A:" + aid
             if pk not in person_info:
                 person_info[pk] = dict(name=aname, orcid=orcid or "", listed=False)
@@ -168,9 +200,19 @@ def is_nl(x):
 # Research institutes of a medical centre that OpenAlex records only as "related", not as part of it, so the
 # lineage rule below cannot merge them (checked 20 Nov 2026: most of their papers also list the medical centre:
 # Amsterdam Public Health 170 of 196, Amsterdam Neuroscience 28 of 30, Radboud Institute for Health Sciences 40 of 46).
+# Checked 21 Nov 2026, papers that also list Amsterdam UMC: Amsterdam Movement Sciences 23 of 33, Amsterdam
+# Reproduction Development 11 of 11, Cancer Center Amsterdam 5 of 6, Amsterdam Gastroenterology Endocrinology
+# Metabolism 2 of 4, Amsterdam institute for Immunology and Infectious Diseases 4 of 4, Amsterdam Cardiovascular
+# Sciences 2 of 2 (without the merge, these institutes won ties against Amsterdam UMC in main_institution).
 MERGE_INTO = {
     "Amsterdam Public Health": "Amsterdam University Medical Centers",
     "Amsterdam Neuroscience": "Amsterdam University Medical Centers",
+    "Amsterdam Movement Sciences": "Amsterdam University Medical Centers",
+    "Amsterdam Reproduction Development": "Amsterdam University Medical Centers",
+    "Cancer Center Amsterdam": "Amsterdam University Medical Centers",
+    "Amsterdam Gastroenterology Endocrinology Metabolism": "Amsterdam University Medical Centers",
+    "Amsterdam institute for Immunology and Infectious Diseases": "Amsterdam University Medical Centers",
+    "Amsterdam Cardiovascular Sciences": "Amsterdam University Medical Centers",
     "Radboud Institute for Health Sciences": "Radboud University Medical Center",
 }
 _name_to_id = {}
@@ -207,15 +249,45 @@ G.add_nodes_from(pp)
 comms = nx.community.louvain_communities(G, weight="weight", seed=42, resolution=1.0)
 comm_of = {n: i for i, c in enumerate(sorted(comms, key=len, reverse=True)) for n in c}
 
-person_inst = collections.defaultdict(collections.Counter)
+person_inst = collections.defaultdict(collections.Counter)         # person -> institution -> number of papers
 person_inst_shared = collections.defaultdict(collections.Counter)   # from shared texts (shared_mixed): used only
-for wid, people in paper_people.items():                             # when a person has no other Dutch institution
+person_inst_last = collections.defaultdict(dict)                    # when a person has no other Dutch institution
+paper_year = {p["id"]: p["y"] or 0 for p in papers}                 # person -> institution -> latest year
+for wid, people in paper_people.items():
     for pos, aid, *_ in auth_rows.get(wid, []):
         pk = listed.get(aid) or ("A:" + aid if ("A:" + aid) in person_info else None)
         if pk in people:
-            for i in inst_rows.get((wid, pos), []):
-                if is_dutch_inst(i):
-                    (person_inst_shared if wid in mixed_papers else person_inst)[pk][top_level(i)] += 1
+            for t in {top_level(i) for i in inst_rows.get((wid, pos), []) if is_dutch_inst(i)}:   # once per paper
+                (person_inst_shared if (wid, pos) in weak else person_inst)[pk][t] += 1
+                person_inst_last[pk][t] = max(person_inst_last[pk].get(t, 0), paper_year[wid])
+
+def inst_info(i):
+    return geo.get(i, {}) or inst_meta.get(i, {})
+
+def main_institution(pk):
+    """The Dutch institution on most of the person's papers. A tie between a medical centre and a university in the
+    same city (UMC Groningen and the University of Groningen are often both in one address) goes to the medical
+    centre; any other tie goes to the institution on the person's most recent paper, then to the name."""
+    cnt = person_inst[pk] or person_inst_shared[pk]
+    if not cnt:
+        return [], 0
+    top = max(cnt.values())
+    tied = sorted(i for i, c in cnt.items() if c == top)
+    if len(tied) > 1:
+        cities = {inst_info(i).get("city") for i in tied if inst_info(i).get("type") == "education"}
+        med = [i for i in tied if inst_info(i).get("type") == "healthcare" and inst_info(i).get("city") in cities]
+        if med:
+            tied = med
+        tied.sort(key=lambda i: (-person_inst_last[pk].get(i, 0), inst_info(i).get("name") or i))
+    return tied[:1], len([i for i, c in cnt.items() if c == top])
+
+_ties = collections.Counter()
+for pk in pp:
+    shown, n_tied = main_institution(pk)
+    if n_tied > 1:
+        _ties[inst_info(shown[0]).get("name")] += 1
+print(f"people whose top institution is tied: {sum(_ties.values())} of {len(pp)}; shown after breaking the tie:",
+      ", ".join(f"{k} {n}" for k, n in _ties.most_common(8)), flush=True)
 
 people_out = []
 for pk, plist in pp.items():
@@ -227,10 +299,10 @@ for pk, plist in pp.items():
         y0=min(years) if years else None, y1=max(years) if years else None,
         cats=dict(collections.Counter(p["cat"] for p in plist)),
         cls=dict(collections.Counter(str(p["cl"]) for p in plist if p["cl"] is not None)),
-        # only the institution on most of the person's papers: OpenAlex sometimes gives an author a co-author's
-        # institution (when the publisher's affiliation text runs two addresses together), so a second institution
-        # is often wrong
-        ins=[i for i, _ in (person_inst[pk] or person_inst_shared[pk]).most_common(1)],
+        # only the institution on most of the person's papers (main_institution): OpenAlex sometimes gives an author
+        # a co-author's institution (when the publisher's affiliation text runs two addresses together), so a second
+        # institution is often wrong
+        ins=main_institution(pk)[0],
         kw=[k for k, _ in kws.most_common(8)], cm=comm_of.get(pk, -1),
         deg=G.degree(pk) if pk in G else 0))
 people_out.sort(key=lambda r: -r["k"])
@@ -335,8 +407,8 @@ meta = dict(n_papers=len(papers), n_people=len(people_out), n_listed=sum(r["l"] 
             years=[min(year_total), max(year_total)], year_total={str(y): c for y, c in sorted(year_total.items())},
             categories=sorted(set(p["cat"] for p in papers)), max_authors_for_links=MAX_AUTHORS_FOR_LINKS,
             model="gpt-oss:20b (Ollama, SURF Research Cloud)", prompt_version=VERSION, built="November 2026",
-            n_excluded_by_hand=n_before - len(cands), n_abroad=n_abroad, n_copies=len(dropped),
-            n_mixed_affiliation_papers=len(mixed_papers), n_no_abstract=sum(1 for p in papers if not db.execute(
+            n_excluded_by_hand=n_excluded_by_hand, n_not_paper=n_not_paper, n_abroad=n_abroad, n_copies=len(dropped),
+            n_mixed_affiliation_papers=len({w for w, _ in weak}), n_no_abstract=sum(1 for p in papers if not db.execute(
                 "SELECT abstract FROM oa_works WHERE work_id=?", (p["id"],)).fetchone()[0]))
 
 dump("meta.json", meta)
