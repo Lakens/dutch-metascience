@@ -96,7 +96,7 @@
       <span><i style="border-color:var(--series-2)"></i>Most cited Dutch paper of the theme</span>
       <span><span class="nl" style="margin:0">NL</span>Dutch event, or paper with a Dutch author</span>
       <span id="youkey"></span>
-      <span class="muted">Scroll sideways; click an item for details. Years with more events and papers take more room, so the spacing of years varies.</span>
+      <span class="muted">Scroll sideways; click an item for details. Years with more events and papers take more room, so the spacing of years varies. Papers are placed in their month of publication (the earliest date OpenAlex knows, often the online version); when the month is unknown, they are in the middle of their year.</span>
     </div>
     <p class="sub" id="note" style="margin:0 0 8px"></p>
     <div class="hist-wrap" id="wrap"><div class="hist" id="hist"></div></div>
@@ -177,7 +177,8 @@ Promise.all([load("history"), Me.ready])
     for (const b of blogs) out.push({ kind: "bl", y: b.year + (b.month - 0.5) / 12, year: b.year, b });
     for (const p of papers) {
       const w = W[p.id];
-      out.push({ kind: p.kind, y: w.y + 0.5, year: w.y, w, id: p.id, th: p.th });
+      // in its month of publication; without a known month, in the middle of the year
+      out.push({ kind: p.kind, y: w.m ? w.y + (w.m - 0.5) / 12 : w.y + 0.5, year: w.y, w, id: p.id, th: p.th });
     }
     return out;
   }
@@ -250,7 +251,7 @@ Promise.all([load("history"), Me.ready])
           <div class="t">${esc(d.e.title)}</div></div>`;
       } else {
         html += `<div class="item ${d.kind}${selected === key ? " on" : ""}" data-key="${esc(key)}" style="left:${left}px;top:${top}px;height:${CH}px">
-          <div class="y">${d.w.y}${d.w.nl ? '<span class="nl">NL</span>' : ""}${citeTag(d.id)}</div>
+          <div class="y">${d.w.m ? MON[d.w.m - 1] + " " : ""}${d.w.y}${d.w.nl ? '<span class="nl">NL</span>' : ""}${citeTag(d.id)}</div>
           <div class="t" style="-webkit-line-clamp:2">${esc(d.w.t)}</div><div class="a">${esc(firstAuthor(d.w))}</div></div>`;
       }
     }
@@ -299,7 +300,7 @@ Promise.all([load("history"), Me.ready])
       const dutchAuth = (w.dp || []).map((id, i) => `<a href="people.html#${encodeURIComponent(id)}">${esc(w.dn[i])}</a>`).join(", ");
       const isMine = me && (w.dp || []).includes(me.id);
       el.innerHTML = `<h3>${esc(w.t)}${w.nl ? '<span class="nl">NL</span>' : ""}</h3>
-        <div class="meta">${esc(auth)} · ${w.y}${w.v ? " · " + esc(w.v) : ""}</div>
+        <div class="meta">${esc(auth)} · ${w.m ? MON[w.m - 1] + " " : ""}${w.y}${w.v ? " · " + esc(w.v) : ""}</div>
         <div>Cited by ${fmt(w.k)} metascience papers on this site and ${fmt(w.c)} works in total${w.fwci !== undefined
           ? ` (${w.fwci ? fmt(w.fwci) + " times the average for its field and year" : "field-weighted impact not available"})` : ""}.
         ${dutchAuth ? `Authors on this site: ${dutchAuth}.` : w.nl ? "A Dutch author is on this paper (it is on this site)." : ""}

@@ -1,10 +1,13 @@
 """Landmark papers and historical events per theme, for the History page.
 
 Usage: python -I build_history.py <site data folder> <references.json> <history_events.json> [raw database.sqlite]
+       [work_dates.json]
 Input: the site's papers.json, people.json and clusters.json, the reference lists and cited-work details from
 fetch_references.py, the checked Wikipedia events (check_events.py), and (optional) the raw database for the full author
 lists of the Dutch papers (without it, only the authors on the site are listed). Output: <site data folder>/history.json
 and history_people.json.
+With work_dates.json (from fetch_work_dates.py) every paper gets its month of publication (field m), except dates of
+1 January (in OpenAlex often a date of which only the year is known) and dates whose year differs from the year shown.
 
 Which cited works are landmark papers of a theme (a theme = one of the 20 clusters on the Themes page)?
 Candidates: works cited by at least MIN_K papers of the theme. Left out are works cited mainly as a tool: software
@@ -41,6 +44,7 @@ import sys, os, re, json, math, bisect, collections, statistics
 sys.stdout.reconfigure(encoding="utf-8")
 data_dir, refs_path, events_path = sys.argv[1:4]
 raw_path = sys.argv[4] if len(sys.argv) > 4 else None
+dates = json.load(open(sys.argv[5], encoding="utf-8")) if len(sys.argv) > 5 else {}
 MIN_K, N_PER_THEME, N_COMBINED, MAX_OVERLAP, MAX_GUIDELINES, MAX_THEMES = 5, 20, 5, 0.3, 3, 3
 N_DUTCH, N_DUTCH_COMBINED = 5, 2
 TOOL_SHARE, W_IN, W_OUT, MIN_SCORE, COMPANION_OVERLAP = 0.003, 0.6, 0.4, 0.6, 0.15
@@ -254,6 +258,19 @@ for q in dutch_ids:
                                        c=p["c"] or 0, k=site_cites.get(q, 0), nl=1, th={}))
     a = authors.get(q) or [people.get(x, "") for x in p["p"]]
     rec.update(a=a[:3], na=max(len(a), int(p.get("na") or 0)), dth=dth, dp=p["p"], dn=[people.get(x, "") for x in p["p"]])
+# month of publication (see the top of this file)
+no_month = collections.Counter()
+for k, rec in out_works.items():
+    d = dates.get(k)
+    if not d or len(d) < 7:
+        no_month["no date (run fetch_work_dates.py)"] += 1
+    elif d[5:] == "01-01":
+        no_month["1 January"] += 1
+    elif int(d[:4]) != rec["y"]:
+        no_month["other year"] += 1
+    else:
+        rec["m"] = int(d[5:7])
+print(f"works with a month: {sum('m' in r for r in out_works.values())} of {len(out_works)}; without: {dict(no_month)}")
 events = json.load(open(events_path, encoding="utf-8")) if os.path.exists(events_path) else []
 # "discussed on blogs" events (blog_candidates.py, written by Claude agents, checked by check_blog_events.py), next to the
 # Wikipedia events file

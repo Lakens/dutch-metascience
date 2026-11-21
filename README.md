@@ -55,7 +55,8 @@ which themes, at which institutions, and how the literature developed over time.
     OpenAlex (`fetch_references.py`); landmark papers per theme chosen by how many of the theme's papers cite a work
     and by its field-weighted citation impact, with rules against near-duplicates, software and too many guidelines,
     plus the 5 most cited Dutch papers per theme (`build_history.py`, rules explained at the top of the script;
-    it reads the raw database for the full author lists); historical events collected from Wikipedia by
+    it reads the raw database for the full author lists; papers are placed in their month of publication, from
+    `fetch_work_dates.py`, run after a first `build_history.py`, which is then run again with the dates); historical events collected from Wikipedia by
     Claude agents, each with the article's own words for the date, and kept only when a script finds those words and
     the year in the current article (`check_events.py`, result in `history_events.json`); and debates from the
     [Open Science Blogs Archive](https://github.com/Lakens/open_science_blogs): candidate episodes from shared links and
