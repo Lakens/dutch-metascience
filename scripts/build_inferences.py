@@ -6,11 +6,13 @@ Reads the site's papers/people/edges/clusters/institutions JSON and the paper em
 embed_and_map.py); writes <site data folder>/inferences.json.
 
 1. Possible collaborations: each active researcher (>= 3 metascience papers, one in 2024 or later) gets the 5 most similar
-   researchers they have never written a paper with. A person's profile is the average embedding of their papers,
+   researchers (similarity >= MIN_SIM) they have never written a paper with, and separately the 5 most similar they
+   wrote a little with (joint papers at most LITTLE of the papers of the one with fewer papers). Only papers with at
+   most MAX_AUTHORS authors count as writing together. A person's profile is the average embedding of their papers,
    after subtracting the average of all papers (otherwise every metascientist looks alike). Evidence per pair: the
-   clusters both work in, and the two papers (one each) that are closest in content.
-   Communities: topical similarity of the research communities (Louvain, from the site data) against how often
-   they actually write together.
+   clusters both work in, and the two papers (one each, not written together) that are closest in content.
+   Communities: a map of the research communities (Louvain, from the site data), placed by the similarity of their
+   papers (SMACOF), with their joint papers.
 2. Rising themes: a multinomial logistic regression of each paper's cluster on year (a natural cubic spline; the
    number of knots chosen by QAIC), fitted to the papers from 2005 on (share_model.py). Shares vary more from year
    to year than a multinomial model allows (one project often brings several papers on one theme in one year), so the
@@ -55,10 +57,16 @@ papers_of = collections.defaultdict(list)
 for p in papers:
     for a in p["p"]:
         papers_of[a].append(p)
+# working together = a joint paper with at most MAX_AUTHORS authors (as for the lines of the co-author network): one
+# Many Labs paper with 190 authors does not make its 21 Dutch authors collaborators
+MAX_AUTHORS = 30
 coauthors = collections.defaultdict(set)
+joint = collections.Counter()   # (a, b), a < b -> number of joint papers
 for p in papers:
-    for a, b in itertools.combinations(set(p["p"]), 2):
-        coauthors[a].add(b); coauthors[b].add(a)
+    if (p["na"] or 0) > MAX_AUTHORS:
+        continue
+    for a, b in itertools.combinations(sorted(set(p["p"])), 2):
+        coauthors[a].add(b); coauthors[b].add(a); joint[(a, b)] += 1
 active = [x for x in people if x["k"] >= 3 and (x["y1"] or 0) >= 2024]   # a paper in 2024 or later: still active
 pv = {x["id"]: unit(np.mean([paper_vec[p["id"]] for p in papers_of[x["id"]] if p["id"] in paper_vec], axis=0)) for x in active}
 A = [x["id"] for x in active]
@@ -74,36 +82,63 @@ def cluster_share(a):
 def evidence(a, b):
     sa, sb = cluster_share(a), cluster_share(b)
     shared = sorted(set(sa) & set(sb), key=lambda k: -min(sa[k], sb[k]))[:2]
-    pa = [p["id"] for p in papers_of[a] if p["id"] in paper_vec]
-    pb = [p["id"] for p in papers_of[b] if p["id"] in paper_vec]
+    # papers both wrote are left out, otherwise a joint paper is shown as the closest pair (twice the same title)
+    both = {p["id"] for p in papers_of[a]} & {p["id"] for p in papers_of[b]}
+    pa = [p["id"] for p in papers_of[a] if p["id"] in paper_vec and p["id"] not in both]
+    pb = [p["id"] for p in papers_of[b] if p["id"] in paper_vec and p["id"] not in both]
+    if not pa or not pb:   # one of them has only joint papers
+        pa = [p["id"] for p in papers_of[a] if p["id"] in paper_vec]
+        pb = [p["id"] for p in papers_of[b] if p["id"] in paper_vec]
     sims = np.stack([paper_vec[x] for x in pa]) @ np.stack([paper_vec[x] for x in pb]).T
     i, j = np.unravel_index(np.argmax(sims), sims.shape)
     return [cname[k] for k in shared], [pa[i], pb[j]]
 
 K = 5
-suggest = {}
-for i, a in enumerate(A):
-    order = np.argsort(-S[i])
-    out = []
-    for j in order:
-        b = A[j]
-        if b == a or b in coauthors[a]:
+# two kinds of suggestions: pairs that never wrote a paper together, and pairs that did, but whose joint papers are at
+# most LITTLE of the metascience papers of the one with fewer papers (1 joint paper means little to someone with 100)
+LITTLE = 0.05
+# and only pairs whose work is clearly alike (similarity at least 0.2, as for the communities below); without this, a
+# person with few such pairs got suggestions that are less alike than the average pair
+MIN_SIM = 0.2
+n_papers = {x["id"]: x["k"] for x in people}
+def never(a, b):
+    return b not in coauthors[a]
+def little(a, b):
+    n = joint[tuple(sorted((a, b)))]
+    return 1 <= n <= LITTLE * min(n_papers[a], n_papers[b])
+def suggestions(allowed):
+    sug = {}
+    for i, a in enumerate(A):
+        out = []
+        for j in np.argsort(-S[i]):
+            if S[i, j] < MIN_SIM:
+                break
+            b = A[j]
+            if b == a or not allowed(a, b):
+                continue
+            shared, pair = evidence(a, b)
+            out.append(dict(id=b, s=round(float(S[i, j]), 3), cl=shared, pp=pair, j=joint[tuple(sorted((a, b)))]))
+            if len(out) == K:
+                break
+        if out:
+            sug[a] = out
+    return sug
+def strongest(sug):
+    # strongest pairs overall, each person at most twice
+    ps = sorted({tuple(sorted((a, s["id"]))): s for a, ss in sug.items() for s in ss}.items(), key=lambda kv: -kv[1]["s"])
+    seen, top = collections.Counter(), []
+    for (a, b), s in ps:
+        if seen[a] >= 2 or seen[b] >= 2:
             continue
         shared, pair = evidence(a, b)
-        out.append(dict(id=b, s=round(float(S[i, j]), 3), cl=shared, pp=pair))
-        if len(out) == K:
+        top.append(dict(a=a, b=b, s=s["s"], cl=shared, pp=pair, j=s["j"])); seen[a] += 1; seen[b] += 1
+        if len(top) == 30:
             break
-    suggest[a] = out
-# strongest pairs overall, each person at most twice
-pairs = sorted({tuple(sorted((a, s["id"]))): s["s"] for a, ss in suggest.items() for s in ss}.items(), key=lambda kv: -kv[1])
-seen, top_pairs = collections.Counter(), []
-for (a, b), s in pairs:
-    if seen[a] >= 2 or seen[b] >= 2:
-        continue
-    shared, pair = evidence(a, b)
-    top_pairs.append(dict(a=a, b=b, s=s, cl=shared, pp=pair)); seen[a] += 1; seen[b] += 1
-    if len(top_pairs) == 30:
-        break
+    return top
+suggest, suggest_little = suggestions(never), suggestions(little)
+top_pairs, top_pairs_little = strongest(suggest), strongest(suggest_little)
+print(f"suggestions: never together for {len(suggest)} people, a little together (<= {LITTLE:.0%}) for "
+      f"{len(suggest_little)} people")
 
 # communities: topical similarity against actual co-authorship
 comm_people = collections.defaultdict(list)
@@ -116,11 +151,14 @@ def comm_vec(c):
     return unit(np.mean(vs, axis=0))
 cv = {c: comm_vec(c) for c in big}
 comm_of = {x["id"]: x["cm"] for x in people}
+# joint papers of two communities: papers (at most MAX_AUTHORS authors) with an author from each
 links = collections.Counter()
-for a, b, w in edges:
-    ca, cb = comm_of.get(a), comm_of.get(b)
-    if ca in cv and cb in cv and ca != cb:
-        links[tuple(sorted((ca, cb)))] += 1
+for p in papers:
+    if (p["na"] or 0) > MAX_AUTHORS:
+        continue
+    cs = sorted({comm_of.get(a) for a in p["p"]} & set(cv))
+    for ca, cb in itertools.combinations(cs, 2):
+        links[(ca, cb)] += 1
 def comm_topics(c):
     # the group's papers, each counted once (also when several members wrote it); groups have no names, only a
     # number (id + 1, so group 1 is the largest) and these themes
@@ -132,10 +170,40 @@ for ca, cb in itertools.combinations(big, 2):
     na, nb = len(comm_people[ca]), len(comm_people[cb])
     comm_pairs.append(dict(a=ca, b=cb, sim=round(float(cv[ca] @ cv[cb]), 3), links=links[(min(ca, cb), max(ca, cb))],
                            per1000=round(1000 * links[(min(ca, cb), max(ca, cb))] / (na * nb), 2)))
-communities = [dict(id=c, n=len(comm_people[c]), topics=comm_topics(c)) for c in big]
+# positions for the map of communities, so communities that work on similar themes lie close together. The content
+# distance of two communities is 1 - similarity. Classical scaling (the first try) put groups 1 and 7 on top of each
+# other although their similarity is only 0.38, because it keeps only the two largest directions of difference; the
+# positions are therefore improved by SMACOF (metric multidimensional scaling), which matches all pairwise distances
+# as well as it can. Circles that would still overlap are then pushed apart a little.
+D = np.array([[1 - float(cv[a] @ cv[b]) if a != b else 0.0 for b in big] for a in big])
+J = np.eye(len(big)) - 1 / len(big)
+vals, vecs = np.linalg.eigh(-0.5 * J @ (D ** 2) @ J)
+top2 = np.argsort(-vals)[:2]
+xy = vecs[:, top2] * np.sqrt(np.maximum(vals[top2], 0))
+for _ in range(500):   # Guttman transform
+    dist = np.linalg.norm(xy[:, None] - xy[None], axis=2)
+    B = -np.divide(D, dist, out=np.zeros_like(D), where=dist > 0)
+    B[np.diag_indices_from(B)] = -B.sum(axis=1)
+    xy = B @ xy / len(big)
+min_gap = 0.12 * (D[D > 0].max())
+for _ in range(200):
+    moved = False
+    for i, j in itertools.combinations(range(len(big)), 2):
+        v = xy[j] - xy[i]; d = np.linalg.norm(v)
+        if d < min_gap:
+            step = (min_gap - d) / 2 * (v / d if d else np.array([1.0, 0.0]))
+            xy[i] -= step; xy[j] += step; moved = True
+    if not moved:
+        break
+dist = np.linalg.norm(xy[:, None] - xy[None], axis=2)
+iu = np.triu_indices(len(big), 1)
+comm_map_r = round(float(np.corrcoef(dist[iu], D[iu])[0, 1]), 2)
+print("community map: correlation of map distances with content distances:", comm_map_r)
+communities = [dict(id=c, n=len(comm_people[c]), topics=comm_topics(c), x=round(float(xy[i, 0]), 4),
+                    y=round(float(xy[i, 1]), 4)) for i, c in enumerate(big)]
 
 # ---------------------------------------------------------------- 2. rising themes
-FIT_FROM, CHANGE_YEARS, MAX_AUTHORS = 2005, 4, 30
+FIT_FROM, CHANGE_YEARS = 2005, 4
 years = list(range(FIT_FROM, LAST_YEAR + 1))
 tot = collections.Counter(p["y"] for p in papers if p["y"])
 cl_year = collections.defaultdict(collections.Counter)
@@ -274,7 +342,8 @@ if goals_path and os.path.exists(goals_path):
 
 out = dict(
     last_year=LAST_YEAR, active_rule="at least 3 metascience papers, one in 2024 or later", n_active=len(A),
-    suggest=suggest, top_pairs=top_pairs, communities=communities, comm_pairs=comm_pairs,
+    suggest=suggest, top_pairs=top_pairs, suggest_little=suggest_little, top_pairs_little=top_pairs_little,
+    little=LITTLE, min_sim=MIN_SIM, max_authors=MAX_AUTHORS, communities=communities, comm_pairs=comm_pairs, comm_map_r=comm_map_r,
     trend=trend, trend_model=trend_model, windows=dict(early=list(EARLY), recent=list(REC)), rising=rising[:30],
     new_keywords=[d for d in rising if d["first"] >= 2023][:15],
     goals=goals)

@@ -51,15 +51,20 @@
   <section class="card">
     <h2>Who could work together?</h2>
     <p class="sub">For every active researcher (<span id="rule"></span>; <span id="nactive"></span> people) we list the
-    researchers whose papers are closest in content, but with whom they have not written a metascience paper in
-    these data. "Closest in content" uses the same text fingerprints as the map on the Themes page; each suggestion
-    shows the clusters both work in and the two papers (one of each) that are most alike.</p>
+    researchers whose papers are closest in content (and clearly alike: a similarity of at least
+    <span class="pmin"></span>), but with whom they have written no metascience paper in these
+    data, or only a few: at most <span class="plittle"></span> of the papers of the one with fewer papers (one joint
+    paper means little to someone with 100 papers, much to someone with 3). Papers with more than
+    <span class="pmax"></span> authors do not count as writing together. "Closest in content" uses the same text
+    fingerprints as the map on the Themes page; each suggestion shows the clusters both work in and the two papers
+    (one of each) that are most alike.</p>
     <div class="controls">
+      <div class="seg" id="kind"><button aria-pressed="true" data-v="never">Never written together</button><button aria-pressed="false" data-v="little">Written together a little</button></div>
       <input type="search" id="who" placeholder="Type part of a name…" aria-label="Find a person" style="min-width:260px">
       <span class="muted small" id="whohint">Or look at the strongest pairs below.</span>
     </div>
     <div id="suggest" class="sugg"></div>
-    <h3 style="margin-top:22px">Strongest pairs that have not written together</h3>
+    <h3 style="margin-top:22px" id="toptitle">Strongest pairs that have not written together</h3>
     <p class="sub">Each person appears at most twice. A pair may in fact have worked together on papers outside
     these data, or OpenAlex may have split one of them into two profiles.</p>
     <div id="toppairs" class="sugg"></div>
@@ -67,11 +72,14 @@
 
   <section class="card">
     <h2>Communities that could talk more</h2>
-    <p class="sub">Each dot is a pair of research communities: groups of people who mostly write together, numbered
-    by size (group 1 is the largest), with the same numbers as on <a href="network.html">Who works with whom</a>. Right means their papers are more alike in content than the average pair; up means they write together more often (joint
-    co-author links per 1,000 possible pairs of people). Pairs at the bottom right work on similar topics but rarely
-    write together.</p>
-    <div id="commchart" class="chart" style="min-height:460px"></div>
+    <p class="sub">Each circle is a research community: a group of people who mostly write together, numbered by size
+    (group 1 is the largest; the same numbers as on <a href="network.html">Who works with whom</a>), with circle size
+    showing the number of people. Communities whose papers are alike in content lie close together (only
+    approximately: the distances on the map correlate <span id="mapr"></span> with the differences in content; hover
+    over a line for the exact similarity). Grey lines are joint papers, thicker for more. Two circles close together with no line, or a thin one,
+    work on similar themes but hardly write together; the dashed lines mark the five clearest cases, listed below the
+    map.</p>
+    <div id="commchart" class="chart" style="min-height:520px"></div>
     <div id="commlist"></div>
   </section>
 
@@ -149,18 +157,40 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
 
   // ---- suggestions ----
   const active = Object.keys(inf.suggest).filter((id) => byP[id]).sort((a, b) => byP[a].n.localeCompare(byP[b].n));
+  const pct = `${Math.round(100 * inf.little)}%`;
+  document.querySelectorAll(".plittle").forEach((e) => (e.textContent = pct));
+  document.querySelectorAll(".pmax").forEach((e) => (e.textContent = inf.max_authors));
+  document.querySelectorAll(".pmin").forEach((e) => (e.textContent = inf.min_sim));
+  let kind = "never", shown = null;
+  const sugOf = () => (kind === "never" ? inf.suggest : inf.suggest_little);
+  const jointText = (a, b, j) => j ? ` · ${j} joint paper${j === 1 ? "" : "s"} (of ${byP[a].k} and ${byP[b].k})` : "";
   const card = (a, s) => {
     const [pa, pb] = s.pp || [];
     return `<div class="c"><h3>${personLink(s.id)}</h3>
       <div class="bar" style="width:${Math.round(100 * Math.max(0, s.s))}%" title="similarity ${s.s}"></div>
-      <p class="small muted">similarity ${s.s.toFixed(2)} · ${byP[s.id].k} papers, ${byP[s.id].y0}–${byP[s.id].y1}</p>
+      <p class="small muted">similarity ${s.s.toFixed(2)} · ${byP[s.id].k} papers, ${byP[s.id].y0}–${byP[s.id].y1}${s.j ? ` · ${s.j} joint paper${s.j === 1 ? "" : "s"}` : ""}</p>
       <p><b>Both work on:</b> ${esc(s.cl.join("; ") || "—")}</p>
       <p><b>Closest papers:</b> ${paperLink(pa)} <i>and</i> ${paperLink(pb)}</p></div>`;
   };
   function showPerson(id) {
-    const s = inf.suggest[id] || [];
+    shown = id;
+    const s = sugOf()[id] || [];
     document.getElementById("whohint").innerHTML = `Suggestions for ${personLink(id)}:`;
-    document.getElementById("suggest").innerHTML = s.map((x) => card(id, x)).join("") || "<p class='muted'>No suggestions.</p>";
+    document.getElementById("suggest").innerHTML = s.map((x) => card(id, x)).join("") || (kind === "never"
+      ? "<p class='muted'>No suggestions.</p>"
+      : `<p class='muted'>No one who is close in content and with whom this person wrote at most ${pct} of their papers.</p>`);
+  }
+  function showTop() {
+    document.getElementById("toptitle").textContent = kind === "never" ? "Strongest pairs that have not written together"
+      : `Strongest pairs that have written together a little (at most ${pct} of their papers)`;
+    document.getElementById("toppairs").innerHTML = (kind === "never" ? inf.top_pairs : inf.top_pairs_little).map((t) => {
+      const [pa, pb] = t.pp;
+      return `<div class="c"><h3>${personLink(t.a)} &amp; ${personLink(t.b)}</h3>
+        <div class="bar" style="width:${Math.round(100 * t.s)}%"></div>
+        <p class="small muted">similarity ${t.s.toFixed(2)}${jointText(t.a, t.b, t.j)}</p>
+        <p><b>Both work on:</b> ${esc(t.cl.join("; "))}</p>
+        <p><b>Closest papers:</b> ${paperLink(pa)} <i>and</i> ${paperLink(pb)}</p></div>`;
+    }).join("");
   }
   const activePeople = active.map((id) => byP[id]);
   nameSearch(document.getElementById("who"), () => activePeople, (p) => showPerson(p.id));
@@ -168,33 +198,70 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
     if (inf.suggest[me.id]) { document.getElementById("who").value = me.n; showPerson(me.id); }
     else document.getElementById("whohint").textContent = `No suggestions for ${me.n}: suggestions are made only for people with ${inf.active_rule}.`;
   }
-  document.getElementById("toppairs").innerHTML = inf.top_pairs.map((t) => {
-    const [pa, pb] = t.pp;
-    return `<div class="c"><h3>${personLink(t.a)} &amp; ${personLink(t.b)}</h3>
-      <div class="bar" style="width:${Math.round(100 * t.s)}%"></div>
-      <p class="small muted">similarity ${t.s.toFixed(2)}</p>
-      <p><b>Both work on:</b> ${esc(t.cl.join("; "))}</p>
-      <p><b>Closest papers:</b> ${paperLink(pa)} <i>and</i> ${paperLink(pb)}</p></div>`;
-  }).join("");
+  showTop();
+  document.querySelectorAll("#kind button").forEach((b) => b.addEventListener("click", () => {
+    kind = b.dataset.v;
+    document.querySelectorAll("#kind button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    if (shown) showPerson(shown);
+    showTop();
+  }));
 
   // ---- communities ----
   const comm = Object.fromEntries(inf.communities.map((c) => [c.id, c]));
   const clab = (c) => `group ${c + 1}`;   // the same numbers as on Who works with whom (group 1 is the largest)
+  if (inf.comm_map_r != null) document.getElementById("mapr").textContent = inf.comm_map_r.toFixed(2);
   function drawComm() {
-    const cp = inf.comm_pairs;
-    Plotly.react("commchart", [{ type: "scatter", mode: "markers", x: cp.map((d) => d.sim), y: cp.map((d) => d.per1000),
-      text: cp.map((d) => `<b>${esc(clab(d.a))}</b> (${comm[d.a].n} people)<br>${esc(comm[d.a].topics.slice(0, 2).join("; "))}<br><b>${esc(clab(d.b))}</b> (${comm[d.b].n} people)<br>${esc(comm[d.b].topics.slice(0, 2).join("; "))}<br>` +
-        `content similarity ${d.sim.toFixed(2)} · ${d.links} co-author links`),
-      hovertemplate: "%{text}<extra></extra>",
-      marker: { size: 11, color: cssVar("--series-1"), opacity: 0.8, line: { width: 1.5, color: cssVar("--surface-1") } } }],
-      baseLayout({ hovermode: "closest", showlegend: false,
-        xaxis: Object.assign(baseLayout().xaxis, { title: "similarity of their papers' content (0 = as alike as average)" }),
-        yaxis: Object.assign(baseLayout().yaxis, { title: "co-author links per 1,000 pairs", rangemode: "tozero" }) }), PLOT_CONFIG);
-    // pairs with clearly similar content (similarity >= 0.2), the ones that write together least first
+    const cp = inf.comm_pairs, cs = inf.communities;
+    // pairs with clearly similar content (similarity >= 0.2), the ones with the fewest joint papers per possible pair
+    // of people first
     const top = cp.filter((d) => d.sim >= 0.2).sort((a, b) => a.per1000 - b.per1000 || b.sim - a.sim).slice(0, 5);
-    document.getElementById("commlist").innerHTML = "<h3 style='margin-top:10px'>Similar in content, few joint papers</h3><ul>" +
+    const maxL = Math.max(...cp.map((d) => d.links), 1), muted = cssVar("--text-muted");
+    const scale = Math.min(1, document.getElementById("commchart").clientWidth / 800);   // smaller circles on phones
+    const pairText = (d) => `<b>Group ${d.a + 1} and group ${d.b + 1}</b><br>content similarity ${d.sim.toFixed(2)}` +
+      ` (0 = as alike as the average pair)<br>${d.links} joint paper${d.links === 1 ? "" : "s"}`;
+    const lines = cp.filter((d) => d.links > 0).map((d) => ({ type: "scatter", mode: "lines", hoverinfo: "skip",
+      x: [comm[d.a].x, comm[d.b].x], y: [comm[d.a].y, comm[d.b].y], opacity: 0.35,
+      line: { color: muted, width: 0.6 + 7 * Math.sqrt(d.links / maxL) } }));
+    const radius = (c) => scale * (16 + 2.2 * Math.sqrt(comm[c].n)) / 2 + 2;   // in pixels, with the white ring
+    // dashed lines stop at the edge of both circles, so they do not cover the group numbers; pxPerUnit is known only
+    // after a first drawing
+    const dashed = (pxPerUnit) => top.map((d) => {
+      const ax = comm[d.a].x, ay = comm[d.a].y, bx = comm[d.b].x, by = comm[d.b].y, len = Math.hypot(bx - ax, by - ay);
+      const ta = pxPerUnit ? radius(d.a) / pxPerUnit / len : 0, tb = pxPerUnit ? radius(d.b) / pxPerUnit / len : 0;
+      return { type: "scatter", mode: "lines", hoverinfo: "skip",
+        x: [ax + ta * (bx - ax), bx - tb * (bx - ax)], y: [ay + ta * (by - ay), by - tb * (by - ay)],
+        line: { color: cssVar("--series-2"), width: 2.5, dash: "dash" } };
+    });
+    // invisible points in the middle of every line, so a line can be hovered
+    const mids = cp.filter((d) => d.links > 0 || top.includes(d));
+    const midTrace = { type: "scatter", mode: "markers", x: mids.map((d) => (comm[d.a].x + comm[d.b].x) / 2),
+      y: mids.map((d) => (comm[d.a].y + comm[d.b].y) / 2), text: mids.map(pairText),
+      hovertemplate: "%{text}<extra></extra>", marker: { size: 14, opacity: 0 } };
+    const nodes = { type: "scatter", mode: "markers+text", x: cs.map((c) => c.x), y: cs.map((c) => c.y),
+      text: cs.map((c) => `${c.id + 1}`), textposition: "middle center",
+      textfont: { color: "#ffffff", size: 13 },
+      customdata: cs.map((c) => `<b>Group ${c.id + 1}</b> (${c.n} people)<br>${c.topics.map(esc).join("<br>")}`),
+      hovertemplate: "%{customdata}<extra></extra>",
+      marker: { size: cs.map((c) => scale * (16 + 2.2 * Math.sqrt(c.n))), color: cssVar("--series-1"),
+        line: { width: 2, color: cssVar("--surface-1") } } };
+    const hidden = { visible: false, showgrid: false, zeroline: false };
+    // dashed lines on top of the circles: a dashed line that passes a third circle must not look as if it ends there
+    const layout = () => baseLayout({ hovermode: "closest", showlegend: false, margin: { l: 10, r: 10, t: 10, b: 10 },
+      xaxis: Object.assign({}, hidden), yaxis: Object.assign({ scaleanchor: "x" }, hidden) });
+    const gd = document.getElementById("commchart");
+    Plotly.react(gd, [...lines, nodes, ...dashed(0), midTrace], layout(), PLOT_CONFIG).then(() => {
+      const xa = gd._fullLayout && gd._fullLayout.xaxis;
+      if (xa && xa._m) Plotly.react(gd, [...lines, nodes, ...dashed(Math.abs(xa._m)), midTrace], layout(), PLOT_CONFIG);
+    });
+    const sorted = [...cs].sort((a, b) => a.id - b.id);
+    document.getElementById("commlist").innerHTML =
+      "<h3 style='margin-top:10px'>Similar in content, few or no joint papers (dashed lines)</h3><ul>" +
       top.map((d) => `<li>Group ${d.a + 1} (${esc(comm[d.a].topics.slice(0, 2).join("; "))}) and
-        ${esc(clab(d.b))} (${esc(comm[d.b].topics.slice(0, 2).join("; "))}): content similarity ${d.sim.toFixed(2)}, ${d.links} co-author link${d.links === 1 ? "" : "s"} between them.</li>`).join("") + "</ul>";
+        group ${d.b + 1} (${esc(comm[d.b].topics.slice(0, 2).join("; "))}): content similarity ${d.sim.toFixed(2)},
+        ${d.links ? `only ${d.links} joint paper${d.links === 1 ? "" : "s"}` : "no joint papers"}
+        (${comm[d.a].n} and ${comm[d.b].n} people).</li>`).join("") + "</ul>" +
+      "<h3 style='margin-top:10px'>The communities</h3><ul class='small'>" +
+      sorted.map((c) => `<li>Group ${c.id + 1} (${c.n} people): ${esc(c.topics.join("; "))}</li>`).join("") + "</ul>";
   }
 
   // ---- rising themes: model-based change in share, new authors per theme ----
