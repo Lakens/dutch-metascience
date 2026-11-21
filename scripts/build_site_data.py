@@ -212,6 +212,16 @@ for wid in dropped:
     del paper_people[wid], paper_nl_insts[wid], paper_countries[wid]
 print(f"left out as copies of another paper: {len(dropped)} papers")
 print("papers in the Dutch metascience landscape:", len(papers), flush=True)
+# every paper on the site should have a hand-check verdict (scripts/hand_check_verdicts.tsv). Papers that come onto the
+# site in a later rebuild (new data, changed rules) have none; on 21 Nov 2026 there were 332 such papers. List them,
+# so they can be checked with scripts/hand_check_rules.md before the site is published.
+CHECKED = {r["work_id"] for r in csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                  "hand_check_verdicts.tsv"), encoding="utf-8"),
+                                                delimiter="\t")}
+unchecked = sorted((p["id"], p["t"]) for p in papers if p["id"] not in CHECKED)
+print(f"papers on the site without a hand-check verdict (should be 0): {len(unchecked)}")
+for wid, t in unchecked:
+    print(f"  {wid} {t[:100]}")
 
 # ---------------------------------------------------------------- institutions: parents and coordinates
 needed = set()
