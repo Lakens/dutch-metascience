@@ -242,6 +242,12 @@ rising.sort(key=lambda d: -d["ratio"])
 goals = None
 if goals_path and os.path.exists(goals_path):
     goals = json.load(open(goals_path, encoding="utf-8"))
+    # a cited paper that is now shown as another copy (a preprint and its journal version; copies.json, made by
+    # build_site_data.py) is cited by the copy that is kept
+    copy_of = load("copies") if os.path.exists(os.path.join(data_dir, "copies.json")) else {}
+    for q in [q for c in goals.get("clusters", []) for q in c.get("questions", [])] + goals.get("goals", []):
+        if "papers" in q:
+            q["papers"] = list(dict.fromkeys(copy_of.get(x, x) for x in q["papers"]))
     cited = [x for c in goals.get("clusters", []) for q in c.get("questions", []) for x in q.get("papers", [])] + \
             [x for g in goals.get("goals", []) for x in g.get("papers", [])]
     missing = [x for x in cited if x not in pid]

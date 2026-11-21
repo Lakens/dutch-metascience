@@ -58,8 +58,17 @@
       revised by Claude (Anthropic) after reading each cluster's most distinctive title words, its most common
       keywords and topics, its most cited titles and a random sample of titles. One cluster has no single subject and
       is called "Mixed metascience topics". The names and the reasons are in <code>scripts/cluster_names.json</code>.</li>
-      <li><b>Who is on the site</b>: everyone with a Dutch institution on at least one of these metascience papers,
-      plus the people on the starting list. Co-authorship lines use only papers with at most 30 authors.</li>
+      <li><b>Which papers and people are on the site</b>: metascience papers with an author at a Dutch institution,
+      and everyone at a Dutch institution on at least one of them. Papers by people on the starting list are shown
+      only when they have a Dutch institution, or when OpenAlex has no institution for that person on that paper
+      (mostly Dutch preprints and theses); <span id="nabroad">some</span> papers from before or after their time in
+      the Netherlands were left out. Some publishers give all authors one shared address text, such as "From
+      University of Oxford … and University Medical Center Utrecht", and OpenAlex then gives every author all those
+      institutions; such a paper alone does not make anyone Dutch. A paper that appears more than once (a preprint and
+      its journal version, or a statement published in several journals) is shown once: as the journal version, with
+      that version's year and citations (<span id="ncopies">some</span> copies left out; copies are recognised by the
+      same title and a shared author, so copies whose titles differ slightly remain). Co-authorship lines use only
+      papers with at most 30 authors.</li>
       <li><b>History</b>: the reference lists of all papers came from OpenAlex. Landmark papers per theme are works
       that many of the theme's papers cite and that the whole of science cites often for their field and year (see the
       History page for the rules); at most 20 per theme. Next to them, each theme shows its 5 most cited papers by
@@ -107,7 +116,7 @@
       make someone a metascientist; the number of papers shows how much of a person's work is metascience.</li>
       <li><b>Missing abstracts</b>: for <span id="noabs">some</span> of the metascience papers OpenAlex has no abstract,
       so the AI saw only the title, and term counts are lower bounds.</li>
-      <li><b>Coverage</b>: papers not in OpenAlex, and papers before 2005 without an author from the starting list (whose full publication lists were collected), are missing.</li>
+      <li><b>Coverage</b>: papers not in OpenAlex, and papers before 2005 without an author from the starting list (whose full publication lists were collected), are missing. A person who is Dutch only through a shared address text (see above) is missing too.</li>
     </ul>
   </section>
 
@@ -134,6 +143,8 @@ load("meta").then((m) => {
   document.getElementById("built").textContent = m.built || "November 2026";
   if (m.n_papers) document.getElementById("npapers").textContent = fmt(m.n_papers);
   if (m.n_excluded_by_hand != null) document.getElementById("nexcl").textContent = fmt(m.n_excluded_by_hand);
+  if (m.n_abroad != null) document.getElementById("nabroad").textContent = fmt(m.n_abroad);
+  if (m.n_copies != null) document.getElementById("ncopies").textContent = fmt(m.n_copies);
   if (m.n_no_abstract != null) document.getElementById("noabs").textContent =
     `${fmt(m.n_no_abstract)} of the ${fmt(m.n_papers)} (${Math.round(100 * m.n_no_abstract / m.n_papers)}%)`;
 }).catch(() => {});

@@ -50,10 +50,13 @@ cands = [c for c in cands if c[0] not in EXCLUDED]
 print(f"left out by hand check: {n_before - len(cands)} papers")
 
 auth_rows = collections.defaultdict(list)
-for wid, pos, aid, aname, orcid, countries in db.execute("""
-    SELECT a.work_id, a.position, a.author_id, a.author_name, a.orcid, a.countries FROM oa_authorships a
+raw_aff = {}                                # (work, position) -> the affiliation text as the publisher gave it
+for wid, pos, aid, aname, orcid, countries, raw in db.execute("""
+    SELECT a.work_id, a.position, a.author_id, a.author_name, a.orcid, a.countries, a.raw_affiliations
+    FROM oa_authorships a
     JOIN metascience_final m ON m.work_id = a.work_id AND m.prompt_version = ? AND m.is_metascience = 1""", (VERSION,)):
     auth_rows[wid].append((pos, aid, aname, orcid, countries or ""))
+    raw_aff[(wid, pos)] = (raw or "").strip()
 inst_rows = collections.defaultdict(list)   # (work, position) -> institution ids
 for wid, pos, iid in db.execute("""
     SELECT ai.work_id, ai.position, ai.institution_id FROM oa_authorship_institutions ai
@@ -62,16 +65,41 @@ for wid, pos, iid in db.execute("""
 inst_meta = {r[0]: dict(name=r[1], country=r[2], type=r[3], lineage=[x.strip() for x in (r[4] or "").split(";") if x.strip()])
              for r in db.execute("SELECT institution_id, name, country_code, type, lineage FROM oa_institutions")}
 
+def shared_mixed(wid):
+    """True when the publisher gave every author one and the same affiliation text, and that text names institutions
+    in the Netherlands and in other countries (for example "From University of Oxford ... and University Medical
+    Center Utrecht ..."). OpenAlex then gives every author all of those institutions, so the paper cannot tell which
+    authors were Dutch (the PRISMA 2009 statement in Annals of Internal Medicine made 9 foreign authors Dutch)."""
+    rows = auth_rows.get(wid, [])
+    texts = {raw_aff.get((wid, r[0]), "") for r in rows}
+    if len(rows) < 2 or len(texts) != 1 or not next(iter(texts)):
+        return False
+    ctys = {inst_meta.get(i, {}).get("country") for r in rows for i in inst_rows.get((wid, r[0]), [])}
+    return "NL" in ctys and len(ctys - {"NL", None}) > 0
+
+def is_dutch_inst(i):
+    return inst_meta.get(i, {}).get("country") == "NL"
+
+# authors who are at a Dutch institution on at least one paper with their own affiliation text; a Dutch institution
+# from a shared text (shared_mixed) counts only for them
+mixed_papers = {c[0] for c in cands if shared_mixed(c[0])}
+dutch_on_own_text = {aid for c in cands if c[0] not in mixed_papers for pos, aid, *_ in auth_rows.get(c[0], [])
+                     if aid and any(is_dutch_inst(i) for i in inst_rows.get((c[0], pos), []))}
+print(f"papers with one shared affiliation text naming the Netherlands and other countries: {len(mixed_papers)}")
+
 papers, paper_people, paper_nl_insts, paper_countries = [], {}, {}, {}
+n_abroad = 0
 for (wid, title, year, venue, doi, n_auth, cited, wtype, kw, field, topic, cat, expl, x, y, cl) in cands:
     people, nl_insts, countries = [], set(), set()
+    listed_unknown = False       # someone from our list has no institution on this paper
     for pos, aid, aname, orcid, ctry in sorted(auth_rows.get(wid, [])):
         insts = inst_rows.get((wid, pos), [])
-        dutch_here = any(inst_meta.get(i, {}).get("country") == "NL" for i in insts)
+        listed_unknown = listed_unknown or (aid in listed and not insts)
+        dutch_here = any(is_dutch_inst(i) for i in insts)
         countries.update(c for c in ctry.split("; ") if c)
-        nl_insts.update(i for i in insts if inst_meta.get(i, {}).get("country") == "NL")
+        nl_insts.update(i for i in insts if is_dutch_inst(i))
         pk = listed.get(aid)
-        if pk is None and dutch_here and aid:
+        if pk is None and dutch_here and aid and (wid not in mixed_papers or aid in dutch_on_own_text):
             pk = "A:" + aid
             if pk not in person_info:
                 person_info[pk] = dict(name=aname, orcid=orcid or "", listed=False)
@@ -79,12 +107,43 @@ for (wid, title, year, venue, doi, n_auth, cited, wtype, kw, field, topic, cat, 
             people.append(pk)
     if not people:      # no Dutch author and no one from our list: not part of the Dutch landscape
         continue
+    if not nl_insts and not listed_unknown:
+        # no Dutch institution, and the institutions of the people from our list on it are known (for example a paper
+        # from before someone on our list moved to the Netherlands). Papers where their institution is unknown are
+        # kept: they are mostly Dutch preprints and theses
+        n_abroad += 1
+        continue
     paper_people[wid], paper_nl_insts[wid], paper_countries[wid] = people, nl_insts, countries
     papers.append(dict(id=wid, t=title, y=year, v=venue or "", doi=doi or "", na=n_auth or 0, c=cited or 0,
                        ty=wtype, cat=cat, ex=expl or "", kw=[k for k in (kw or "").split("; ") if k][:8],
                        f=field or "", tp=topic or "", x=None if x is None else round(x, 3),
                        yy=None if y is None else round(y, 3), cl=cl, p=people,
                        co=sorted(countries - {"NL"})))
+print(f"left out because every known institution is abroad: {n_abroad} papers")
+
+# copies of one paper (a preprint and its journal version, preprint versions, or a statement published in several
+# journals) are shown once: same title (letters and digits only), at least one shared person, and at least 5 words in
+# the title, so that titles such as "Editorial" or "Authors' reply" are never joined. The copy kept is the journal
+# version (not a preprint), and among those the most cited; its own citation count is used, not a sum.
+def norm_title(t):
+    return re.sub(r"[^a-z0-9]", "", (t or "").lower())
+by_title = collections.defaultdict(list)
+for p in papers:
+    if len((p["t"] or "").split()) >= 5:
+        by_title[norm_title(p["t"])].append(p)
+dropped, copy_of = set(), {}   # copy_of: removed copy -> the paper kept (written to copies.json, for goals.json)
+for group in by_title.values():
+    rest = sorted(group, key=lambda p: (p["ty"] == "preprint", -p["c"], p["id"]))
+    while rest:
+        keep, rest = rest[0], rest[1:]
+        copies = [p for p in rest if set(p["p"]) & set(keep["p"])]
+        dropped.update(p["id"] for p in copies)
+        copy_of.update((p["id"], keep["id"]) for p in copies)
+        rest = [p for p in rest if p not in copies]
+papers = [p for p in papers if p["id"] not in dropped]
+for wid in dropped:
+    del paper_people[wid], paper_nl_insts[wid], paper_countries[wid]
+print(f"left out as copies of another paper: {len(dropped)} papers")
 print("papers in the Dutch metascience landscape:", len(papers), flush=True)
 
 # ---------------------------------------------------------------- institutions: parents and coordinates
@@ -149,13 +208,14 @@ comms = nx.community.louvain_communities(G, weight="weight", seed=42, resolution
 comm_of = {n: i for i, c in enumerate(sorted(comms, key=len, reverse=True)) for n in c}
 
 person_inst = collections.defaultdict(collections.Counter)
-for wid, people in paper_people.items():
+person_inst_shared = collections.defaultdict(collections.Counter)   # from shared texts (shared_mixed): used only
+for wid, people in paper_people.items():                             # when a person has no other Dutch institution
     for pos, aid, *_ in auth_rows.get(wid, []):
         pk = listed.get(aid) or ("A:" + aid if ("A:" + aid) in person_info else None)
-        if pk:
+        if pk in people:
             for i in inst_rows.get((wid, pos), []):
-                if inst_meta.get(i, {}).get("country") == "NL":
-                    person_inst[pk][top_level(i)] += 1
+                if is_dutch_inst(i):
+                    (person_inst_shared if wid in mixed_papers else person_inst)[pk][top_level(i)] += 1
 
 people_out = []
 for pk, plist in pp.items():
@@ -170,7 +230,7 @@ for pk, plist in pp.items():
         # only the institution on most of the person's papers: OpenAlex sometimes gives an author a co-author's
         # institution (when the publisher's affiliation text runs two addresses together), so a second institution
         # is often wrong
-        ins=[i for i, _ in person_inst[pk].most_common(1)],
+        ins=[i for i, _ in (person_inst[pk] or person_inst_shared[pk]).most_common(1)],
         kw=[k for k, _ in kws.most_common(8)], cm=comm_of.get(pk, -1),
         deg=G.degree(pk) if pk in G else 0))
 people_out.sort(key=lambda r: -r["k"])
@@ -275,7 +335,8 @@ meta = dict(n_papers=len(papers), n_people=len(people_out), n_listed=sum(r["l"] 
             years=[min(year_total), max(year_total)], year_total={str(y): c for y, c in sorted(year_total.items())},
             categories=sorted(set(p["cat"] for p in papers)), max_authors_for_links=MAX_AUTHORS_FOR_LINKS,
             model="gpt-oss:20b (Ollama, SURF Research Cloud)", prompt_version=VERSION, built="November 2026",
-            n_excluded_by_hand=n_before - len(cands), n_no_abstract=sum(1 for p in papers if not db.execute(
+            n_excluded_by_hand=n_before - len(cands), n_abroad=n_abroad, n_copies=len(dropped),
+            n_mixed_affiliation_papers=len(mixed_papers), n_no_abstract=sum(1 for p in papers if not db.execute(
                 "SELECT abstract FROM oa_works WHERE work_id=?", (p["id"],)).fetchone()[0]))
 
 dump("meta.json", meta)
@@ -287,3 +348,4 @@ dump("countries.json", countries_out)
 dump("terms.json", dict(terms=terms_json, totals={str(y): c for y, c in sorted(year_total.items())}))
 dump("keywords.json", keywords_out)
 dump("clusters.json", clusters)
+dump("copies.json", copy_of)

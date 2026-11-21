@@ -40,7 +40,10 @@ which themes, at which institutions, and how the literature developed over time.
 6. Embeddings (`bge-m3`), a UMAP map and 20 k-means clusters named by the model (`embed_and_map.py`); the names
    were then revised by hand after reading each cluster's keywords and titles (`cluster_names.json`, applied by
    `build_site_data.py`).
-7. The JSON files for the website (`build_site_data.py`, output in `docs/data/`).
+7. The JSON files for the website (`build_site_data.py`, output in `docs/data/`). A paper is shown when it has an
+   author at a Dutch institution, or an author from the starting list without a known institution on it; a shared
+   affiliation text that names the Netherlands and other countries does not make an author Dutch on its own; copies
+   of one paper (same title and a shared author) are shown once, as the journal version (`copies.json` lists them).
 8. The Inferences page (`build_inferences.py`): collaboration suggestions from the paper embeddings; rising themes
    from a multinomial logistic regression of each paper's cluster on year (natural spline, chosen by QAIC, intervals
    widened for extra year-to-year variation; `share_model.py`); new authors entering each theme, with intervals from
