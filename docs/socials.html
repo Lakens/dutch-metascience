@@ -28,8 +28,6 @@
   .weeks blockquote .who { display: block; margin-top: 4px; color: var(--text-muted); font-size: 0.8rem; white-space: normal; }
   ol.papers { margin: 6px 0 0; padding-left: 20px; font-size: 0.9rem; }
   ol.papers li { margin-bottom: 6px; }
-  #net svg { width: 100%; height: auto; display: block; }
-  #net .lbl { font-size: 11px; fill: var(--text-primary); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; pointer-events: none; }
   table.data td a { overflow-wrap: anywhere; }
 </style>
 </head>
@@ -53,7 +51,7 @@
 </header>
 <main>
   <h1>Socials</h1>
-  <p class="lede" id="lede">What the people on this site post about metascience on Bluesky and Mastodon.</p>
+  <p class="lede" id="lede">What the people on this site who work in the Netherlands now post about metascience on Bluesky and Mastodon.</p>
 
   <section class="card">
     <h2>Who posts most about metascience</h2>
@@ -125,12 +123,27 @@
 
   <section class="card">
     <h2>Who interacts with whom</h2>
-    <p class="sub">A line joins two people when one mentioned (@name), reposted or replied to the other at least
-    twice, in any of their posts. Thicker lines mean more interactions. Blue lines join people who also wrote a paper together that is on this site; grey
-    lines join people without a joint paper on this site (they may have written other papers together). Circles are larger for people with more metascience posts. On Mastodon a reply always
-    mentions the other person; on Bluesky, replies are counted for metascience posts only.</p>
-    <div class="controls"><div class="seg" id="nmode"><button aria-pressed="true" data-v="all">All pairs</button><button aria-pressed="false" data-v="noco">Only pairs without a joint paper on this site</button></div></div>
-    <div id="net"></div>
+    <p class="sub">A line joins two people when one mentioned (@name), reposted or replied to the other, in any of their
+    posts. Thicker lines mean more interactions. Blue lines join people who also wrote a paper together that is on this
+    site; grey lines join people without a joint paper on this site (they may have written other papers together).
+    Circles are larger for people with more metascience posts. On Mastodon a reply always mentions the other person; on
+    Bluesky, replies are counted for metascience posts only. Scroll to zoom, drag to move, hover for details, click a
+    person to see who they interact with.</p>
+    <div class="controls">
+      <label>At least <select id="nmin"><option>2</option><option selected>3</option><option>5</option><option>10</option><option>25</option></select> interactions</label>
+      <div class="seg" id="nmode"><button aria-pressed="true" data-v="all">All pairs</button><button aria-pressed="false" data-v="noco">Only pairs without a joint paper on this site</button></div>
+      <label><input type="checkbox" id="nlabels" checked> names</label>
+      <input type="search" id="nsearch" placeholder="Find a person…" aria-label="Find a person in the network">
+      <span class="muted small" id="ncount"></span>
+    </div>
+    <div class="split">
+      <div style="margin:0"><canvas class="net" id="net"></canvas></div>
+      <aside class="card panel" style="margin:0" id="npanel">
+        <h3>Click a person</h3>
+        <p class="muted small">The people they interact with light up in the network, and are listed here with the number
+        of mentions, reposts and replies between them.</p>
+      </aside>
+    </div>
     <h3 style="margin-top:14px">Pairs who interact most without a joint paper on this site</h3>
     <div class="tablewrap"><table class="data" id="pairs"></table></div>
   </section>
@@ -144,10 +157,12 @@ Promise.all([load("socials")]).then(([S]) => {
   const tcolor = (name) => seriesColor(themeNames.indexOf(name));
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   document.getElementById("lede").innerHTML =
-    `What the people on this site post about metascience on Bluesky and Mastodon. We found ${fmt(S.n_accounts)} accounts of
-    ${fmt(S.n_people)} people and read their ${fmt(S.n_own_posts)} public posts and replies. ${fmt(S.n_meta_posts)} of these,
+    `What the people on this site who work in the Netherlands now post about metascience on Bluesky and Mastodon. We found
+    ${fmt(S.n_accounts)} accounts of ${fmt(S.n_people)} such people and read their ${fmt(S.n_own_posts)} public posts and
+    replies. ${fmt(S.n_meta_posts)} of these,
     by ${fmt(S.n_meta_people)} people, contain a metascience term (from a list based on the terms used to find the papers
-    on this site). ${fmt(S.n_feed)} people regularly post about metascience. <a href="about.html#socials">How this page was made</a>.`;
+    on this site). ${fmt(S.n_feed)} people regularly post about metascience. People who have left the Netherlands
+    are not included. <a href="about.html#socials">How this page was made</a>.`;
 
   // ---- top posters ----
   for (const kind of ["bluesky", "mastodon"]) {
@@ -287,49 +302,152 @@ Promise.all([load("socials")]).then(([S]) => {
   document.getElementById("shared").innerHTML = S.shared_papers.map((p) => `<li><a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>
     <span class="muted small">${p.y} · ${fmt(p.posts)} posts by ${fmt(p.people)} people</span></li>`).join("");
 
-  // ---- who interacts with whom ----
+  // ---- who interacts with whom: a live network like the co-author network (canvas, zoom, drag, click) ----
   let nmode = "all";
   const byId = Object.fromEntries(S.network.nodes.map((n) => [n.id, n]));
-  document.querySelectorAll("#nmode button").forEach((b) => b.addEventListener("click", () => {
-    nmode = b.dataset.v; document.querySelectorAll("#nmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawNet();
-  }));
-  // the layout is computed once (with all pairs) so that switching keeps everyone in place
-  const W = 900, H = 640;
-  const nodes = S.network.nodes.map((n) => Object.assign({}, n));
-  const links = S.network.edges.map((e) => Object.assign({ source: e.a, target: e.b }, e));
-  const r = (n) => 3 + 2.2 * Math.sqrt(n.posts || 0) / 3;
-  const sim = d3.forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id((d) => d.id).distance(40).strength((l) => Math.min(1, 0.1 + 0.05 * l.w)))
-    .force("charge", d3.forceManyBody().strength(-60))
-    .force("x", d3.forceX(W / 2).strength(0.06)).force("y", d3.forceY(H / 2).strength(0.08))
-    .force("collide", d3.forceCollide((d) => r(d) + 2)).stop();
-  for (let i = 0; i < 400; i++) sim.tick();
-  const xs = d3.extent(nodes, (d) => d.x), ys = d3.extent(nodes, (d) => d.y);
-  const pad = 30, k = Math.min((W - 2 * pad) / (xs[1] - xs[0] || 1), (H - 2 * pad) / (ys[1] - ys[0] || 1));
-  nodes.forEach((d) => { d.px = pad + (d.x - xs[0]) * k; d.py = pad + (d.y - ys[0]) * k; });
-  function drawNet() {
-    const el = document.getElementById("net"); el.innerHTML = "";
-    const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img")
-      .attr("aria-label", "Network of people who mention or repost each other");
-    const show = links.filter((l) => nmode === "all" || !l.co);
-    svg.append("g").selectAll("line").data(show.sort((a, b) => a.co - b.co)).join("line")
-      .attr("x1", (l) => l.source.px).attr("y1", (l) => l.source.py).attr("x2", (l) => l.target.px).attr("y2", (l) => l.target.py)
-      .attr("stroke", (l) => l.co ? cssVar("--series-1") : cssVar("--other")).attr("stroke-opacity", (l) => l.co ? 0.9 : 0.55)
-      .attr("stroke-width", (l) => Math.min(6, 0.6 + Math.log2(l.w)))
-      .on("mousemove", (ev, l) => Tip.show(`<b>${esc(l.source.n)}</b> and <b>${esc(l.target.n)}</b><br>${fmt(l.w)} mentions, reposts or replies${l.co ? "<br>also a joint paper on this site" : ""}`, ev))
-      .on("mouseleave", () => Tip.hide());
-    const deg = {}; show.forEach((l) => { deg[l.source.id] = (deg[l.source.id] || 0) + l.w; deg[l.target.id] = (deg[l.target.id] || 0) + l.w; });
-    svg.append("g").selectAll("circle").data(nodes).join("circle")
-      .attr("cx", (d) => d.px).attr("cy", (d) => d.py).attr("r", r)
-      .attr("fill", (d) => deg[d.id] ? cssVar("--text-secondary") : cssVar("--other")).attr("stroke", cssVar("--surface-1")).attr("stroke-width", 2)
-      .style("cursor", "pointer")
-      .on("mousemove", (ev, d) => Tip.show(`<b>${esc(d.n)}</b><br>${fmt(d.posts)} metascience posts · ${fmt(d.k)} papers on this site<br>${fmt(deg[d.id] || 0)} mentions, reposts or replies with others shown`, ev))
-      .on("mouseleave", () => Tip.hide())
-      .on("click", (ev, d) => { location.href = `people.html#${encodeURIComponent(d.id)}`; });
-    const texts = svg.append("g").selectAll("text").data(nodes).join("text").attr("class", "lbl")
-      .attr("x", (d) => d.px + r(d) + 3).attr("y", (d) => d.py + 4).text((d) => d.n);
-    declutter(texts, (d) => deg[d.id] || 0, (d) => (deg[d.id] || 0) >= 20);
+  const nbAll = {};   // person -> [[other, interactions, joint paper]]
+  S.network.edges.forEach((e) => {
+    (nbAll[e.a] = nbAll[e.a] || []).push([e.b, e.w, e.co]); (nbAll[e.b] = nbAll[e.b] || []).push([e.a, e.w, e.co]);
+  });
+  const canvas = document.getElementById("net"), ctx = canvas.getContext("2d");
+  let NW, NH, dpr, nodes = [], links = [], sim, transform = d3.zoomIdentity, selected = null, hovered = null, userMoved = false;
+  const rad = (n) => 3 + Math.sqrt(n.p.posts || 0) * 0.7;
+  function size() { dpr = window.devicePixelRatio || 1; NW = canvas.clientWidth; NH = canvas.clientHeight; canvas.width = NW * dpr; canvas.height = NH * dpr; }
+  size();
+  function shownEdges() {
+    const min = +document.getElementById("nmin").value;
+    return S.network.edges.filter((e) => e.w >= min && (nmode === "all" || !e.co));
   }
+  function build() {
+    const es = shownEdges();
+    const ids = new Set(es.flatMap((e) => [e.a, e.b]));
+    const old = Object.fromEntries(nodes.map((n) => [n.id, n]));
+    nodes = S.network.nodes.filter((p) => ids.has(p.id)).map((p) => Object.assign(old[p.id] || {}, { id: p.id, p }));
+    nodes.forEach((n) => (n.r = rad(n)));
+    links = es.map((e) => ({ source: e.a, target: e.b, w: e.w, co: e.co }));
+    document.getElementById("ncount").textContent = `${fmt(nodes.length)} people, ${fmt(links.length)} pairs`;
+    if (selected && !ids.has(selected.id)) { selected = null; }
+    if (sim) sim.stop();
+    let ticks = 0;
+    sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id((d) => d.id).distance(45).strength((l) => Math.min(1, 0.08 + 0.04 * l.w)))
+      .force("charge", d3.forceManyBody().strength(-90).distanceMax(500))
+      .force("collide", d3.forceCollide((d) => d.r + 2))
+      .force("x", d3.forceX(0).strength(0.05)).force("y", d3.forceY(0).strength(0.05))
+      .on("tick", () => { ticks++; if (!userMoved && ticks % 15 === 0) fit(); drawNet(); })
+      .on("end", () => { if (!userMoved) fit(); });
+    if (selected) selected = nodes.find((n) => n.id === selected.id) || null;
+  }
+  function fit() {
+    if (!nodes.length || nodes[0].x == null) return;
+    const xs = nodes.map((n) => n.x).sort((a, b) => a - b), ys = nodes.map((n) => n.y).sort((a, b) => a - b);
+    const q = (arr, f) => arr[Math.min(arr.length - 1, Math.max(0, Math.round(f * (arr.length - 1))))];
+    const x0 = q(xs, 0.01), x1 = q(xs, 0.99), y0 = q(ys, 0.01), y1 = q(ys, 0.99);
+    const k = Math.min(3, 0.85 * Math.min(NW / Math.max(1, x1 - x0), NH / Math.max(1, y1 - y0)));
+    transform = d3.zoomIdentity.translate(NW / 2 - k * (x0 + x1) / 2, NH / 2 - k * (y0 + y1) / 2).scale(k);
+    d3.select(canvas).call(zoom.transform, transform);
+  }
+  function drawNet() {
+    if (!ctx) return;
+    const nb = selected ? new Set((nbAll[selected.id] || []).map(([id]) => id)) : null;
+    const touches = (l) => selected && (l.source.id === selected.id || l.target.id === selected.id);
+    ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, NW, NH);
+    ctx.translate(transform.x, transform.y); ctx.scale(transform.k, transform.k);
+    const blue = cssVar("--series-1"), grey = cssVar("--other");
+    // grey lines first, blue (joint paper) on top; with a person selected, only their lines are strong
+    for (const co of [false, true]) for (const l of links) {
+      if (l.co !== co) continue;
+      ctx.globalAlpha = selected ? (touches(l) ? 0.95 : 0.06) : (co ? 0.85 : 0.45);
+      ctx.strokeStyle = co ? blue : grey;
+      ctx.lineWidth = Math.min(6, 0.6 + Math.log2(l.w)) / Math.sqrt(transform.k);
+      ctx.beginPath(); ctx.moveTo(l.source.x, l.source.y); ctx.lineTo(l.target.x, l.target.y); ctx.stroke();
+    }
+    const fill = cssVar("--text-secondary"), ring = cssVar("--surface-1");
+    for (const n of nodes) {
+      ctx.globalAlpha = selected && n !== selected && !nb.has(n.id) ? 0.15 : 1;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 2 * Math.PI); ctx.fillStyle = fill; ctx.fill();
+      ctx.lineWidth = (n === selected || n === hovered ? 2.5 : 1) / transform.k;
+      ctx.strokeStyle = n === selected || n === hovered ? cssVar("--text-primary") : ring; ctx.stroke();
+    }
+    ctx.restore();
+    if (document.getElementById("nlabels").checked) {
+      // names in screen pixels, skipped where they would overlap a name already drawn (selected, hovered and their
+      // contacts first, then people with more metascience posts)
+      ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.font = "11px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      const rank = (n) => (n === selected ? 3e9 : n === hovered ? 2e9 : nb && nb.has(n.id) ? 1e9 + n.p.posts : n.p.posts);
+      const cand = nodes.filter((n) => !selected || n === selected || n === hovered || nb.has(n.id)).sort((a, b) => rank(b) - rank(a));
+      const placed = [];
+      for (const n of cand) {
+        const sx = transform.applyX(n.x), sy = transform.applyY(n.y) - n.r * transform.k - 3;
+        if (sx < -50 || sx > NW + 50 || sy < 0 || sy > NH + 20) continue;
+        const w = ctx.measureText(n.p.n).width, box = [sx - w / 2 - 2, sy - 13, sx + w / 2 + 2, sy + 1];
+        const forced = n === selected || n === hovered;
+        if (!forced && placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
+        placed.push(box);
+        ctx.globalAlpha = 0.85; ctx.fillStyle = ring; ctx.fillRect(box[0], box[1], box[2] - box[0], box[3] - box[1]);
+        ctx.globalAlpha = 1; ctx.fillStyle = cssVar("--text-primary"); ctx.fillText(n.p.n, sx, sy);
+        if (placed.length >= 120 && !forced) break;
+      }
+      ctx.restore();
+    }
+  }
+  function showPanel(p) {
+    const nbrs = (nbAll[p.id] || []).slice().sort((a, b) => b[1] - a[1]);
+    document.getElementById("npanel").innerHTML = `<h3>${esc(p.n)}</h3>
+      <p class="small">${fmt(p.posts)} metascience posts · ${fmt(p.k)} paper${p.k === 1 ? "" : "s"} on this site ·
+        <a href="people.html#${encodeURIComponent(p.id)}">full profile</a></p>
+      <p class="small">${(p.links || []).map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.replace(/^https:\/\//, ""))}</a>`).join("<br>")}</p>
+      <h3>Interacts with (${nbrs.length})</h3>
+      <ul>${nbrs.slice(0, 60).map(([id, w, co]) => `<li><a href="#" data-id="${esc(id)}">${esc(byId[id] ? byId[id].n : id)}</a>
+        <span class="muted">(${fmt(w)}${co ? ", joint paper" : ""})</span></li>`).join("")}</ul>`;
+    document.querySelectorAll("#npanel a[data-id]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); select(a.dataset.id, true); }));
+  }
+  function select(id, center) {
+    let n = nodes.find((x) => x.id === id);
+    if (!n && byId[id]) {   // not shown with the current settings: show all pairs from 2 interactions
+      document.getElementById("nmin").value = 2; nmode = "all";
+      document.querySelectorAll("#nmode button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.v === "all"));
+      build(); n = nodes.find((x) => x.id === id);
+    }
+    selected = n || null;
+    if (n) {
+      showPanel(n.p);
+      if (center && n.x != null) {
+        userMoved = true;
+        const k = Math.max(transform.k, 1.4);
+        d3.select(canvas).transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(NW / 2 - n.x * k, NH / 2 - n.y * k).scale(k));
+      }
+    }
+    drawNet();
+  }
+  const zoom = d3.zoom().scaleExtent([0.1, 8]).on("zoom", (e) => { if (e.sourceEvent) userMoved = true; transform = e.transform; drawNet(); });
+  d3.select(canvas).call(zoom).on("dblclick.zoom", null);
+  function nodeAt(ev) {
+    const [mx, my] = d3.pointer(ev, canvas), [x, y] = transform.invert([mx, my]);
+    return sim ? sim.find(x, y, 14 / transform.k) : null;
+  }
+  canvas.addEventListener("mousemove", (ev) => {
+    const n = nodeAt(ev);
+    if (n !== hovered) { hovered = n; drawNet(); }
+    if (n) {
+      const nb = nbAll[n.id] || [];
+      Tip.show(`<b>${esc(n.p.n)}</b><br>${fmt(n.p.posts)} metascience posts · ${fmt(n.p.k)} papers on this site<br>
+        interacts with ${fmt(nb.length)} people (${fmt(nb.reduce((s, x) => s + x[1], 0))} mentions, reposts or replies)`, ev);
+      canvas.style.cursor = "pointer";
+    } else { Tip.hide(); canvas.style.cursor = "grab"; }
+  });
+  canvas.addEventListener("mouseleave", () => { Tip.hide(); hovered = null; drawNet(); });
+  canvas.addEventListener("click", (ev) => { const n = nodeAt(ev); select(n ? n.id : null, false); });
+  nameSearch(document.getElementById("nsearch"), () => S.network.nodes, (p) => select(p.id, true));
+  document.getElementById("nmin").addEventListener("change", () => { userMoved = false; build(); });
+  document.querySelectorAll("#nmode button").forEach((b) => b.addEventListener("click", () => {
+    nmode = b.dataset.v; document.querySelectorAll("#nmode button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    userMoved = false; build();
+  }));
+  document.getElementById("nlabels").addEventListener("change", drawNet);
+  window.addEventListener("resize", () => { size(); drawNet(); });
+  build();
   const pairs = S.network.edges.filter((e) => !e.co).sort((a, b) => b.w - a.w).slice(0, 15);
   document.getElementById("pairs").innerHTML = "<tr><th>Person</th><th>Person</th><th class=\"num\">Mentions, reposts or replies</th></tr>" +
     pairs.map((e) => `<tr><td>${esc(byId[e.a].n)}</td><td>${esc(byId[e.b].n)}</td><td class="num">${fmt(e.w)}</td></tr>`).join("");

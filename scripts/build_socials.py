@@ -1,13 +1,17 @@
 """Data for the Socials page: what the people on the site post about metascience on Bluesky and Mastodon.
 
 Usage: python -I build_socials.py <site data folder> <nl_metascience.sqlite> <posts folder> <hits.jsonl>
-           <social_final.json> <feed_accounts.tsv> <bluesky_post_details.json>
+           <social_final.json> <feed_accounts.tsv> <bluesky_post_details.json> <location_verdicts.tsv>
 Input: the confirmed accounts (confirm_social_accounts.py; <social_final>_all.json holds all accounts of a person),
 the downloaded posts (download_social_posts.py), the posts with a metascience term (search_social_posts.py) and
 the people selected for the feeds (select_feed_accounts.py).
-Output: <site data folder>/socials.json. It holds counts only, and no post texts. People are named (with links to
-their accounts) only in the parts about individuals (top posters, who interacts with whom), and only when they are in
-the feeds (select_feed_accounts.py). Only a person's own posts and replies are counted, not reposts.
+Only people who work in the Netherlands now are counted: "yes" in <location_verdicts.tsv> (Claude reviewers, see
+location_review_instructions.md; "no" and "unclear" are left out). The posts of everyone else stay downloaded but are
+not used.
+Output: <site data folder>/socials.json: counts, plus the text of the most popular posts of the busiest weeks.
+People are named (with links to their accounts) only in the parts about individuals (top posters, popular posts, who
+interacts with whom), and only when they are in the feeds (select_feed_accounts.py). Only a person's own posts and
+replies are counted, not reposts.
 
 Parts:
  - per theme and term: number of posts and of people (social_terms.py);
@@ -30,7 +34,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from social_terms import THEMES, THEME_OF, NOT_COUNTED, terms_in
 
 sys.stdout.reconfigure(encoding="utf-8")
-data_dir, db_path, posts_dir, hits_path, final_path, feed_path, details_path = sys.argv[1:8]
+data_dir, db_path, posts_dir, hits_path, final_path, feed_path, details_path, location_path = sys.argv[1:9]
+in_nl = {r["person"] for r in csv.DictReader(open(location_path, encoding="utf-8"), delimiter="	")
+         if r["verdict"].strip().lower() == "yes"}
 details = json.load(open(details_path, encoding="utf-8"))   # full links of Bluesky posts (fetch_bluesky_links.py)
 people = {p["id"]: p for p in json.load(open(os.path.join(data_dir, "people.json"), encoding="utf-8"))}
 papers = json.load(open(os.path.join(data_dir, "papers.json"), encoding="utf-8"))
@@ -61,9 +67,12 @@ for g in groups.values():
     best = max(g, key=lambda p: (people[p]["k"], p))
     for p in g:
         canon[p] = best
-owner_of_file = {file_of(e["kind"], e["account"]): canon[pid] for pid, lst in every.items() for e in lst}
+# only people who work in the Netherlands now (a verdict is given for one record of each person)
+nl_people = {canon[p] for g in groups.values() if any(q in in_nl for q in g) for p in g}
+owner_of_file = {file_of(e["kind"], e["account"]): canon[pid] for pid, lst in every.items() for e in lst
+                 if canon[pid] in nl_people}
 platform_of_file = {f: f.split("_", 1)[0] for f in owner_of_file}
-feed = {canon[p] for p in feed_ids if p in canon}
+feed = {canon[p] for p in feed_ids if p in canon and canon[p] in nl_people}
 def post_link(h):
     u = h.get("uri") or ""
     m = re.match(r"at://([^/]+)/app\.bsky\.feed\.post/(.+)$", u)
@@ -83,6 +92,8 @@ month_total = collections.Counter()
 popularity = {}   # metascience post -> (likes, reposts) at download time
 did_owner = {}    # Bluesky account identifier (did) -> person, to know whose post a reply answers
 for fn in glob.glob(os.path.join(posts_dir, "*.jsonl")):
+    if os.path.basename(fn)[:-6] not in owner_of_file:
+        continue   # not someone who works in the Netherlands now
     for line in open(fn, encoding="utf-8"):
         p = json.loads(line)
         if not p["repost"] and (p.get("uri") or "").startswith("at://"):
