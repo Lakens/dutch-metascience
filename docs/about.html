@@ -22,6 +22,7 @@
     <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
     <a href="inferences.html">Inferences</a>
+    <a href="socials.html">Socials</a>
     <a href="about.html" aria-current="page">About</a>
   </nav>
   <button id="theme-toggle" type="button">Dark mode</button>
@@ -134,6 +135,44 @@
     <p>The personal view ("Find yourself" on the overview page) only highlights public data that is already on the
     site. The chosen person is kept in your browser and in the page address (<code>?me=</code>), so a link can be
     shared; nothing is sent to a server, because the site has none. Anyone can choose any name.</p>
+    <p>The Socials page uses public posts on Bluesky and Mastodon (see <a href="#socials">below</a>). It names only
+    people who post regularly about metascience, and quotes a few of their public posts with a link to the original. If
+    an account was matched to you by mistake, or you do not want to be included, open an issue in the GitHub repository
+    and you will be removed.</p>
+  </section>
+
+  <section class="card" id="socials">
+    <h2>How the Socials page was made</h2>
+    <p>The Socials page is built only from public data: public profiles and public posts on Bluesky and Mastodon,
+    read through the public interfaces that both platforms offer to programs, without logging in.</p>
+    <p><b>Finding accounts.</b> For every person on this site we looked for accounts in three ways.</p>
+    <ol>
+      <li>Accounts that people listed themselves, in their ORCID record or in Wikidata.</li>
+      <li>A search by first and last name on Bluesky and on three Mastodon servers (mastodon.social, fediscience.org and
+      akademienl.social), keeping accounts whose display name contains both names. Such an account was accepted when it
+      was the only match on that platform and its profile names the person's ORCID, their institution or its city, or
+      when it is on a Mastodon server for scientists.</li>
+      <li>The other name matches were judged by AI reviewers (Claude), who compared the profile text and the five most
+      recent posts with the person's institution and paper titles, and answered "yes" only when the account clearly
+      belongs to the person. Researchers who have since moved abroad count when their field fits.</li>
+    </ol>
+    <p>Accounts that never posted or no longer exist were left out. Automatic copies of an account on the other
+    platform (by the Bridgy Fed bridge) were replaced by the original account, and accounts that moved were followed to
+    their new address. One account is never given to two different people with the same name.</p>
+    <p><b>Reading the posts.</b> All public posts of these accounts were downloaded in November 2026. Only a person's
+    own posts and replies are counted, not reposts of other people's posts. A post counts as a metascience post when it
+    contains one of 37 metascience terms, grouped in five themes. The terms are based on those used to find the
+    papers on this site, with a few short forms used on social media (such as "prereg" and "OSF"). Capitals, hyphens and
+    the "#" of hashtags are ignored. Plain "replication" is not a term, because it mostly means DNA replication.</p>
+    <p><b>Who is named.</b> People are named on the Socials page only when they post regularly about metascience: at
+    least 3 of their own posts contain a metascience term, and these are at least 1% of all their own posts. "Peer
+    review" and "impact factor" do not count for this, because almost every academic uses them. Everyone else is only
+    counted in the totals.</p>
+    <p><b>Limitations.</b> Only accounts we could find are included, so people who post under another name, or on
+    other Mastodon servers that we could not search, are missing. Some name matches may still be wrong. A term in a post
+    does not always mean the post is about metascience (a job advertisement can mention open science). Interactions are
+    counted from mentions, reposts and replies; on Bluesky, replies are known for metascience posts only. Likes and
+    reposts were counted at the time of download.</p>
   </section>
 
   <section class="card">

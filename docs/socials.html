@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metascience on Socials</title>
+<meta name="description" content="What the people of Dutch metascience post about metascience on Bluesky and Mastodon: terms, themes, busy weeks, shared links and who interacts with whom.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="assets/common.js"></script>
+<style>
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .two h3 { font-size: 1rem; margin: 0 0 6px; }
+  .cloud { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; line-height: 1.25; padding: 4px 0; }
+  .cloud span { color: var(--text-primary); overflow-wrap: anywhere; }
+  .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .multiples .m { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 0; }
+  .multiples .m h3 { font-size: 0.92rem; margin: 0; display: flex; gap: 6px; align-items: center; }
+  .multiples .m .sp { height: 140px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .weeks { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+  .weeks .c { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--surface-1); }
+  .weeks .c h3 { font-size: 0.98rem; margin: 0 0 4px; }
+  .weeks .c p { margin: 4px 0 0; font-size: 0.86rem; color: var(--text-secondary); }
+  .weeks blockquote { margin: 8px 0 0; padding: 6px 10px; border-left: 3px solid var(--border); font-size: 0.86rem;
+    color: var(--text-primary); white-space: pre-line; overflow-wrap: anywhere; }
+  .weeks blockquote .who { display: block; margin-top: 4px; color: var(--text-muted); font-size: 0.8rem; white-space: normal; }
+  ol.papers { margin: 6px 0 0; padding-left: 20px; font-size: 0.9rem; }
+  ol.papers li { margin-bottom: 6px; }
+  #net svg { width: 100%; height: auto; display: block; }
+  #net .lbl { font-size: 11px; fill: var(--text-primary); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; pointer-events: none; }
+  table.data td a { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="index.html">Dutch Metascience Landscape</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="network.html">Who works with whom</a>
+    <a href="people.html">People</a>
+    <a href="themes.html">Themes</a>
+    <a href="time.html">Over time</a>
+    <a href="history.html">History</a>
+    <a href="places.html">Places</a>
+    <a href="funding.html">Funding</a>
+    <a href="inferences.html">Inferences</a>
+    <a href="socials.html" aria-current="page">Socials</a>
+    <a href="about.html">About</a>
+  </nav>
+  <button id="theme-toggle" type="button">Dark mode</button>
+</header>
+<main>
+  <h1>Socials</h1>
+  <p class="lede" id="lede">What the people on this site post about metascience on Bluesky and Mastodon.</p>
+
+  <section class="card">
+    <h2>Who posts most about metascience</h2>
+    <p class="sub">The ten people with the most posts of their own that contain a metascience term, per platform. Reposts
+    are not counted, and neither are posts whose only term is "peer review" or "impact factor", which almost every
+    academic uses. Only people who regularly post about metascience are named on this page (see About).</p>
+    <div class="two">
+      <div><h3>Bluesky</h3><table class="data" id="top-bluesky"></table></div>
+      <div><h3>Mastodon</h3><table class="data" id="top-mastodon"></table></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Terms by theme</h2>
+    <p class="sub">How often each metascience term appears in the posts, grouped in five themes. A post can contain
+    several terms. Choose a theme, and whether to count posts or the number of people who used the term.</p>
+    <div class="controls">
+      <div class="seg" id="theme-sel"></div>
+      <div class="seg" id="tmeasure"><button aria-pressed="true" data-v="posts">Posts</button><button aria-pressed="false" data-v="people">People</button></div>
+    </div>
+    <div id="terms" class="chart" style="min-height:420px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Words around each theme</h2>
+    <p class="sub">The words used most often in the posts of a theme, larger when used in more posts. The terms
+    themselves and common words are left out, and a word is shown only when at least five people used it.</p>
+    <div class="controls"><div class="seg" id="cloud-sel"></div></div>
+    <div class="cloud" id="cloud"></div>
+  </section>
+
+  <section class="card">
+    <h2>Over time</h2>
+    <p class="sub">Posts per month with a term of each theme, from 2020 (the month of download is left out, because it is
+    not complete). Most people started on Mastodon in late 2022
+    and on Bluesky in 2023 or 2024, so the counts mostly show how many people were active. The share of all their posts
+    is a better measure of interest.</p>
+    <div class="controls"><div class="seg" id="mmode"><button aria-pressed="true" data-v="count">Posts</button><button aria-pressed="false" data-v="share">Share of all their posts</button></div></div>
+    <div class="multiples" id="mult"></div>
+  </section>
+
+  <section class="card">
+    <h2>Discussed versus published</h2>
+    <p class="sub">For each term: the share of metascience posts that contain it, against the share of the papers on
+    this site that contain it in their title or abstract. Terms above the line are talked about more than they are
+    written about in papers; terms below the line the other way round. Both scales are logarithmic.</p>
+    <div id="vs" class="chart" style="min-height:520px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Busiest weeks</h2>
+    <p class="sub">The ten weeks with the most metascience posts (each the busiest within three weeks on either side),
+    compared with the median week of the half year before. "Unusually often" lists the terms used at least twice as
+    often as usual that week. Below each week are its three most popular metascience posts (most likes plus reposts at
+    the time of download) by people who regularly post about metascience.</p>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <section class="card">
+    <h2>What gets shared</h2>
+    <p class="sub">The websites linked most often in metascience posts, counted when at least three people linked
+    them ("Mastodon posts" and "Bluesky posts" are links to other posts), and the papers on this site that at least two
+    different people linked to.</p>
+    <div class="two">
+      <div id="links" class="chart" style="min-height:560px"></div>
+      <div><h3>Papers on this site shared by several people</h3><ol class="papers" id="shared"></ol></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Who interacts with whom</h2>
+    <p class="sub">A line joins two people when one mentioned (@name), reposted or replied to the other at least
+    twice, in any of their posts. Thicker lines mean more interactions. Blue lines join people who also wrote a paper together that is on this site; grey
+    lines join people without a joint paper on this site (they may have written other papers together). Circles are larger for people with more metascience posts. On Mastodon a reply always
+    mentions the other person; on Bluesky, replies are counted for metascience posts only.</p>
+    <div class="controls"><div class="seg" id="nmode"><button aria-pressed="true" data-v="all">All pairs</button><button aria-pressed="false" data-v="noco">Only pairs without a joint paper on this site</button></div></div>
+    <div id="net"></div>
+    <h3 style="margin-top:14px">Pairs who interact most without a joint paper on this site</h3>
+    <div class="tablewrap"><table class="data" id="pairs"></table></div>
+  </section>
+</main>
+<footer>Data: public posts on Bluesky and Mastodon by the people on this site, downloaded in November 2026. See
+<a href="about.html#socials">About</a> for how accounts were found and how to be removed.</footer>
+
+<script>
+Promise.all([load("socials")]).then(([S]) => {
+  const themeNames = S.themes.map((t) => t.name);
+  const tcolor = (name) => seriesColor(themeNames.indexOf(name));
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  document.getElementById("lede").innerHTML =
+    `What the people on this site post about metascience on Bluesky and Mastodon. We found ${fmt(S.n_accounts)} accounts of
+    ${fmt(S.n_people)} people and read their ${fmt(S.n_own_posts)} public posts and replies. ${fmt(S.n_meta_posts)} of these,
+    by ${fmt(S.n_meta_people)} people, contain a metascience term (from a list based on the terms used to find the papers
+    on this site). ${fmt(S.n_feed)} people regularly post about metascience. <a href="about.html#socials">How this page was made</a>.`;
+
+  // ---- top posters ----
+  for (const kind of ["bluesky", "mastodon"]) {
+    document.getElementById(`top-${kind}`).innerHTML = "<tr><th></th><th>Person</th><th class=\"num\">Posts</th></tr>" +
+      S.top[kind].map((r, i) => `<tr><td class="num">${i + 1}</td><td><a href="people.html#${encodeURIComponent(r.id)}">${esc(r.n)}</a><br>
+        <a class="small" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.account)}</a></td><td class="num">${fmt(r.posts)}</td></tr>`).join("");
+  }
+
+  // ---- terms by theme ----
+  let theme = "all", measure = "posts";
+  const seg = (id, items, cur, onPick) => {
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(([v, label]) => `<button aria-pressed="${v === cur}" data-v="${esc(v)}">${esc(label)}</button>`).join("");
+    el.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+      el.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(b.dataset.v);
+    }));
+  };
+  seg("theme-sel", [["all", "All themes"], ...themeNames.map((t) => [t, cap(t)])], theme, (v) => { theme = v; drawTerms(); });
+  document.querySelectorAll("#tmeasure button").forEach((b) => b.addEventListener("click", () => {
+    measure = b.dataset.v; document.querySelectorAll("#tmeasure button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawTerms();
+  }));
+  function drawTerms() {
+    const rows = [];
+    S.themes.forEach((t) => { if (theme === "all" || theme === t.name) t.terms.forEach((x) => rows.push(Object.assign({ theme: t.name }, x))); });
+    rows.sort((a, b) => a[measure] - b[measure]);
+    const traces = (theme === "all" ? themeNames : [theme]).map((th) => {
+      const r = rows.filter((x) => x.theme === th);
+      return { type: "bar", orientation: "h", name: cap(th), y: r.map((x) => x.name), x: r.map((x) => x[measure]),
+        marker: { color: tcolor(th) }, hovertemplate: `<b>%{y}</b><br>%{x} ${measure}<extra>${esc(cap(th))}</extra>` };
+    });
+    const h = Math.max(320, rows.length * 20 + 80);
+    document.getElementById("terms").style.height = h + "px";
+    Plotly.react("terms", traces, baseLayout({ barmode: "stack", height: h, showlegend: theme === "all",
+      legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0 }, margin: { l: 10, r: 20, t: theme === "all" ? 60 : 10, b: 40 },
+      yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map((x) => x.name) }),
+      xaxis: Object.assign(baseLayout().xaxis, { title: measure === "posts" ? "posts" : "people" }) }), PLOT_CONFIG);
+  }
+
+  // ---- word clouds ----
+  let cloudTheme = themeNames[0];
+  seg("cloud-sel", themeNames.map((t) => [t, cap(t)]), cloudTheme, (v) => { cloudTheme = v; drawCloud(); });
+  function drawCloud() {
+    const words = S.clouds[cloudTheme] || [];
+    const max = Math.max(...words.map((w) => w[1])), min = Math.min(...words.map((w) => w[1]));
+    const size = (n) => 0.8 + 1.7 * Math.sqrt((n - min) / Math.max(1, max - min));
+    // alphabetical, so that the eye is not led by position, only by size
+    document.getElementById("cloud").innerHTML = words.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([w, n]) =>
+      `<span style="font-size:${size(n).toFixed(2)}rem" title="${esc(w)}: ${fmt(n)} posts">${esc(w)}</span>`).join("");
+  }
+
+  // ---- over time ----
+  let mmode = "count";
+  const months = [];
+  for (let y = 2020; ; y++) {
+    let done = false;
+    for (let m = 1; m <= 12; m++) { const k = `${y}-${String(m).padStart(2, "0")}`; if (k >= S.last_month) { done = true; break; } months.push(k); }
+    if (done) break;
+  }
+  document.querySelectorAll("#mmode button").forEach((b) => b.addEventListener("click", () => {
+    mmode = b.dataset.v; document.querySelectorAll("#mmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawMonths();
+  }));
+  function drawMonths() {
+    const el = document.getElementById("mult"); el.innerHTML = "";
+    [["any", "Any metascience term"], ...themeNames.map((t) => [t, cap(t)])].forEach(([key, label], i) => {
+      const series = S.months[key] || {};
+      const total = Object.values(series).reduce((s, x) => s + x, 0);
+      const div = document.createElement("div"); div.className = "m";
+      const col = key === "any" ? cssVar("--text-secondary") : tcolor(key);
+      div.innerHTML = `<h3><span class="swatch" style="background:${col}"></span>${esc(label)}</h3><div class="muted small">${fmt(total)} posts</div><div class="sp"></div>`;
+      el.appendChild(div);
+      const y = months.map((m) => { const n = series[m] || 0, t = S.month_total[m] || 0; return mmode === "share" ? (t >= 200 ? 100 * n / t : null) : n; });
+      Plotly.newPlot(div.querySelector(".sp"), [{ x: months.map((m) => m + "-15"), y, type: "scatter", mode: "lines",
+        line: { color: col, width: 2 }, connectgaps: false,
+        hovertemplate: `%{x|%b %Y}: %{y:${mmode === "share" ? ".1f" : ".0f"}}${mmode === "share" ? "% of all posts" : " posts"}<extra></extra>` }],
+        baseLayout({ margin: { l: 34, r: 6, t: 4, b: 22 }, showlegend: false, height: 140,
+          xaxis: Object.assign(baseLayout().xaxis, { type: "date", nticks: 4 }),
+          yaxis: Object.assign(baseLayout().yaxis, { nticks: 3, rangemode: "tozero" }) }),
+        { displayModeBar: false, responsive: true });
+    });
+  }
+
+  // ---- discussed versus published ----
+  function drawVs() {
+    const traces = S.themes.map((t) => {
+      const r = t.terms.filter((x) => x.post_share > 0 && x.paper_share > 0);
+      return { type: "scatter", mode: "markers+text", name: cap(t.name), x: r.map((x) => x.paper_share), y: r.map((x) => x.post_share),
+        text: r.map((x) => x.name), textposition: "top center", textfont: { size: 11, color: cssVar("--text-secondary") },
+        marker: { size: 10, color: tcolor(t.name), line: { width: 2, color: cssVar("--surface-1") } },
+        customdata: r.map((x) => [x.posts, x.papers]),
+        hovertemplate: "<b>%{text}</b><br>%{y:.1f}% of metascience posts (%{customdata[0]})<br>%{x:.1f}% of papers (%{customdata[1]})<extra></extra>" };
+    });
+    traces.push({ type: "scatter", mode: "lines", x: [0.01, 100], y: [0.01, 100], hoverinfo: "skip", showlegend: false,
+      line: { color: cssVar("--axis"), width: 1, dash: "dot" } });
+    Plotly.react("vs", traces, baseLayout({ hovermode: "closest", legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0 },
+      margin: { l: 60, r: 20, t: 60, b: 50 },
+      xaxis: Object.assign(baseLayout().xaxis, { type: "log", title: "% of papers on this site", range: [-1.3, 1.9] }),
+      yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "% of metascience posts", range: [-1.3, 1.9] }) }), PLOT_CONFIG)
+      .then(declutterVs);
+  }
+  // where labels overlap, only the label of the more used term is shown (all are named on hover)
+  const usedness = {}; S.themes.forEach((t) => t.terms.forEach((x) => (usedness[x.name] = x.posts + x.papers)));
+  function declutterVs() {
+    const texts = d3.select("#vs").selectAll("g.textpoint text");
+    texts.each(function () { this.__term = this.textContent; });
+    const items = []; texts.each(function () { items.push(this); });
+    items.forEach((el) => el.setAttribute("opacity", 1));
+    items.sort((a, b) => (usedness[b.__term] || 0) - (usedness[a.__term] || 0));
+    const placed = [];
+    for (const el of items) {
+      const r = el.getBoundingClientRect(); if (!r.width) continue;
+      const box = [r.left - 2, r.top - 1, r.right + 2, r.bottom + 1];
+      if (placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) el.setAttribute("opacity", 0);
+      else placed.push(box);
+    }
+  }
+
+
+  // ---- busiest weeks ----
+  const dfmt = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  document.getElementById("weeks").innerHTML = S.peaks.map((p) => `<div class="c"><h3>Week of ${esc(dfmt(p.week))}</h3>
+    <p><b>${fmt(p.posts)}</b> metascience posts by ${fmt(p.people)} people${p.typical != null ? ` (a usual week before: ${fmt(p.typical)})` : ""}</p>
+    <p>Most used: ${p.top.map((t) => `${esc(t.name)} (${fmt(t.posts)})`).join(", ")}</p>
+    ${p.unusual.length ? `<p>Unusually often: ${p.unusual.map((t) => `${esc(t.name)} (${t.times}× usual)`).join(", ")}</p>` : ""}
+    ${(p.popular || []).map((x) => `<blockquote>${esc(x.text)}<span class="who"><a href="people.html#${encodeURIComponent(x.id)}">${esc(x.n)}</a>
+      · <a href="${esc(x.url)}" target="_blank" rel="noopener">${x.platform === "bluesky" ? "Bluesky" : "Mastodon"}, ${esc(dfmt(x.date))}</a>
+      · ${fmt(x.likes)} likes · ${fmt(x.reposts)} reposts</span></blockquote>`).join("")}</div>`).join("");
+
+  // ---- shared links ----
+  function drawLinks() {
+    const r = S.links.slice().reverse();
+    Plotly.react("links", [{ type: "bar", orientation: "h", y: r.map((x) => x.site), x: r.map((x) => x.posts),
+      customdata: r.map((x) => x.people), marker: { color: cssVar("--series-1") },
+      hovertemplate: "<b>%{y}</b><br>%{x} posts by %{customdata} people<extra></extra>" }],
+      baseLayout({ height: 560, margin: { l: 10, r: 20, t: 10, b: 40 }, xaxis: Object.assign(baseLayout().xaxis, { title: "posts" }) }), PLOT_CONFIG);
+  }
+
+  document.getElementById("shared").innerHTML = S.shared_papers.map((p) => `<li><a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>
+    <span class="muted small">${p.y} · ${fmt(p.posts)} posts by ${fmt(p.people)} people</span></li>`).join("");
+
+  // ---- who interacts with whom ----
+  let nmode = "all";
+  const byId = Object.fromEntries(S.network.nodes.map((n) => [n.id, n]));
+  document.querySelectorAll("#nmode button").forEach((b) => b.addEventListener("click", () => {
+    nmode = b.dataset.v; document.querySelectorAll("#nmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawNet();
+  }));
+  // the layout is computed once (with all pairs) so that switching keeps everyone in place
+  const W = 900, H = 640;
+  const nodes = S.network.nodes.map((n) => Object.assign({}, n));
+  const links = S.network.edges.map((e) => Object.assign({ source: e.a, target: e.b }, e));
+  const r = (n) => 3 + 2.2 * Math.sqrt(n.posts || 0) / 3;
+  const sim = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id((d) => d.id).distance(40).strength((l) => Math.min(1, 0.1 + 0.05 * l.w)))
+    .force("charge", d3.forceManyBody().strength(-60))
+    .force("x", d3.forceX(W / 2).strength(0.06)).force("y", d3.forceY(H / 2).strength(0.08))
+    .force("collide", d3.forceCollide((d) => r(d) + 2)).stop();
+  for (let i = 0; i < 400; i++) sim.tick();
+  const xs = d3.extent(nodes, (d) => d.x), ys = d3.extent(nodes, (d) => d.y);
+  const pad = 30, k = Math.min((W - 2 * pad) / (xs[1] - xs[0] || 1), (H - 2 * pad) / (ys[1] - ys[0] || 1));
+  nodes.forEach((d) => { d.px = pad + (d.x - xs[0]) * k; d.py = pad + (d.y - ys[0]) * k; });
+  function drawNet() {
+    const el = document.getElementById("net"); el.innerHTML = "";
+    const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img")
+      .attr("aria-label", "Network of people who mention or repost each other");
+    const show = links.filter((l) => nmode === "all" || !l.co);
+    svg.append("g").selectAll("line").data(show.sort((a, b) => a.co - b.co)).join("line")
+      .attr("x1", (l) => l.source.px).attr("y1", (l) => l.source.py).attr("x2", (l) => l.target.px).attr("y2", (l) => l.target.py)
+      .attr("stroke", (l) => l.co ? cssVar("--series-1") : cssVar("--other")).attr("stroke-opacity", (l) => l.co ? 0.9 : 0.55)
+      .attr("stroke-width", (l) => Math.min(6, 0.6 + Math.log2(l.w)))
+      .on("mousemove", (ev, l) => Tip.show(`<b>${esc(l.source.n)}</b> and <b>${esc(l.target.n)}</b><br>${fmt(l.w)} mentions, reposts or replies${l.co ? "<br>also a joint paper on this site" : ""}`, ev))
+      .on("mouseleave", () => Tip.hide());
+    const deg = {}; show.forEach((l) => { deg[l.source.id] = (deg[l.source.id] || 0) + l.w; deg[l.target.id] = (deg[l.target.id] || 0) + l.w; });
+    svg.append("g").selectAll("circle").data(nodes).join("circle")
+      .attr("cx", (d) => d.px).attr("cy", (d) => d.py).attr("r", r)
+      .attr("fill", (d) => deg[d.id] ? cssVar("--text-secondary") : cssVar("--other")).attr("stroke", cssVar("--surface-1")).attr("stroke-width", 2)
+      .style("cursor", "pointer")
+      .on("mousemove", (ev, d) => Tip.show(`<b>${esc(d.n)}</b><br>${fmt(d.posts)} metascience posts · ${fmt(d.k)} papers on this site<br>${fmt(deg[d.id] || 0)} mentions, reposts or replies with others shown`, ev))
+      .on("mouseleave", () => Tip.hide())
+      .on("click", (ev, d) => { location.href = `people.html#${encodeURIComponent(d.id)}`; });
+    const texts = svg.append("g").selectAll("text").data(nodes).join("text").attr("class", "lbl")
+      .attr("x", (d) => d.px + r(d) + 3).attr("y", (d) => d.py + 4).text((d) => d.n);
+    declutter(texts, (d) => deg[d.id] || 0, (d) => (deg[d.id] || 0) >= 20);
+  }
+  const pairs = S.network.edges.filter((e) => !e.co).sort((a, b) => b.w - a.w).slice(0, 15);
+  document.getElementById("pairs").innerHTML = "<tr><th>Person</th><th>Person</th><th class=\"num\">Mentions, reposts or replies</th></tr>" +
+    pairs.map((e) => `<tr><td>${esc(byId[e.a].n)}</td><td>${esc(byId[e.b].n)}</td><td class="num">${fmt(e.w)}</td></tr>`).join("");
+
+  const all = () => { drawTerms(); drawCloud(); drawMonths(); drawVs(); drawLinks(); drawNet(); };
+  all(); onThemeChange(all);
+  document.getElementById("vs").on("plotly_afterplot", declutterVs);   // also after a redraw (window resized)
+}).catch((e) => failed(document.getElementById("lede"), e));
+</script>
+</body>
+</html>
