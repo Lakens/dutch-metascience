@@ -23,13 +23,17 @@ Parts:
    that are themselves a term; a word counts when at least 5 people used it;
  - the websites linked most often in metascience posts;
  - top 10 people per platform by number of metascience posts ("peer review" and "impact factor" not counted);
+ - rising and falling on social media (for the Inferences page): each term's and theme's share of the metascience
+   posts in the last 24 complete months, compared with the 24 months before, as a ratio with a 95% interval from
+   resampling people (1,000 times), so that one very active person cannot make the interval narrow. Terms with fewer
+   than 30 posts in the two periods together, or fewer than 5 people, are left out;
  - who interacts with whom: mentions (@name in a post) and reposts between people in the feeds, in all their posts,
    plus replies between them among the Bluesky metascience posts (fetch_bluesky_links.py stores which post a post
    replies to; on Mastodon a reply mentions the other person, so it is already counted), and whether the two also
    wrote a paper together.
 People with several records on the site (one account shared by several records) are counted once.
 """
-import sys, os, re, json, glob, csv, sqlite3, collections, datetime
+import sys, os, re, json, glob, csv, sqlite3, collections, datetime, random
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from social_terms import THEMES, THEME_OF, NOT_COUNTED, terms_in
 
@@ -350,6 +354,57 @@ nodes_out = [dict(id=pid, n=people[pid]["n"], k=people[pid]["k"], posts=meta_by_
                          if e["account"].lower() in {v["account"].lower() for v in final.get(pid, {}).values()}])
              for pid in sorted(in_net)]
 
+# ---------------------------------------------------------------- rising and falling on social media
+def month_add(m, k):
+    y, mo = int(m[:4]), int(m[5:7]) - 1 + k
+    return f"{y + mo // 12}-{mo % 12 + 1:02d}"
+last_complete = month_add(max(month_total), -1)   # the month of download is not complete
+B1, B0 = last_complete, month_add(last_complete, -23)
+A1, A0 = month_add(B0, -1), month_add(B0, -24)
+per = collections.defaultdict(lambda: {"A": collections.Counter(), "B": collections.Counter()})   # person -> period -> counts
+for h in hits:
+    m = h["date"][:7]
+    p = "A" if A0 <= m <= A1 else "B" if B0 <= m <= B1 else None
+    if not p:
+        continue
+    c = per[owner_of_file[h["account"]]][p]
+    c["*"] += 1
+    for t in h["terms"]:
+        c["t:" + t] += 1
+    for th in {THEME_OF[t] for t in h["terms"]}:
+        c["h:" + th] += 1
+persons = sorted(per)
+def ratio(sample, key):
+    a = sum(per[x]["A"][key] for x in sample); b = sum(per[x]["B"][key] for x in sample)
+    ta = sum(per[x]["A"]["*"] for x in sample); tb = sum(per[x]["B"]["*"] for x in sample)
+    if not (a or b) or not (ta and tb):
+        return None
+    if not a:
+        return MAX_RATIO   # only in the last two years: counted as a very large rise, not skipped
+    if not b:
+        return 1 / MAX_RATIO
+    return min(MAX_RATIO, max(1 / MAX_RATIO, (b / tb) / (a / ta)))
+MAX_RATIO = 100
+rng = random.Random(1)
+boots = [[rng.choice(persons) for _ in persons] for _ in range(1000)]
+def summary(key, name, theme):
+    a = sum(per[x]["A"][key] for x in persons); b = sum(per[x]["B"][key] for x in persons)
+    pa = sum(1 for x in persons if per[x]["A"][key]); pb = sum(1 for x in persons if per[x]["B"][key])
+    both = sum(1 for x in persons if per[x]["A"][key] or per[x]["B"][key])
+    r = ratio(persons, key)
+    if r is None or not a or not b or a + b < 30 or both < 5:
+        return None
+    # a resample without anyone who used the term in one period counts as an extreme ratio (it is not skipped),
+    # so that a term carried by one or two people gets a wide interval
+    rs = sorted(x for x in (ratio(bs, key) for bs in boots) if x is not None)
+    lo, hi = rs[int(0.025 * len(rs))], rs[int(0.975 * len(rs)) - 1]
+    return dict(name=name, theme=theme, a=a, b=b, people_a=pa, people_b=pb, ratio=round(r, 3), lo=round(lo, 3),
+                hi=round(hi, 3), status="rising" if lo > 1 else "declining" if hi < 1 else "no clear change")
+rising = dict(periods=[A0, A1, B0, B1],
+              posts=[sum(per[x]["A"]["*"] for x in persons), sum(per[x]["B"]["*"] for x in persons)],
+              themes=[x for x in (summary("h:" + th, th, th) for th in THEMES) if x],
+              terms=[x for x in (summary("t:" + t, t, THEME_OF[t]) for th in THEMES for t in THEMES[th]) if x])
+
 out = dict(
     n_accounts=len(owner_of_file), n_people=len(set(owner_of_file.values())), n_feed=len(feed),
     n_own_posts=sum(month_total.values()), n_meta_posts=n_meta, n_meta_people=len({owner_of_file[h["account"]] for h in hits}),
@@ -357,7 +412,7 @@ out = dict(
     themes=themes_out, months={k: dict(v) for k, v in month_theme.items()}, month_total=dict(month_total),
     months_by={pl: {th: dict(c) for th, c in v.items()} for pl, v in month_theme_pl.items()},
     month_total_by={pl: dict(c) for pl, c in month_total_pl.items()},
-    peaks=peaks_out, clouds=clouds, links=links_out, shared_papers=shared_papers, top=top,
+    rising=rising, peaks=peaks_out, clouds=clouds, links=links_out, shared_papers=shared_papers, top=top,
     network=dict(nodes=nodes_out, edges=edges_out))
 with open(os.path.join(data_dir, "socials.json"), "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, separators=(",", ":"))

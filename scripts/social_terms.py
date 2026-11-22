@@ -4,7 +4,7 @@ select_feed_accounts.py and build_socials.py).
 The terms combine the three lists used elsewhere in this project: the OpenAlex search terms (terms.py), the terms
 over time on the site (build_site_data.py) and the Dutch terms for metascience grants (build_funding.py), plus short
 forms used on social media (prereg, OSF, QRPs, HARKing, RRs). The search ignores capital letters, except for short
-forms that are also ordinary words or names (OSF, QRP, HARK, RRs, NHST, TOST, DORA); spaces, hyphens and the "#" of a
+forms that are also ordinary words or names (OSF, QRP, HARK, RRs, NHST, TOST, DORA, FAIR); spaces, hyphens and the "#" of a
 hashtag are optional inside a term, so "#OpenScience" and "open-science" match "open science".
 Bare "replication" is left out (DNA and virus replication); "replication" counts only next to words such as study,
 crisis or attempt.
@@ -35,6 +35,7 @@ THEMES = {
         "research waste": rf"research{S}waste",
         "reporting guidelines": rf"reporting{S}(guidelines?|quality)",
         "data sharing": rf"data{S}sharing|open{S}data|fair{S}data",
+        "FAIR": r"(?-i:\bFAIR\b)",   # the FAIR principles, in capitals only ("a fair point" and "FAIRS" do not count)
         "peer review": rf"peer{S}review",
     },
     "meta-research and integrity": {
