@@ -1,7 +1,8 @@
-"""Data for the Inferences page: possible collaborations, rising themes, and (from a hand-written file) shared
-questions and goals.
+"""Data for the Inferences page: possible collaborations, rising themes, similar ongoing NWO projects, and (from a
+hand-written file) shared questions and goals.
 
 Usage: python -I build_inferences.py <site data folder> <embeddings.npy> <embedding_ids.txt> [goals.json]
+       [project_groups.json]
 Reads the site's papers/people/edges/clusters/institutions JSON and the paper embeddings (bge-m3, from
 embed_and_map.py); writes <site data folder>/inferences.json.
 
@@ -27,6 +28,13 @@ embed_and_map.py); writes <site data folder>/inferences.json.
    Rising keywords: share of papers with the keyword, 2024-2026 against 2019-2023.
 3. Shared questions and goals: copied from goals.json (written by Claude from the 2025-2026 abstracts), after
    checking that every cited paper is on the site.
+4. Similar ongoing projects: the ongoing metascience-related NWO projects (embed_projects.py; their fingerprints,
+   project_embeddings.npy and project_ids.txt, lie next to embeddings.npy). Groups with a shared aim come from
+   project_groups.json (written and checked by Claude reviewers, project_groups_instructions.md). Computed here: the
+   most similar pairs of projects that are NOT in the same group (the groups already show those), from different
+   funding schemes, with no organisation and no team member in common, and for every project the
+   N_NEAR papers on the site that are closest in content. Similarity as for people: fingerprints minus the average
+   of the site's papers, then the cosine.
 """
 import sys, os, json, collections, itertools
 import numpy as np
@@ -36,6 +44,7 @@ from share_model import design, fit_multinomial, knots_for, draws_of_shares, sha
 sys.stdout.reconfigure(encoding="utf-8")
 data_dir, emb_path, ids_path = sys.argv[1:4]
 goals_path = sys.argv[4] if len(sys.argv) > 4 else None
+groups_path = sys.argv[5] if len(sys.argv) > 5 else None
 load = lambda n: json.load(open(os.path.join(data_dir, n + ".json"), encoding="utf-8"))
 papers, people, edges, clusters = load("papers"), load("people"), load("edges"), load("clusters")
 cname = {c["id"]: c["name"] for c in clusters}
@@ -340,13 +349,70 @@ if goals_path and os.path.exists(goals_path):
     missing = [x for x in cited if x not in pid]
     assert not missing, f"goals.json cites papers that are not on the site: {missing[:10]}"
 
+# ---------------------------------------------------------------- 4. similar ongoing projects
+projects_out = None
+work = os.path.dirname(os.path.abspath(emb_path))
+if groups_path and os.path.exists(os.path.join(work, "project_embeddings.npy")):
+    N_NEAR, N_PAIRS, PAIR_MIN_SIM = 3, 15, MIN_SIM
+    pg = json.load(open(groups_path, encoding="utf-8"))
+    pids = open(os.path.join(work, "project_ids.txt")).read().split()
+    fund = {p["id"]: p for p in load("funding")["projects"]}
+    V = np.load(os.path.join(work, "project_embeddings.npy")) - mean_vec
+    V /= np.linalg.norm(V, axis=1, keepdims=True)
+    PS = V @ V.T
+    # every project in exactly one place, and only projects that are in the data
+    placed = [x for g in pg["groups"] for x in g["projects"]] + pg.get("on_their_own", [])
+    assert sorted(placed) == sorted(pids), "project_groups.json does not hold every ongoing project exactly once: " +         str(sorted(set(pids) ^ set(placed)) or [x for x, n in collections.Counter(placed).items() if n > 1])
+    assert all(len(g["projects"]) >= 2 for g in pg["groups"])
+    group_of = {x: gi for gi, g in enumerate(pg["groups"]) for x in g["projects"]}
+    def team(p):
+        out, seen = [], set()
+        for m in p["ppl"]:
+            if m["n"] not in seen:
+                seen.add(m["n"]); out.append(m)
+        return out
+    def leaders(p):
+        ls = [m for m in team(p) if m["r"] in ("Project leader", "Main Applicant")]
+        return [dict(n=m["n"], id=m["id"], o=m["o"]) for m in (ls or team(p))[:3]]
+    # closest papers on the site
+    P_ids = list(paper_vec)
+    PM = np.stack([paper_vec[x] for x in P_ids])
+    near = {}
+    for i, x in enumerate(pids):
+        sims = PM @ V[i]
+        near[x] = [P_ids[j] for j in np.argsort(-sims)[:N_NEAR]]
+    items = {x: dict(t=fund[x]["t"], s=fund[x]["s"], g=fund[x].get("g") or "", b=(fund[x]["b"] or "")[:7],
+                     ld=leaders(fund[x]), n=len(team(fund[x])), near=near[x],
+                     pp=sorted({m["id"] for m in fund[x]["ppl"] if m["id"]})) for x in pids}
+    # similar pairs that the groups keep apart, from different funding schemes (projects of one funding round follow one
+    # template and already meet), with no organisation and no team member in common; each project at most twice
+    orgs = {x: {m["o"] for m in fund[x]["ppl"] if m["o"]} for x in pids}
+    names = {x: {m["n"] for m in fund[x]["ppl"]} for x in pids}
+    cand = sorted(((float(PS[i, j]), pids[i], pids[j]) for i, j in itertools.combinations(range(len(pids)), 2)
+                   if PS[i, j] >= PAIR_MIN_SIM and fund[pids[i]]["s"] != fund[pids[j]]["s"]
+                   and not (pids[i] in group_of and group_of[pids[i]] == group_of.get(pids[j]))
+                   and not (orgs[pids[i]] & orgs[pids[j]])
+                   and not (names[pids[i]] & names[pids[j]])), reverse=True)
+    seen, ppairs = collections.Counter(), []
+    for s_, a, b in cand:
+        if seen[a] >= 2 or seen[b] >= 2:
+            continue
+        ppairs.append(dict(a=a, b=b, s=round(s_, 3)))
+        seen[a] += 1; seen[b] += 1
+        if len(ppairs) == N_PAIRS:
+            break
+    projects_out = dict(items=items, groups=pg["groups"], alone=pg.get("on_their_own", []), pairs=ppairs,
+                        written_by=pg.get("written_by", ""), n=len(pids))
+    print(f"ongoing projects: {len(pids)} | groups: {len(pg['groups'])} | on their own: {len(pg.get('on_their_own', []))}"
+          f" | similar pairs without a shared organisation or person: {len(ppairs)}")
+
 out = dict(
     last_year=LAST_YEAR, active_rule="at least 3 metascience papers, one in 2024 or later", n_active=len(A),
     suggest=suggest, top_pairs=top_pairs, suggest_little=suggest_little, top_pairs_little=top_pairs_little,
     little=LITTLE, min_sim=MIN_SIM, max_authors=MAX_AUTHORS, communities=communities, comm_pairs=comm_pairs, comm_map_r=comm_map_r,
     trend=trend, trend_model=trend_model, windows=dict(early=list(EARLY), recent=list(REC)), rising=rising[:30],
     new_keywords=[d for d in rising if d["first"] >= 2023][:15],
-    goals=goals)
+    goals=goals, projects=projects_out)
 with open(os.path.join(data_dir, "inferences.json"), "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
 print(f"inferences.json: {os.path.getsize(os.path.join(data_dir, 'inferences.json')) / 1e6:.2f} MB | active people: {len(A)} | "

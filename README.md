@@ -49,6 +49,11 @@ which themes, at which institutions, and how the literature developed over time.
    widened for extra year-to-year variation; `share_model.py`); new authors entering each theme, with intervals from
    resampling papers; and shared questions and goals (`goals.json`, written by Claude after reading
    all 2025-2026 titles and abstracts; every statement cites the papers it rests on).
+   Similar ongoing projects: the ongoing metascience-related NWO projects (after step 9) get text fingerprints with the
+   same model as the papers, run on this computer (`embed_projects.py`, which checks that its fingerprints match the
+   stored ones); a first grouping by similarity (`draft_project_groups.py`) was corrected and described by one Claude
+   reviewer and checked by a second (`project_groups_instructions.md`; result in `project_groups.json`, the fifth
+   argument of `build_inferences.py`).
 9. NWO grants (`fetch_nwo.py`, `build_funding.py`): all projects from NWO's open API NWOpen (CC0), linked to people on
    the site by ORCID, or by full name together with a shared organisation (ROR); ZonMw and other funders are not included.
 10. The History page: the reference lists of all papers on the site and details of the works they cite most, from

@@ -1,0 +1,383 @@
+{
+ "written_by": "Claude (Anthropic): grouped and described by one reviewer from a first grouping by text fingerprints, checked against the summaries by a second reviewer (156 of 159 placements fit, 3 partly; 6 descriptions corrected), 22 Nov 2026",
+ "groups": [
+  {
+   "name": "Strengthening local digital competence centres",
+   "aim": "Each project expands a digital competence centre (a support unit for research data and software) at one institution or group of institutions, or links these centres nationally, mostly by adding trainers in open research software and staff who help make research data work together across systems (interoperability).",
+   "differences": "They differ in the institutions served (general universities, university medical centres, universities of applied sciences, the NWO institutes, the philosophical universities and the Dutch Caribbean) and in emphasis: some focus on software training, others on data standards or on setting up a new centre, and one builds a national network of the centres' software trainers.",
+   "projects": [
+    "500.030.2401",
+    "500.030.2402",
+    "500.030.2403",
+    "500.030.2404",
+    "500.030.2405",
+    "500.030.2406",
+    "500.030.2407",
+    "500.030.2408",
+    "500.030.2409",
+    "500.030.2410",
+    "500.030.2411",
+    "500.030.2412",
+    "500.030.2414",
+    "500.030.2417",
+    "500.030.2418",
+    "500.030.2419",
+    "500.030.2420",
+    "500.030.2421",
+    "500.030.2422",
+    "500.030.2423",
+    "500.030.2450",
+    "500.030.2451",
+    "500.030.2452"
+   ]
+  },
+  {
+   "name": "Replicating influential findings in behavioural and social science",
+   "aim": "Each project repeats or re-analyses influential published findings in psychology, communication, economics or a related field, to test whether they hold.",
+   "differences": "They differ in topic (from eyewitness memory, persuasion and fear appeals to happiness and income, honesty, child development and fairness in apes) and in approach: new experiments run in many labs, field studies in other countries, or new analyses of existing data.",
+   "projects": [
+    "080.25002",
+    "080.25006",
+    "080.25010",
+    "080.25011",
+    "080.25012",
+    "080.25018",
+    "080.25026",
+    "080.25038",
+    "080.25050",
+    "080.25071",
+    "080.25073",
+    "080.25074",
+    "080.25078"
+   ]
+  },
+  {
+   "name": "Involving members of the public in research",
+   "aim": "The projects aim to make citizen science (research done together with members of the public) and other forms of public involvement in research more common, better supported or better understood.",
+   "differences": "Most build regional or thematic hubs, a national network or shared data platforms; others hold meetings on evaluating citizen science and on citizens researching their own health, study whether citizen science raises public trust in science, collect weather measurements from citizens, or open research labs to local residents.",
+   "projects": [
+    "110.110.010",
+    "500.010.2619",
+    "500.010.2623",
+    "500.020.2402",
+    "500.020.2405",
+    "500.020.2406",
+    "500.020.2407",
+    "500.020.2409",
+    "500.040.2456",
+    "500.060.2401",
+    "500.040.2414",
+    "500.040.2523"
+   ]
+  },
+  {
+   "name": "Strengthening Open Science Communities in the Netherlands",
+   "aim": "The projects support Open Science Communities, the local networks in which researchers and support staff learn open science practices from one another, and the national network that connects them.",
+   "differences": "Seven are grants to the community at one university (Amsterdam, Eindhoven, Nijmegen, Rotterdam, Twente, Utrecht and Wageningen), most of which say they will strengthen community management; one funds a national executive team, one a national barcamp (an event whose programme participants set on the day), and one a meeting to prepare a new community in The Hague.",
+   "projects": [
+    "050.050.2401",
+    "500.050.202301",
+    "500.050.202303",
+    "500.050.202307",
+    "500.050.202308",
+    "500.050.202310",
+    "500.050.202311",
+    "500.050.202312",
+    "500.010.2627",
+    "500.010.2638"
+   ]
+  },
+  {
+   "name": "Replicating influential findings in brain and health research",
+   "aim": "Each project repeats an influential published study in neuroscience, medicine or health research to test whether its finding holds.",
+   "differences": "They range from brain imaging and brain stimulation studies, through laboratory work on drugs, lab-grown mini-kidneys, a heart therapy and links between the brain and the immune response to cancer, to analyses of large population groups on processed food and on dementia risk.",
+   "projects": [
+    "080.25008",
+    "080.25017",
+    "080.25040",
+    "080.25044",
+    "080.25051",
+    "080.25058",
+    "080.25060",
+    "080.25070",
+    "080.25077"
+   ]
+  },
+  {
+   "name": "Making health and patient data reusable for research",
+   "aim": "The projects build platforms, tools or shared rules that let researchers (and, in one project, care providers) find, combine and reuse health and biomedical data, many of them following the FAIR principles (findable, accessible, interoperable, reusable).",
+   "differences": "They differ in the data concerned: long-running cohort studies, linked biomedical databases, eye scans and other medical images, combined social and medical data, data on harm from medication, patient experience reports, and privacy-safe synthetic (artificial) health data.",
+   "projects": [
+    "500.040.2412",
+    "500.040.2447",
+    "500.040.2457",
+    "500.040.2530",
+    "500.040.2483",
+    "500.040.2426",
+    "500.040.2454",
+    "500.040.2537",
+    "500.040.2498"
+   ]
+  },
+  {
+   "name": "Studying how open science spreads in institutions",
+   "aim": "These research projects study how widely open science practices are taken up by researchers and institutions, what helps or hinders their adoption, and how efforts to promote them can be evaluated or improved.",
+   "differences": "They focus on different settings and drivers: dentistry and biomedicine, universities of applied sciences, the social sciences as a whole, institutional policies on sharing data and code, the culture of research departments, Open Science Communities, the less visible work of librarians, data stewards and statisticians, and the evaluation of open science programmes.",
+   "projects": [
+    "110.110.007",
+    "110.110.011",
+    "110.110.014",
+    "110.110.028",
+    "110.110.035",
+    "110.110.037",
+    "110.110.042",
+    "110.110.046"
+   ]
+  },
+  {
+   "name": "Recognising and rewarding open science in careers",
+   "aim": "The projects aim to make open science count when researchers and PhD candidates are evaluated, recruited and rewarded.",
+   "differences": "Most work within particular institutions (Maastricht University, Radboud University, the Open Universiteit and the Dutch universities of religion and philosophy), through personnel policy, training of managers or conversation guidelines; one coordinates the national effort, and one works with PhD candidates across the country towards a policy brief.",
+   "projects": [
+    "500.060.101",
+    "500.070.2401",
+    "500.070.2409",
+    "500.070.2410",
+    "500.070.2420",
+    "500.010.2603"
+   ]
+  },
+  {
+   "name": "Open data platforms for natural science fields",
+   "aim": "Each project builds or improves a shared open platform that makes the data, and sometimes the analysis software, of one natural science field easier to find, access and reuse.",
+   "differences": "The fields are radio astronomy and astronomy, earth science, fungal biology, plant and crop science, and the ecology of breeding birds; some link Dutch data to international portals, others offer tools for entering or analysing data to wider groups, including the general public.",
+   "projects": [
+    "500.040.2415",
+    "500.040.2445",
+    "500.040.2440",
+    "500.040.2500",
+    "500.040.2534",
+    "500.040.2571"
+   ]
+  },
+  {
+   "name": "Opening up sources for humanities and social research",
+   "aim": "The projects make collections and data in history, heritage, archaeology and political communication openly accessible and reusable, through shared platforms, tools or community meetings.",
+   "differences": "They work with different material: archival records on Dutch slavery and the slave trade, historical maps, historical documents read by artificial intelligence text recognition, 3D models used in scholarship and museums, archaeological isotope data, and political texts and images.",
+   "projects": [
+    "500.040.2462",
+    "500.010.2640",
+    "500.040.2541",
+    "500.040.2466",
+    "500.150.2603",
+    "500.040.2468"
+   ]
+  },
+  {
+   "name": "Moving journals to diamond open access",
+   "aim": "Each project supports one academic journal in moving to, or working under, diamond open access: free to read and free for authors to publish in, without commercial publisher income.",
+   "differences": "The journals cover economics, nursing, healthcare ethics and philosophy, labour studies and literary studies; several are Dutch journals, and one is led by students.",
+   "projects": [
+    "36.2024.101",
+    "36.2024.102",
+    "36.2024.103",
+    "36.2024.104",
+    "36.2024.106"
+   ]
+  },
+  {
+   "name": "Open-source software tools for specific research fields",
+   "aim": "Each project builds or extends open-source software for particular research fields or kinds of research where existing tools were closed, fragmented or hard to use, so that this research becomes more accessible and reproducible.",
+   "differences": "The fields are legal research, monitoring of breathing in intensive care, simulation of body movement (biomechanics), space research on the orbits of spacecraft and planetary bodies, and, across disciplines, real-time data collection from laboratory equipment.",
+   "projects": [
+    "500.040.2512",
+    "500.040.2424",
+    "500.040.2551",
+    "500.040.2526",
+    "500.040.2488"
+   ]
+  },
+  {
+   "name": "Shared infrastructure for non-commercial university publishing",
+   "aim": "The projects build shared national systems and networks so that Dutch university presses and other research organisations can publish books and journals under diamond open access (free to read and free to publish).",
+   "differences": "One builds a national platform for open access books, one a shared catalogue and system for describing books, one a wider publication infrastructure for articles, journals and books, and one strengthens the network of university presses through training, mentoring and working groups.",
+   "projects": [
+    "500.040.2433",
+    "500.040.2420",
+    "500.040.2450",
+    "500.090.2501"
+   ]
+  },
+  {
+   "name": "Hands-on open science training for researchers",
+   "aim": "The projects organise workshops, meetings or schools where researchers, often early in their careers, or teachers learn to apply or teach open science practices in their own work.",
+   "differences": "They differ in audience and topic: members of Open Science Communities working with tools from the international FORRT network, PhD candidates building leadership in research communication, early-career brain researchers using open software and data, and teachers adapting a data science curriculum to the Dutch Caribbean.",
+   "projects": [
+    "500.010.2609",
+    "500.010.2636",
+    "500.010.2646",
+    "500.010.2641"
+   ]
+  },
+  {
+   "name": "Replicating influential findings in physical sciences and engineering",
+   "aim": "Each project repeats a key published experiment or model in the physical sciences or engineering to test whether its results hold.",
+   "differences": "The topics are forces in thin liquid films, flow in the Earth's mantle when tectonic plates sink, the reaction of hydrogen with molten iron oxides for cleaner steel making, and thermal comfort in naturally ventilated buildings in different climates.",
+   "projects": [
+    "080.25003",
+    "080.25016",
+    "080.25069",
+    "080.25075"
+   ]
+  },
+  {
+   "name": "Shared data standards within broad research domains",
+   "aim": "Each project adds specialists who help researchers across one broad research domain describe their data with shared vocabularies and standards, so that data from different sources can be combined and reused.",
+   "differences": "The domains are the natural and engineering sciences, the life sciences and health, and the social sciences and humanities.",
+   "projects": [
+    "500.030.2413",
+    "500.030.2415",
+    "500.030.2416"
+   ]
+  },
+  {
+   "name": "Free open-source alternatives for statistical modelling",
+   "aim": "Each project improves free, open-source statistical software so that researchers do not have to depend on expensive commercial packages or tools that are hard to use for advanced analyses.",
+   "differences": "Two improve packages that estimate models with unobserved (latent) variables (LATENT, a package for the R statistics language, and lavaan, for structural equation modelling); the third builds a set of tools and a shared web environment for causal inference, which separates cause and effect from mere correlation.",
+   "projects": [
+    "500.040.2469",
+    "500.040.2516",
+    "500.040.2467"
+   ]
+  },
+  {
+   "name": "Helping researchers do better replication studies",
+   "aim": "Rather than replicating one finding, these projects aim to improve how replication studies are planned and carried out.",
+   "differences": "One checks the power calculations (how many observations a study needs) in five large replication projects; the other two are meetings that prepare the first large collaborative replication project in criminology and teach early-career management researchers to design replication studies.",
+   "projects": [
+    "080.25005",
+    "500.010.2626",
+    "500.010.2642"
+   ]
+  },
+  {
+   "name": "Testing and renewing peer review",
+   "aim": "The projects try out or assess new ways of reviewing research: making review more transparent, supporting the review of preprints (papers shared before formal publication), or adopting the publish-review-curate model of open scholarly communication.",
+   "differences": "One studies the advantages and disadvantages of transparent peer review, one builds an AI reviewer that checks preprints for reporting, method and transparency issues, and one sets up publish-review-curate workflows with Dutch research communities.",
+   "projects": [
+    "110.110.036",
+    "110.110.034",
+    "500.040.2555"
+   ]
+  },
+  {
+   "name": "Open science where data are sensitive or qualitative",
+   "aim": "The projects look for ways to share and reuse research data and to practise open science in research where privacy, confidentiality or ethics make openness difficult.",
+   "differences": "One develops methods and a search platform for reusing qualitative management data without sharing the raw data; the other two are meetings for qualitative researchers and for early-career researchers in criminology and related fields.",
+   "projects": [
+    "406.21.EB.014",
+    "500.010.2621",
+    "500.010.2629"
+   ]
+  },
+  {
+   "name": "Sustaining and assessing open research software",
+   "aim": "The projects aim to make research software more sustainable and its value easier to see, through shared platforms, guidelines, measures and a national programme.",
+   "differences": "One expands the Research Software Directory with peer review of software and community governance, one develops measures of impact, guidelines and training for good open software practice, and one is a national programme on research software sustainability for which no summary is available.",
+   "projects": [
+    "500.040.2416",
+    "110.110.039",
+    "500.100.001"
+   ]
+  },
+  {
+   "name": "Improving shared research data repositories",
+   "aim": "The projects improve repository systems that several Dutch institutions use to store and share research data.",
+   "differences": "One connects the Yoda system to other infrastructure such as the national supercomputer, one extends the Djehuty platform to better share software and AI models, and one funds study visits abroad to learn how to run the DataverseNL service better.",
+   "projects": [
+    "500.040.2489",
+    "500.040.2554",
+    "500.140.26003"
+   ]
+  },
+  {
+   "name": "Testing whether open science practices improve reliability",
+   "aim": "Both projects study whether specific open science practices make research results more reliable and reproducible.",
+   "differences": "One examines across disciplines whether practices such as preregistration (registering a study plan in advance), open data and new review formats help results showing no effect get published; the other evaluates preregistration of precise hypotheses and multiverse analysis (running all plausible analyses instead of one), and how using them changes students' attitudes.",
+   "projects": [
+    "110.110.023",
+    "110.110.029"
+   ]
+  },
+  {
+   "name": "Monitoring public engagement within open science",
+   "aim": "Both projects develop ways to make citizen science and public engagement visible in the systems used to monitor progress in open science.",
+   "differences": "One identifies barriers and tests indicators for environments that enable citizen science and societal engagement; the other develops strategies to capture the variety and impact of public engagement activities, partly to support recognition of the researchers who do them.",
+   "projects": [
+    "110.110.015",
+    "110.110.033"
+   ]
+  },
+  {
+   "name": "Checking whether shared code and data reproduce results",
+   "aim": "Both projects help verify that research results can be reproduced from the code and data that researchers share.",
+   "differences": "One studies which features of research software predict success when the CODECHECK service re-runs code; the other builds tools to improve and validate reproducibility packages for research with secondary and sensitive data, together with educational material.",
+   "projects": [
+    "110.110.017",
+    "500.040.2559"
+   ]
+  },
+  {
+   "name": "Training in open-source acoustics software",
+   "aim": "Both projects are training events by teams at Eindhoven University of Technology that teach people to use open-source software for acoustics research and build a community around it.",
+   "differences": "One is a one-day meeting for users of the CHORAS room acoustics platform; the other is a five-day international autumn school for PhD students, with tracks on machine learning and on research software.",
+   "projects": [
+    "500.010.2639",
+    "500.500.2521"
+   ]
+  },
+  {
+   "name": "Expanding OpenML for open AI research",
+   "aim": "Both projects develop OpenML, an open platform for sharing datasets, AI models and experiments, so that research driven by artificial intelligence becomes transparent and reproducible.",
+   "differences": "One improves OpenML's usability, descriptions of data and links with the open science community; the other turns it into a wider infrastructure connected to Dutch and international data and computing facilities.",
+   "projects": [
+    "500.040.2501",
+    "500.040.2503"
+   ]
+  },
+  {
+   "name": "Open information about Dutch research outputs",
+   "aim": "Both projects build shared open infrastructure that collects and connects information on what Dutch research produces.",
+   "differences": "BROCCOLI gathers research information for monitoring publisher deals, monitoring open science and responsible research evaluation; the Dutch Repository Federation links institutional repositories to collect, preserve and make findable the full texts of Dutch publications.",
+   "projects": [
+    "500.040.2446",
+    "500.040.2443"
+   ]
+  },
+  {
+   "name": "Research data events at university medical centres",
+   "aim": "Both are events organised by teams at Dutch university medical centres that help researchers and support staff improve how they manage, describe and share research data.",
+   "differences": "FAIR clinics (University Medical Center Groningen) offers hands-on sessions in which participants work on their own data and software; Research Data Day (Leiden University Medical Center) is an annual meeting with a market of services and sessions for people who work with research data.",
+   "projects": [
+    "500.010.2632",
+    "500.010.2628"
+   ]
+  }
+ ],
+ "on_their_own": [
+  "406.23.PPO.019",
+  "VI.C.231.102",
+  "ICT.TDCC.001.005",
+  "500.040.2487",
+  "500.040.2434",
+  "500.040.2435",
+  "500.010.2617",
+  "500.010.2606",
+  "500.010.2645",
+  "500.010.2637",
+  "500.010.2648",
+  "500.010.2618",
+  "500.010.2624",
+  "500.010.2625"
+ ]
+}

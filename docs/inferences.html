@@ -22,6 +22,7 @@
   .goal .proj { border-left: 3px solid var(--series-1); padding-left: 10px; }
   details.cl { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; background: var(--surface-1); }
   details.cl summary { cursor: pointer; font-weight: 600; }
+  #projects { overflow-wrap: anywhere; }   /* long titles and file names must not widen the page on phones */
   .note { border-left: 3px solid var(--axis); padding: 6px 12px; color: var(--text-secondary); font-size: 0.9rem; }
 </style>
 </head>
@@ -126,6 +127,25 @@
   <section class="card" id="trendmethod">
     <h2>How the trends were estimated</h2>
     <p class="sub" id="trendmethodtext"></p>
+  </section>
+
+  <section class="card" id="projects">
+    <h2>Similar ongoing projects</h2>
+    <p class="sub">The <span id="nproj"></span> metascience-related NWO projects that are running now or will start
+    soon (started in 2023 or later, or ending in the future; NWO's open data give no end date for recent projects),
+    grouped by shared aim. Only NWO grants are included, not ZonMw, EU or university grants. The groups were made in
+    two steps: the projects were first grouped by the similarity of their titles and summaries (the same text
+    fingerprints as for the papers), then Claude, an AI assistant, read every summary, corrected the groups and wrote
+    the descriptions; a second Claude reviewer checked every group against the summaries
+    (instructions: <code>scripts/project_groups_instructions.md</code>). Project leaders are linked when they are on
+    this site. Under each project: the papers on this site closest in content, by the same fingerprints.</p>
+    <div id="pgroups"><p class="loading">Not available yet.</p></div>
+    <h3 style="margin-top:22px">Similar projects in different groups</h3>
+    <p class="sub">Pairs of projects whose titles and summaries are alike, but that are in different groups, come from
+    different funding schemes, and have no organisation or team member in common.</p>
+    <div id="ppairs" class="sugg"></div>
+    <details class="cl" style="margin-top:16px"><summary>Projects without a similar ongoing project
+    (<span id="nalone"></span>)</summary><div id="palone"></div></details>
   </section>
 
   <section class="card">
@@ -391,8 +411,35 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
       ${q.people && q.people.length ? `<p class="small"><b>People:</b> ${q.people.map(esc).join(", ")}</p>` : ""}${refs(q.papers || [])}</div>`).join("")}</details>`).join("");
   }
 
+  // ---- similar ongoing projects ----
+  function drawProjects() {
+    const P = inf.projects;
+    if (!P) return;
+    const it = P.items;
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    document.getElementById("nproj").textContent = fmt(P.n);
+    const mine = (x) => !!me && (it[x].pp || []).includes(me.id);
+    const lead = (x) => it[x].ld.map((m) => `${m.id && byP[m.id] ? personLink(m.id) : esc(m.n)}${m.o ? ` (${esc(m.o)})` : ""}`).join(", ");
+    const meta = (x) => `${esc(it[x].g || it[x].s)} · start ${it[x].b ? MONTHS[+it[x].b.slice(5, 7) - 1] + " " + it[x].b.slice(0, 4) : "unknown"}` +
+      ` · ${it[x].n} team member${it[x].n === 1 ? "" : "s"}`;
+    const proj = (x) => `<li style="margin-bottom:8px"><b>${esc(it[x].t)}</b>${mine(x) ? '<span class="you">your project</span>' : ""}
+      <br><span class="small">${lead(x)}</span><br><span class="small muted">${meta(x)}</span>
+      <details><summary class="small muted">Closest papers on this site</summary><ul class="small">${it[x].near.map((w) => `<li>${paperLink(w)}</li>`).join("")}</ul></details></li>`;
+    const hasMine = (g) => g.projects.some(mine);
+    const groups = P.groups.slice().sort((a, b) => hasMine(b) - hasMine(a));
+    document.getElementById("pgroups").innerHTML = groups.map((g) => `<details class="cl"${hasMine(g) ? " open" : ""}>
+      <summary>${esc(g.name)} <span class="muted small">(${g.projects.length} projects)</span>${hasMine(g) ? '<span class="you">your project</span>' : ""}</summary>
+      <p>${esc(g.aim)}</p><p class="small muted">${esc(g.differences)}</p>
+      <ul>${g.projects.map(proj).join("")}</ul></details>`).join("");
+    document.getElementById("ppairs").innerHTML = P.pairs.map((d) => `<div class="c"><h3>${esc(it[d.a].t)}</h3>
+      <p class="small">${lead(d.a)}</p><p style="margin:6px 0"><i>and</i></p><h3>${esc(it[d.b].t)}</h3>
+      <p class="small">${lead(d.b)}</p><p class="small muted">similarity ${d.s.toFixed(2)}</p></div>`).join("");
+    document.getElementById("nalone").textContent = P.alone.length;
+    document.getElementById("palone").innerHTML = `<ul>${P.alone.map(proj).join("")}</ul>`;
+  }
+
   const all = () => { drawComm(); drawGrowth(); drawEntries(); drawTrend(); drawKw(); };
-  all(); drawGoals(); onThemeChange(all);
+  all(); drawGoals(); drawProjects(); onThemeChange(all);
 }).catch((e) => failed(document.getElementById("suggest"), e));
 </script>
 </body>
