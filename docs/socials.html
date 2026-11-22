@@ -10,6 +10,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="assets/common.js"></script>
 <style>
+  :root { --bluesky: #0085FF; --mastodon: #563ACC; }
+  @media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) { --mastodon: #5F44D8; } }
+  :root[data-theme="dark"] { --mastodon: #5F44D8; }
+  .pl-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.88rem; color: var(--text-secondary); margin: 0 0 8px; }
+  .pl-legend span, h3 .pl { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
   .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
   .two h3 { font-size: 1rem; margin: 0 0 6px; }
   .cloud { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; line-height: 1.25; padding: 4px 0; }
@@ -59,15 +65,16 @@
     are not counted, and neither are posts whose only term is "peer review" or "impact factor", which almost every
     academic uses. Only people who regularly post about metascience are named on this page (see About).</p>
     <div class="two">
-      <div><h3>Bluesky</h3><table class="data" id="top-bluesky"></table></div>
-      <div><h3>Mastodon</h3><table class="data" id="top-mastodon"></table></div>
+      <div><h3><span class="pl"><span class="dot" style="background:var(--bluesky)"></span>Bluesky</span></h3><table class="data" id="top-bluesky"></table></div>
+      <div><h3><span class="pl"><span class="dot" style="background:var(--mastodon)"></span>Mastodon</span></h3><table class="data" id="top-mastodon"></table></div>
     </div>
   </section>
 
   <section class="card">
     <h2>Terms by theme</h2>
     <p class="sub">How often each metascience term appears in the posts, grouped in five themes. A post can contain
-    several terms. Choose a theme, and whether to count posts or the number of people who used the term.</p>
+    several terms. Choose a theme, and whether to count posts or the number of people who used the term (people on
+    both platforms are counted for each).</p>
     <div class="controls">
       <div class="seg" id="theme-sel"></div>
       <div class="seg" id="tmeasure"><button aria-pressed="true" data-v="posts">Posts</button><button aria-pressed="false" data-v="people">People</button></div>
@@ -88,8 +95,9 @@
     <p class="sub">Posts per month with a term of each theme, from 2020 (the month of download is left out, because it is
     not complete). Most people started on Mastodon in late 2022
     and on Bluesky in 2023 or 2024, so the counts mostly show how many people were active. The share of all their posts
-    is a better measure of interest.</p>
+    on that platform is a better measure of interest (shown for months with at least 100 posts on the platform).</p>
     <div class="controls"><div class="seg" id="mmode"><button aria-pressed="true" data-v="count">Posts</button><button aria-pressed="false" data-v="share">Share of all their posts</button></div></div>
+    <div class="pl-legend"><span><span class="dot" style="background:var(--bluesky)"></span>Bluesky</span><span><span class="dot" style="background:var(--mastodon)"></span>Mastodon</span></div>
     <div class="multiples" id="mult"></div>
   </section>
 
@@ -124,9 +132,9 @@
   <section class="card">
     <h2>Who interacts with whom</h2>
     <p class="sub">A line joins two people when one mentioned (@name), reposted or replied to the other, in any of their
-    posts. Thicker lines mean more interactions. Blue lines join people who also wrote a paper together that is on this
+    posts. Thicker lines mean more interactions. Orange lines join people who also wrote a paper together that is on this
     site; grey lines join people without a joint paper on this site (they may have written other papers together).
-    Circles are larger for people with more metascience posts. On Mastodon a reply always mentions the other person; on
+    Circles are larger for people with more metascience posts, and coloured by the platform the person uses. On Mastodon a reply always mentions the other person; on
     Bluesky, replies are counted for metascience posts only. Scroll to zoom, drag to move, hover for details, click a
     person to see who they interact with.</p>
     <div class="controls">
@@ -136,6 +144,7 @@
       <input type="search" id="nsearch" placeholder="Find a person…" aria-label="Find a person in the network">
       <span class="muted small" id="ncount"></span>
     </div>
+    <div class="pl-legend"><span><span class="dot" style="background:var(--bluesky)"></span>on Bluesky</span><span><span class="dot" style="background:var(--mastodon)"></span>on Mastodon</span><span><span class="dot" style="background:linear-gradient(90deg,var(--bluesky) 50%,var(--mastodon) 50%)"></span>on both</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--series-2)"></span>also a joint paper on this site</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--other)"></span>no joint paper on this site</span></div>
     <div class="split">
       <div style="margin:0"><canvas class="net" id="net"></canvas></div>
       <aside class="card panel" style="margin:0" id="npanel">
@@ -156,6 +165,8 @@ Promise.all([load("socials")]).then(([S]) => {
   const themeNames = S.themes.map((t) => t.name);
   const tcolor = (name) => seriesColor(themeNames.indexOf(name));
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const PLATFORMS = [["bluesky", "Bluesky"], ["mastodon", "Mastodon"]];
+  const plColor = (pl) => cssVar(`--${pl}`);
   document.getElementById("lede").innerHTML =
     `What the people on this site who work in the Netherlands now post about metascience on Bluesky and Mastodon. We found
     ${fmt(S.n_accounts)} accounts of ${fmt(S.n_people)} such people and read their ${fmt(S.n_own_posts)} public posts and
@@ -188,15 +199,13 @@ Promise.all([load("socials")]).then(([S]) => {
     const rows = [];
     S.themes.forEach((t) => { if (theme === "all" || theme === t.name) t.terms.forEach((x) => rows.push(Object.assign({ theme: t.name }, x))); });
     rows.sort((a, b) => a[measure] - b[measure]);
-    const traces = (theme === "all" ? themeNames : [theme]).map((th) => {
-      const r = rows.filter((x) => x.theme === th);
-      return { type: "bar", orientation: "h", name: cap(th), y: r.map((x) => x.name), x: r.map((x) => x[measure]),
-        marker: { color: tcolor(th) }, hovertemplate: `<b>%{y}</b><br>%{x} ${measure}<extra>${esc(cap(th))}</extra>` };
-    });
-    const h = Math.max(320, rows.length * 20 + 80);
+    const traces = PLATFORMS.map(([pl, label]) => ({ type: "bar", orientation: "h", name: label, y: rows.map((x) => x.name),
+      x: rows.map((x) => x.by[pl][measure]), customdata: rows.map((x) => cap(x.theme)), marker: { color: plColor(pl) },
+      hovertemplate: `<b>%{y}</b><br>%{x} ${measure} on ${label}<br>%{customdata}<extra></extra>` }));
+    const h = Math.max(320, rows.length * (measure === "people" ? 26 : 20) + 100);
     document.getElementById("terms").style.height = h + "px";
-    Plotly.react("terms", traces, baseLayout({ barmode: "stack", height: h, showlegend: theme === "all",
-      legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0 }, margin: { l: 10, r: 20, t: theme === "all" ? 60 : 10, b: 40 },
+    Plotly.react("terms", traces, baseLayout({ barmode: measure === "people" ? "group" : "stack", height: h, showlegend: true,
+      legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0, traceorder: "normal" }, margin: { l: 10, r: 20, t: 50, b: 40 },
       yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map((x) => x.name) }),
       xaxis: Object.assign(baseLayout().xaxis, { title: measure === "posts" ? "posts" : "people" }) }), PLOT_CONFIG);
   }
@@ -230,13 +239,16 @@ Promise.all([load("socials")]).then(([S]) => {
       const series = S.months[key] || {};
       const total = Object.values(series).reduce((s, x) => s + x, 0);
       const div = document.createElement("div"); div.className = "m";
-      const col = key === "any" ? cssVar("--text-secondary") : tcolor(key);
-      div.innerHTML = `<h3><span class="swatch" style="background:${col}"></span>${esc(label)}</h3><div class="muted small">${fmt(total)} posts</div><div class="sp"></div>`;
+      div.innerHTML = `<h3>${esc(label)}</h3><div class="muted small">${fmt(total)} posts</div><div class="sp"></div>`;
       el.appendChild(div);
-      const y = months.map((m) => { const n = series[m] || 0, t = S.month_total[m] || 0; return mmode === "share" ? (t >= 200 ? 100 * n / t : null) : n; });
-      Plotly.newPlot(div.querySelector(".sp"), [{ x: months.map((m) => m + "-15"), y, type: "scatter", mode: "lines",
-        line: { color: col, width: 2 }, connectgaps: false,
-        hovertemplate: `%{x|%b %Y}: %{y:${mmode === "share" ? ".1f" : ".0f"}}${mmode === "share" ? "% of all posts" : " posts"}<extra></extra>` }],
+      const traces = PLATFORMS.map(([pl, plabel]) => {
+        const ser = (S.months_by[pl] || {})[key] || {}, tot = S.month_total_by[pl] || {};
+        const y = months.map((m) => { const n = ser[m] || 0, t = tot[m] || 0; return mmode === "share" ? (t >= 100 ? 100 * n / t : null) : n; });
+        return { x: months.map((m) => m + "-15"), y, type: "scatter", mode: "lines", name: plabel,
+          line: { color: plColor(pl), width: 2 }, connectgaps: false,
+          hovertemplate: `${plabel}, %{x|%b %Y}: %{y:${mmode === "share" ? ".1f" : ".0f"}}${mmode === "share" ? "% of all posts" : " posts"}<extra></extra>` };
+      });
+      Plotly.newPlot(div.querySelector(".sp"), traces,
         baseLayout({ margin: { l: 34, r: 6, t: 4, b: 22 }, showlegend: false, height: 140,
           xaxis: Object.assign(baseLayout().xaxis, { type: "date", nticks: 4 }),
           yaxis: Object.assign(baseLayout().yaxis, { nticks: 3, rangemode: "tozero" }) }),
@@ -287,16 +299,17 @@ Promise.all([load("socials")]).then(([S]) => {
     <p>Most used: ${p.top.map((t) => `${esc(t.name)} (${fmt(t.posts)})`).join(", ")}</p>
     ${p.unusual.length ? `<p>Unusually often: ${p.unusual.map((t) => `${esc(t.name)} (${t.times}× usual)`).join(", ")}</p>` : ""}
     ${(p.popular || []).map((x) => `<blockquote>${esc(x.text)}<span class="who"><a href="people.html#${encodeURIComponent(x.id)}">${esc(x.n)}</a>
-      · <a href="${esc(x.url)}" target="_blank" rel="noopener">${x.platform === "bluesky" ? "Bluesky" : "Mastodon"}, ${esc(dfmt(x.date))}</a>
+      · <span class="dot" style="background:var(--${x.platform});width:8px;height:8px"></span> <a href="${esc(x.url)}" target="_blank" rel="noopener">${x.platform === "bluesky" ? "Bluesky" : "Mastodon"}, ${esc(dfmt(x.date))}</a>
       · ${fmt(x.likes)} likes · ${fmt(x.reposts)} reposts</span></blockquote>`).join("")}</div>`).join("");
 
   // ---- shared links ----
   function drawLinks() {
     const r = S.links.slice().reverse();
-    Plotly.react("links", [{ type: "bar", orientation: "h", y: r.map((x) => x.site), x: r.map((x) => x.posts),
-      customdata: r.map((x) => x.people), marker: { color: cssVar("--series-1") },
-      hovertemplate: "<b>%{y}</b><br>%{x} posts by %{customdata} people<extra></extra>" }],
-      baseLayout({ height: 560, margin: { l: 10, r: 20, t: 10, b: 40 }, xaxis: Object.assign(baseLayout().xaxis, { title: "posts" }) }), PLOT_CONFIG);
+    Plotly.react("links", PLATFORMS.map(([pl, label]) => ({ type: "bar", orientation: "h", name: label, y: r.map((x) => x.site),
+      x: r.map((x) => x.by[pl]), customdata: r.map((x) => [x.posts, x.people]), marker: { color: plColor(pl) },
+      hovertemplate: `<b>%{y}</b><br>%{x} posts on ${label}<br>%{customdata[0]} posts by %{customdata[1]} people in all<extra></extra>` })),
+      baseLayout({ barmode: "stack", height: 580, showlegend: true, legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0, traceorder: "normal" },
+        margin: { l: 10, r: 20, t: 40, b: 40 }, xaxis: Object.assign(baseLayout().xaxis, { title: "posts" }) }), PLOT_CONFIG);
   }
 
   document.getElementById("shared").innerHTML = S.shared_papers.map((p) => `<li><a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>
@@ -353,19 +366,26 @@ Promise.all([load("socials")]).then(([S]) => {
     const touches = (l) => selected && (l.source.id === selected.id || l.target.id === selected.id);
     ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, NW, NH);
     ctx.translate(transform.x, transform.y); ctx.scale(transform.k, transform.k);
-    const blue = cssVar("--series-1"), grey = cssVar("--other");
+    const joint = cssVar("--series-2"), grey = cssVar("--other");   // orange: not one of the two platform colours
     // grey lines first, blue (joint paper) on top; with a person selected, only their lines are strong
     for (const co of [false, true]) for (const l of links) {
       if (l.co !== co) continue;
       ctx.globalAlpha = selected ? (touches(l) ? 0.95 : 0.06) : (co ? 0.85 : 0.45);
-      ctx.strokeStyle = co ? blue : grey;
+      ctx.strokeStyle = co ? joint : grey;
       ctx.lineWidth = Math.min(6, 0.6 + Math.log2(l.w)) / Math.sqrt(transform.k);
       ctx.beginPath(); ctx.moveTo(l.source.x, l.source.y); ctx.lineTo(l.target.x, l.target.y); ctx.stroke();
     }
-    const fill = cssVar("--text-secondary"), ring = cssVar("--surface-1");
+    const cb = plColor("bluesky"), cm = plColor("mastodon"), ring = cssVar("--surface-1");
     for (const n of nodes) {
       ctx.globalAlpha = selected && n !== selected && !nb.has(n.id) ? 0.15 : 1;
-      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 2 * Math.PI); ctx.fillStyle = fill; ctx.fill();
+      const pls = n.p.pl || [];
+      if (pls.length === 2) {   // on both platforms: left half Bluesky, right half Mastodon
+        ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.arc(n.x, n.y, n.r, Math.PI / 2, 3 * Math.PI / 2); ctx.closePath(); ctx.fillStyle = cb; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.arc(n.x, n.y, n.r, -Math.PI / 2, Math.PI / 2); ctx.closePath(); ctx.fillStyle = cm; ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 2 * Math.PI); ctx.fillStyle = pls[0] === "mastodon" ? cm : cb; ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 2 * Math.PI);
       ctx.lineWidth = (n === selected || n === hovered ? 2.5 : 1) / transform.k;
       ctx.strokeStyle = n === selected || n === hovered ? cssVar("--text-primary") : ring; ctx.stroke();
     }

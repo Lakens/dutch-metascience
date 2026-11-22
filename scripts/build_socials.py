@@ -14,8 +14,8 @@ interacts with whom), and only when they are in the feeds (select_feed_accounts.
 replies are counted, not reposts.
 
 Parts:
- - per theme and term: number of posts and of people (social_terms.py);
- - per month and theme: number of posts, and all own posts that month (for shares);
+ - per theme and term: number of posts and of people (social_terms.py), in total and per platform;
+ - per month and theme: number of posts, and all own posts that month (for shares), in total and per platform;
  - terms in posts compared with terms in the titles and abstracts of the papers on the site;
  - the busiest weeks: the weeks with the most metascience posts (each the highest within three weeks on either
    side), compared with the median week of the half year before, with the terms used most and unusually often;
@@ -89,6 +89,7 @@ hit_uris = {h["uri"] for h in hits}
 
 # ---------------------------------------------------------------- own posts per month (all posts, for shares)
 month_total = collections.Counter()
+month_total_pl = collections.defaultdict(collections.Counter)   # platform -> month -> own posts
 popularity = {}   # metascience post -> (likes, reposts) at download time
 did_owner = {}    # Bluesky account identifier (did) -> person, to know whose post a reply answers
 for fn in glob.glob(os.path.join(posts_dir, "*.jsonl")):
@@ -100,11 +101,14 @@ for fn in glob.glob(os.path.join(posts_dir, "*.jsonl")):
             did_owner.setdefault(p["uri"].split("/")[2], owner_of_file.get(os.path.basename(fn)[:-6]))
         if not p["repost"] and p.get("date"):
             month_total[p["date"][:7]] += 1
+            month_total_pl[platform_of_file[os.path.basename(fn)[:-6]]][p["date"][:7]] += 1
             if p.get("uri") in hit_uris:
                 popularity[p["uri"]] = (p.get("likes") or 0, p.get("reposts") or 0)
 
 # ---------------------------------------------------------------- metascience posts
 term_posts, term_people = collections.Counter(), collections.defaultdict(set)
+term_pl, term_people_pl = collections.defaultdict(collections.Counter), collections.defaultdict(lambda: collections.defaultdict(set))
+month_theme_pl = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
 theme_posts, theme_people = collections.Counter(), collections.defaultdict(set)
 month_theme = collections.defaultdict(collections.Counter)
 week_total, week_term = collections.Counter(), collections.defaultdict(collections.Counter)
@@ -115,8 +119,13 @@ def week_of(d):
 for h in hits:
     who = owner_of_file[h["account"]]
     m, w = h["date"][:7], week_of(h["date"])
+    pl = platform_of_file[h["account"]]
     for t in h["terms"]:
         term_posts[t] += 1; term_people[t].add(who)
+        term_pl[pl][t] += 1; term_people_pl[pl][t].add(who)
+    for th in {THEME_OF[t] for t in h["terms"]}:
+        month_theme_pl[pl][th][m] += 1
+    month_theme_pl[pl]["any"][m] += 1
     for th in {THEME_OF[t] for t in h["terms"]}:
         theme_posts[th] += 1; theme_people[th].add(who); month_theme[th][m] += 1
     month_theme["any"][m] += 1
@@ -145,6 +154,8 @@ for th, terms in THEMES.items():
                            paper_share=round(100 * paper_theme[th] / n_papers, 2),
                            post_share=round(100 * theme_posts[th] / n_meta, 2),
                            terms=[dict(name=t, posts=term_posts[t], people=len(term_people[t]),
+                                       by={pl: dict(posts=term_pl[pl][t], people=len(term_people_pl[pl][t]))
+                                           for pl in ("bluesky", "mastodon")},
                                        post_share=round(100 * term_posts[t] / n_meta, 2),
                                        paper_share=round(100 * paper_terms[t] / n_papers, 2),
                                        papers=paper_terms[t]) for t in terms]))
@@ -228,6 +239,7 @@ servers |= {"mastodon.social", "fediscience.org", "mstdn.social", "mastodon.onli
 site_doi = {p["doi"].lower(): p for p in papers if p.get("doi")}
 DOI = re.compile(r"(10\.\d{4,9}/[^\s?#]+)")
 dom_posts, dom_people = collections.Counter(), collections.defaultdict(set)
+dom_pl = collections.defaultdict(collections.Counter)
 doi_posts, doi_people = collections.Counter(), collections.defaultdict(set)
 for h in hits:
     who = owner_of_file[h["account"]]
@@ -255,10 +267,11 @@ for h in hits:
             dom = "Bluesky posts"
         seen.add(dom)
     for dom in seen:
-        dom_posts[dom] += 1; dom_people[dom].add(who)
+        dom_posts[dom] += 1; dom_people[dom].add(who); dom_pl[platform_of_file[h["account"]]][dom] += 1
     for d in dois:
         doi_posts[d] += 1; doi_people[d].add(who)
-links_out = [dict(site=d, posts=n, people=len(dom_people[d])) for d, n in dom_posts.most_common(60)
+links_out = [dict(site=d, posts=n, people=len(dom_people[d]), by={pl: dom_pl[pl][d] for pl in ("bluesky", "mastodon")})
+             for d, n in dom_posts.most_common(60)
              if len(dom_people[d]) >= 3][:25]
 # papers on this site linked by at least two people (one person sharing their own paper is not shared widely)
 shared_papers = [dict(id=site_doi[d]["id"], t=site_doi[d]["t"], y=site_doi[d]["y"], doi=site_doi[d]["doi"], posts=n,
@@ -329,7 +342,10 @@ in_net = {x for e in edges_out for x in (e["a"], e["b"])}
 meta_by_person = collections.Counter()
 for f, n in poster.items():
     meta_by_person[owner_of_file[f]] += n
-nodes_out = [dict(id=pid, n=people[pid]["n"], k=people[pid]["k"], posts=meta_by_person[pid],
+platforms_of = collections.defaultdict(set)
+for f, pid in owner_of_file.items():
+    platforms_of[pid].add(platform_of_file[f])
+nodes_out = [dict(id=pid, n=people[pid]["n"], k=people[pid]["k"], posts=meta_by_person[pid], pl=sorted(platforms_of[pid]),
                   links=[account_link(e["kind"], e["account"]) for e in sorted(every[pid], key=lambda e: e["kind"])
                          if e["account"].lower() in {v["account"].lower() for v in final.get(pid, {}).values()}])
              for pid in sorted(in_net)]
@@ -339,6 +355,8 @@ out = dict(
     n_own_posts=sum(month_total.values()), n_meta_posts=n_meta, n_meta_people=len({owner_of_file[h["account"]] for h in hits}),
     n_papers=n_papers, first_month=min(month_total), last_month=max(month_total),
     themes=themes_out, months={k: dict(v) for k, v in month_theme.items()}, month_total=dict(month_total),
+    months_by={pl: {th: dict(c) for th, c in v.items()} for pl, v in month_theme_pl.items()},
+    month_total_by={pl: dict(c) for pl, c in month_total_pl.items()},
     peaks=peaks_out, clouds=clouds, links=links_out, shared_papers=shared_papers, top=top,
     network=dict(nodes=nodes_out, edges=edges_out))
 with open(os.path.join(data_dir, "socials.json"), "w", encoding="utf-8") as f:
