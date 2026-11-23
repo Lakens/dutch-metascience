@@ -48,8 +48,17 @@
       search below (<span id="nnotpaper">some</span> items left out).</li>
       <li><b>A search of OpenAlex</b> added every paper since 2005 with an author at a Dutch institution whose title or
       abstract uses metascience terms (such as replicability, preregistration, publication bias, research integrity,
-      Bayes factor, scientometrics, research assessment).</li>
-      <li><b>An AI judged every paper</b> (about 50,000 titles and abstracts): is it metascience, and if so, which
+      Bayes factor, scientometrics, research assessment). In November 2026 terms on research funding and grant review,
+      reporting standards, research data and software, preprints and scholarly publishing, research careers and
+      research evaluation were added (the full list is in <code>scripts/terms.py</code>).</li>
+      <li><b>More papers by frequent authors.</b> For people who are not on the starting list, the search finds only
+      papers that use one of its terms. For everyone not on the starting list with at least two metascience papers on
+      the site, their other papers with an author at a Dutch institution were added when OpenAlex gives them one of
+      238 keywords. The keywords were chosen from the data: each is on at least 10 papers on the site, and in the full
+      publication lists of the starting list at least 60% of the papers with that keyword were judged metascience (the
+      list is in <code>scripts/author_lists_input.json</code>). This was done once; people who reached two papers only
+      through these added papers were not looked up again.</li>
+      <li><b>An AI judged every paper</b> (about 63,000 titles and abstracts): is it metascience, and if so, which
       of eight themes? Papers it called metascience were then checked a second time with stricter instructions, and
       every remaining paper was then checked once more by reading it (see below); <span id="npapers">about 6,300</span> remain. The model was gpt-oss:20b, run in Ollama on a GPU of SURF Research
       Cloud, with written instructions that say what counts (for example: a replication of a published finding, a
@@ -61,7 +70,9 @@
       cluster (for example, a cluster on hypothesis testing in general was called "Bayesian"), so all 20 names were
       revised by Claude (Anthropic) after reading each cluster's most distinctive title words, its most common
       keywords and topics, its most cited titles and a random sample of titles. One cluster has no single subject and
-      is called "Mixed metascience topics". The names and the reasons are in <code>scripts/cluster_names.json</code>.</li>
+      is called "Mixed metascience topics". The names and the reasons are in <code>scripts/cluster_names.json</code>.
+      Papers added later (November 2026) joined the cluster whose centre is nearest to their fingerprint, and the map
+      was computed again starting from the earlier positions, so the clusters and their names stayed the same.</li>
       <li><b>Which papers and people are on the site</b>: metascience papers with an author at a Dutch institution,
       and everyone at a Dutch institution on at least one of them. Papers by people on the starting list are shown
       only when they have a Dutch institution, or when OpenAlex has no institution for that person on that paper
@@ -100,11 +111,25 @@
     quality, each reviewer also judged 15 papers whose answer had been decided beforehand (agreement 94%; it never
     called a paper "not metascience" when the decided answer was "metascience"), and 115 papers were judged by two
     reviewers (same verdict for 106; never "metascience" against "not metascience"). A sample of 40 removals was
-    checked again: 39 were right. In total <span id="nexcl">571</span> papers were removed; the list, with a reason for
-    each, is <code>scripts/excluded_by_hand.csv</code>.</p>
-    <p><b>What remains.</b> Papers judged "unclear" (about one in eight, for example a replication of a genetic
-    association, or a critique of one specific meta-analysis) stay on the site. From the checks above, we expect that
-    roughly 1 to 2% of the papers shown are clearly not metascience. The theme of each paper and its explanation
+    checked again: 39 were right. The papers added in November 2026 (about 3,500) were checked in the same way by 9
+    more reviewers. Their agreement with the decided answers was lower (81%), but almost all differences were
+    "unclear" where the decided answer was "not metascience", so such papers stay on the site; again no reviewer
+    called a paper "not metascience" when the decided answer was "metascience", and of 135 papers judged by two
+    reviewers 127 got the same verdict (never "metascience" against "not metascience").</p>
+    <p><b>Revised rules for borderline papers.</b> After these rounds, about one in six papers on the site had been
+    judged "unclear". The rules were then made explicit for the borderline cases: research practice within one field
+    counts (for example research priorities, evidence standards or research data infrastructure for one field, and
+    methods for developing clinical guidelines), and so does a comment on one study that makes a general point about
+    research practice; a debate about what one study shows does not, nor do quality appraisals of specific clinical
+    guidelines, retraction notices, or ordinary studies that include a replication sample. All "unclear" papers and
+    all removed papers (about 2,200) were judged again under these rules by 6 more reviewers (of 120 papers judged
+    by two of them, 113 got the same verdict); groups of papers that reviewers had decided differently were then
+    settled by one decision per group. "Unclear" is now used only when title and abstract do not tell enough. In
+    total <span id="nexcl">571</span> papers were removed; the list, with a reason for each, is
+    <code>scripts/excluded_by_hand.csv</code>.</p>
+    <p><b>What remains.</b> Papers still judged "unclear" (about 60, mostly papers
+    without an abstract) stay on the site. From the checks above, we expect that roughly 1 to 2% of the papers shown
+    are clearly not metascience. The theme of each paper and its explanation
     were written by the language model and were not checked by hand.</p>
   </section>
 
@@ -123,7 +148,7 @@
       make someone a metascientist; the number of papers shows how much of a person's work is metascience.</li>
       <li><b>Missing abstracts</b>: for <span id="noabs">some</span> of the metascience papers OpenAlex has no abstract,
       so the AI saw only the title, and term counts are lower bounds.</li>
-      <li><b>Coverage</b>: papers not in OpenAlex, and papers before 2005 without an author from the starting list (whose full publication lists were collected), are missing. A person who is Dutch only through a shared address text (see above) is missing too.</li>
+      <li><b>Coverage</b>: papers not in OpenAlex are missing. For people who are not on the starting list (whose full publication lists were collected), papers are missing when they use none of the search terms and carry none of the keywords above, and papers before 2005 are found only through the keywords (so only for people with at least two metascience papers). A person who is Dutch only through a shared address text (see above) is missing too.</li>
     </ul>
   </section>
 

@@ -45,6 +45,10 @@ details = json.load(open(details_path, encoding="utf-8"))   # full links of Blue
 people = {p["id"]: p for p in json.load(open(os.path.join(data_dir, "people.json"), encoding="utf-8"))}
 papers = json.load(open(os.path.join(data_dir, "papers.json"), encoding="utf-8"))
 every = json.load(open(re.sub(r"\.json$", "", final_path) + "_all.json", encoding="utf-8"))
+# people who are no longer on the site (their papers were removed in a later hand check) are left out
+_gone = [p for p in every if p not in people]
+every = {p: v for p, v in every.items() if p in people}
+print(f"accounts of people no longer on the site, left out: {len(_gone)}")
 final = json.load(open(final_path, encoding="utf-8"))
 feed_ids = {r["person"] for r in csv.DictReader(open(feed_path, encoding="utf-8"), delimiter="\t") if r["include"] == "yes"}
 

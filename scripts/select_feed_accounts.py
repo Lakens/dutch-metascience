@@ -18,6 +18,9 @@ data_dir, final_path, posts_dir, hits_path, out_path = sys.argv[1:6]
 MIN_POSTS, MIN_SHARE = 3, 0.01
 people = {p["id"]: p for p in json.load(open(os.path.join(data_dir, "people.json"), encoding="utf-8"))}
 final = json.load(open(final_path, encoding="utf-8"))
+# people who are no longer on the site (their papers were removed in a later hand check) are left out, as in
+# build_socials.py
+final = {p: v for p, v in final.items() if p in people}
 
 # Posts are counted per account file and given to the people who own that account in <social_final>_all.json
 # (all their confirmed accounts, also older ones), not by the person id stored in the posts.

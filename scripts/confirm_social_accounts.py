@@ -15,7 +15,10 @@ private until published on purpose):
     city of that institution, or the account is on a Mastodon server for scientists (SCIENCE_SERVERS);
  3. found by name without such evidence, and judged "yes" by a Claude reviewer who compared the profile text and the
     last 5 posts with the person's institution and paper titles. Names that match several accounts on one platform
-    also go to the reviewer.
+    also go to the reviewer;
+ 4. added by hand in social_added_by_hand.tsv (next to <review_verdicts.tsv>), for accounts the name search cannot
+    find, such as an account without a display name, and for one person split into several records that share no
+    ORCID or institution (the account is then added to each record).
 Then, per person and platform:
  - automatic copies: a Bluesky account that copies a Mastodon account (handle ending in .ap.brid.gy) is replaced by
    that Mastodon account; a Mastodon account that copies a Bluesky account (server bsky.brid.gy) is replaced by that
@@ -204,6 +207,12 @@ if not os.path.exists(verdict_path):
 for r in csv.DictReader(open(verdict_path, encoding="utf-8"), delimiter="\t"):
     if r["verdict"].strip().lower() == "yes":
         accepted[r["person"].strip()][r["account"].strip().lower()] = "found by name; reviewer: " + r["reason"].strip()
+# accounts added by hand (the name search can miss an account without a display name): social_added_by_hand.tsv in
+# the same folder as <review_verdicts.tsv>, columns person, account, reason
+hand_path = os.path.join(os.path.dirname(os.path.abspath(verdict_path)), "social_added_by_hand.tsv")
+if os.path.exists(hand_path):
+    for r in csv.DictReader(open(hand_path, encoding="utf-8"), delimiter="\t"):
+        accepted[r["person"].strip()][r["account"].strip().lower()] = "added by hand: " + r["reason"].strip()
 
 # ---------------------------------------------------------------- copies, moves, newest version
 s = requests.Session()
@@ -266,7 +275,7 @@ for pid, accs in accepted.items():
         final[pid] = best
 # One account, several people on the site. Often one person split into several records (same ORCID, or same
 # institution): then all keep it. Otherwise the account stays with the person who listed it in ORCID or Wikidata and
-# is removed from the others; if nobody listed it, it is removed from all of them and written to
+# is removed from the others (an account added by hand counts as listed); if nobody listed it, it is removed from all of them and written to
 # <out>_conflicts.json for a decision by hand.
 owners = collections.defaultdict(list)
 for pid, lst in every.items():
@@ -280,7 +289,7 @@ for acct, pids in owners.items():
     inst = [set(people[p].get("ins") or []) for p in pids]
     if (len(orcids) == 1 and None not in orcids and "" not in orcids) or set.intersection(*inst):
         continue
-    listed_by = [p for p in pids if any(e["account"].lower() == acct and e["reason"].startswith("listed")
+    listed_by = [p for p in pids if any(e["account"].lower() == acct and e["reason"].startswith(("listed", "added by hand"))
                                         for e in every[p])]
     losers = [p for p in pids if p not in listed_by] if listed_by else pids
     if not listed_by:

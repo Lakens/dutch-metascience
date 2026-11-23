@@ -1,4 +1,5 @@
-"""Judge every paper (our cleaned papers + the Dutch OpenAlex search results) as metascience or not.
+"""Judge every paper (our cleaned papers + the Dutch OpenAlex search results + the publication lists from
+fetch_author_lists.py) as metascience or not.
 
 Usage: python -I classify_all.py <raw database.sqlite> <clean database.sqlite>
 Needs SRC_API_KEY and OPENALEX_API_KEY. Starts the SURF GPU and always pauses it at the end.
@@ -82,8 +83,11 @@ def run(items, version, label):
 ref = list(csv.DictReader(open(os.path.join(HERE, "reference_100.csv"), encoding="utf-8")))
 ref_text = texts_for([r["work_id"] for r in ref])
 
+# the starting list's papers, the search results, and the publication lists of frequent authors not on the starting
+# list (fetch_author_lists.py)
+db.execute("CREATE TABLE IF NOT EXISTS oa_author_list_hits (work_id TEXT PRIMARY KEY)")
 all_ids = [r[0] for r in db.execute(
-    "SELECT work_id FROM clean.papers UNION SELECT work_id FROM oa_search_hits")]
+    "SELECT work_id FROM clean.papers UNION SELECT work_id FROM oa_search_hits UNION SELECT work_id FROM oa_author_list_hits")]
 print("papers to judge in total:", len(all_ids), flush=True)
 
 tunnel = None

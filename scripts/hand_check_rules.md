@@ -38,6 +38,18 @@ measurement, a disease, a domain? A paper that merely USES good practices is not
   interface, research ethics (informed consent in research, ethics review, ethics of trial designs such as
   human challenge trials), science communication and science journalism as a topic of study, trust in science.
 
+- **Research practice within one field** (added 23 Nov 2026): how research is done, reported, prioritised,
+  funded, regulated or governed in one field or for one disease also counts. Examples: research agendas, roadmaps
+  and priority setting for a field; evidence standards and guidance on how to produce good evidence in a field;
+  guidelines for patient and public engagement in research; participatory research approaches; the use of health
+  records or other routine data for research; data collection quality for research datasets.
+- **Research data, also for one field** (added 23 Nov 2026): research data infrastructure, repositories, data
+  standards, FAIR implementation and data policy for research, also when they concern one field, one kind of data
+  or one country.
+- **A critique that makes a general point** (added 23 Nov 2026): a comment on one study that uses it as an example
+  to make a general point about research practice (e.g. "incomplete reporting undermines study quality
+  assessment").
+
 A paper does NOT have to be empirical: position papers, commentaries, editorials, guidelines and reports ABOUT
 research practice count.
 
@@ -50,23 +62,27 @@ research practice count.
   interventions exist), even when they assess risk of bias as part of their method.
 - Reliability, validity, measurement properties or fairness of tests, instruments, classification systems,
   imaging or lab measurements in one field; measurement methods for one field (accelerometry, EMA reliability).
-- Methods or confounders for one specific field or application (e.g. "minimizing microbiome confounders in
-  cardiovascular research", a statistical method for one clinical problem).
-- Data infrastructure, data standards, databases, ontologies, software, corpora or tools for one domain or one
-  kind of data, even when they are called "open", "FAIR" or "reproducible"; studies that merely USE shared data.
+- A technique for answering one substantive question (e.g. "minimizing microbiome confounders in cardiovascular
+  research", a statistical method for one clinical problem), as opposed to guidance on how research in a field
+  should be done (YES, see above).
+- A database, corpus, ontology, software or tool whose purpose is a substantive question or clinical care rather
+  than the practice of research; studies that merely USE shared data.
 - Open data / linked data of governments, companies or utilities; privacy and data protection outside research.
 - Clinical practice, clinical guidelines for a disease, quality of care, evidence-based medicine in practice,
   drug regulation and drug safety, health economics.
-- Research agendas or priority setting for one disease or topic; descriptions or deliverables of a consortium,
-  network or project for one domain; editorials introducing a substantive special issue.
+- Descriptions of the substantive work of a consortium, network or project; editorials introducing a substantive
+  special issue.
+- A debate between authors about what one study shows (comments, replies, authors' responses about its
+  substantive conclusions), unless it makes a general point about research practice (YES, see above).
 - Ethics, governance or trust concerning a technology (AI, biotechnology, dual use in industry) or a profession,
   not concerning research.
 - Education, management, business or economics topics that are not about research.
 
 ## Answer UNCLEAR
 
-Use "unclear" when the paper is genuinely borderline or when title and abstract do not tell enough (e.g. no
-abstract and an ambiguous title), for example: a critique of one specific substantive meta-analysis; research
-methodology for one field that discusses reproducibility of that field; a genetic replication cohort;
-reproducibility of brain imaging results; participatory research approaches; a journal's yearly editorial.
-Unclear papers stay on the website, so only use "no" when you are confident.
+Use "unclear" only when title and abstract do not tell enough to decide (e.g. no abstract and an ambiguous
+title). Decide the borderline cases with the rules above (changed 23 Nov 2026; before, borderline papers were
+"unclear" and stayed on the website): research practice in one field is YES; a debate about what one study
+shows is NO; a substantive study with a genetic replication cohort is NO; reproducibility of brain imaging
+results is YES (reproducibility of published results); a journal's yearly editorial is YES when it is about the
+journal's editorial practice and NO when it introduces substantive content. Unclear papers stay on the website.

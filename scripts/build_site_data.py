@@ -263,6 +263,11 @@ MERGE_INTO = {
 _name_to_id = {}
 for _i, _g in geo.items():
     _name_to_id.setdefault(_g.get("name"), _i)
+# names that OpenAlex changed since the list above was made (23 Nov 2026: I4210151833 "Amsterdam University Medical
+# Centers" is now called "Amsterdam UMC")
+for _old, _new in {"Amsterdam University Medical Centers": "Amsterdam UMC"}.items():
+    if _old not in _name_to_id and _new in _name_to_id:
+        _name_to_id[_old] = _name_to_id[_new]
 _missing = [n for pair in MERGE_INTO.items() for n in pair if n not in _name_to_id]
 assert not _missing, f"institutions to merge not found in the data: {_missing}"
 MERGE_IDS = {_name_to_id[a]: _name_to_id[b] for a, b in MERGE_INTO.items()}

@@ -19,6 +19,9 @@ people = {p["id"]: p for p in json.load(open(os.path.join(data_dir, "people.json
 insts = {i["id"]: i["n"] for i in json.load(open(os.path.join(data_dir, "institutions.json"), encoding="utf-8"))["list"]}
 papers = json.load(open(os.path.join(data_dir, "papers.json"), encoding="utf-8"))
 every = json.load(open(re.sub(r"\.json$", "", final_path) + "_all.json", encoding="utf-8"))
+# people who are no longer on the site (their papers were removed in a later hand check) are left out, as in
+# build_socials.py
+every = {p: v for p, v in every.items() if p in people}
 
 # ---------------------------------------------------------------- one person = all records that share an account
 file_of = lambda kind, acct: f"{kind}_{re.sub(r'[^A-Za-z0-9._-]+', '_', acct.lstrip('@'))}"   # as in download_social_posts.py
