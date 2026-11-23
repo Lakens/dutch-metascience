@@ -53,12 +53,15 @@
   <section class="card">
     <h2>NWO funding over time</h2>
     <p class="sub">Projects by the year they started, coloured by funding scheme (all grants) or by open science programme
-    (metascience-related projects). The last year is not complete. Amounts are known for only part of the projects
-    (mostly recent ones), so the amount view underestimates older years.</p>
+    (metascience-related projects). The number above each bar is the total for that year. The last year is not
+    complete. Amounts are known for only part of the projects (mostly recent ones), so the amount view underestimates
+    older years. When you view the site as a person, a third view shows that person's grants, metascience-related or
+    not.</p>
     <div class="controls">
       <div class="seg" id="scope"><button aria-pressed="true" data-v="all">All grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
       <div class="seg" id="measure"><button aria-pressed="true" data-v="n">Number of projects</button><button aria-pressed="false" data-v="a">Amount awarded</button></div>
     </div>
+    <p class="small" id="ottotal"></p>
     <div class="legend" id="famlegend"></div>
     <div id="overtime" class="chart" style="min-height:420px"></div>
   </section>
@@ -119,9 +122,12 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
   const famColor = (f) => (f === "Other" ? cssVar("--other") : seriesColor(fams.indexOf(f)));
   // metascience-related projects are coloured by open science programme; the last group (other NWO schemes) is grey
   const progColor = (g) => (g === progs[progs.length - 1] ? cssVar("--other") : seriesColor(progs.indexOf(g)));
-  const groups = (sc) => (sc === "meta" ? progs : fams);
-  const groupOf = (p, sc) => (sc === "meta" ? p.g : p.f);
-  const groupColor = (g, sc) => (sc === "meta" ? progColor(g) : famColor(g));
+  // the person's own grants (personal view): metascience-related in colour, other grants grey
+  const PERSON_GROUPS = ["Metascience-related", "Other grants"];
+  const groups = (sc) => (sc === "meta" ? progs : sc === "person" ? PERSON_GROUPS : fams);
+  const groupOf = (p, sc) => (sc === "meta" ? p.g : sc === "person" ? PERSON_GROUPS[p.m ? 0 : 1] : p.f);
+  const groupColor = (g, sc) => (sc === "meta" ? progColor(g) : sc === "person"
+    ? (g === PERSON_GROUPS[0] ? seriesColor(0) : cssVar("--other")) : famColor(g));
   const projects = F.projects.filter((p) => p.b);
   const year = (s) => +s.slice(0, 4);
   const money = (a) => (a >= 1e6 ? `€${(a / 1e6).toFixed(1)} million` : `€${fmt(Math.round(a / 1000))} thousand`);
@@ -148,17 +154,49 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
   let scope = "all", measure = "n", tlscope = "all";
   const legendHtml = (sc) => groups(sc).map((f) =>
     `<span class="item"><span class="swatch" style="background:${groupColor(f, sc)}"></span>${esc(f)}</span>`).join("");
+  const meId = me && me.mode !== "field" && F.people[me.id] ? me.id : null;
+  if (meId) {   // personal view: a third choice with the person's own grants
+    const b = document.createElement("button");
+    b.setAttribute("aria-pressed", "false"); b.dataset.v = "person"; b.textContent = `Grants of ${me.n}`;
+    document.getElementById("scope").appendChild(b);
+  }
+  const amountOf = (ps) => ps.reduce((s, p) => s + (p.a || 0), 0);
+  const pct = (a, b) => (b ? ` (${Math.round((100 * a) / b)}%)` : "");
   function drawOverTime() {
     document.getElementById("famlegend").innerHTML = legendHtml(scope);
-    const ps = projects.filter((p) => (scope === "meta" ? p.m : p.ppl.some((x) => x.id)) && year(p.b) >= 2000);
+    const ps = scope === "person" ? projects.filter((p) => p.ppl.some((x) => x.id === meId))
+      : projects.filter((p) => (scope === "meta" ? p.m : p.ppl.some((x) => x.id)) && year(p.b) >= 2000);
     const yrs = [...new Set(ps.map((p) => year(p.b)))].sort((a, b) => a - b);
-    const traces = groups(scope).map((f) => {
-      const v = yrs.map((y) => ps.filter((p) => groupOf(p, scope) === f && year(p.b) === y).reduce((s, p) => s + (measure === "n" ? 1 : (p.a || 0) / 1e6), 0));
-      return { type: "bar", name: f, x: yrs, y: v, marker: { color: groupColor(f, scope), line: { color: cssVar("--surface-1"), width: 1 } },
-        hovertemplate: `${esc(f)}, %{x}: %{y:${measure === "n" ? ".0f" : ".2f"}}${measure === "n" ? " projects" : " million euro"}<extra></extra>` };
-    });
+    const vals = groups(scope).map((f) => yrs.map((y) => ps.filter((p) => groupOf(p, scope) === f && year(p.b) === y)
+      .reduce((s, p) => s + (measure === "n" ? 1 : (p.a || 0) / 1e6), 0)));
+    const tot = yrs.map((y, i) => vals.reduce((s, v) => s + v[i], 0));   // the total of each year
+    const unit = measure === "n" ? " projects" : " million euro", num = measure === "n" ? ".0f" : ".2f";
+    const traces = groups(scope).map((f, gi) => ({ type: "bar", name: f, x: yrs, y: vals[gi], customdata: tot,
+      marker: { color: groupColor(f, scope), line: { color: cssVar("--surface-1"), width: 1 } },
+      hovertemplate: `${esc(f)}, %{x}: %{y:${num}}${unit}<br>year total: %{customdata:${num}}${unit}<extra></extra>` }));
+    // the year totals written above the bars, when the bars are wide enough for them (otherwise only in the hover)
+    // (only years with a total: Plotly does not show a text again that was empty in the previous drawing)
+    const label = (v) => (measure === "n" ? fmt(v) : v >= 10 ? v.toFixed(0) : v.toFixed(1));
+    const plotWidth = document.getElementById("overtime").clientWidth - 90;
+    const withTotal = yrs.map((y, i) => i).filter((i) => tot[i] > 0);
+    if (yrs.length && plotWidth / (yrs[yrs.length - 1] - yrs[0] + 1) >= 26)
+      traces.push({ type: "scatter", mode: "text", x: withTotal.map((i) => yrs[i]), y: withTotal.map((i) => tot[i]),
+        text: withTotal.map((i) => label(tot[i])), textposition: "top center",
+        textfont: { size: 10, color: cssVar("--text-secondary") }, hoverinfo: "skip", showlegend: false, cliponaxis: false });
+    // the total over all years shown, with the metascience-related part
+    const span = yrs.length ? `${yrs[0]}–${yrs[yrs.length - 1]}` : "";
+    const metaPs = ps.filter((p) => p.m), aAll = amountOf(ps), aMeta = amountOf(metaPs);
+    const amountText = (a) => (!a ? "€0" : a >= 1e8 ? `€${fmt(Math.round(a / 1e6))} million` : money(a));
+    document.getElementById("ottotal").textContent = !ps.length ? "" : scope === "meta"
+      ? `Total ${span}: ${fmt(ps.length)} metascience-related projects; ${amountText(aAll)} awarded (where known).`
+      : `Total ${span}: ${fmt(ps.length)} projects${scope === "person" ? ` of ${me.n}` : " of researchers on this site"}, of which ` +
+        `${fmt(metaPs.length)} metascience-related${pct(metaPs.length, ps.length)}. Awarded (where known): ${amountText(aAll)}, ` +
+        `of which ${amountText(aMeta)} metascience-related${pct(aMeta, aAll)}` +
+        `${scope === "person" ? "; amounts are of whole projects, whatever the person's role" : ""}.`;
     Plotly.react("overtime", traces, baseLayout({ barmode: "stack", showlegend: false, hovermode: "closest",
-      yaxis: Object.assign(baseLayout().yaxis, { title: measure === "n" ? "projects started" : "million euro (where known)" }) }), PLOT_CONFIG);
+      margin: { l: 50, r: 20, t: 24, b: 40 },
+      yaxis: Object.assign(baseLayout().yaxis, { title: measure === "n" ? "projects started" : "million euro (where known)",
+        range: [0, Math.max(1e-9, ...tot) * 1.1], dtick: measure === "n" && Math.max(0, ...tot) <= 8 ? 1 : undefined }) }), PLOT_CONFIG);
   }
   const seg = (id, set) => document.querySelectorAll(`#${id} button`).forEach((b) => b.addEventListener("click", () => {
     document.querySelectorAll(`#${id} button`).forEach((x) => x.setAttribute("aria-pressed", x === b)); set(b.dataset.v);

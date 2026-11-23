@@ -7,11 +7,11 @@ Input: all NWO projects from the NWOpen API (fetch_nwo.py; CC0), the site's peop
 Matching an NWO project member to a person on the site (NWO gives names, organisations with ROR ids, and for some
 members an ORCID):
  1. same ORCID;
- 2. otherwise the same full name (first name, prefix, last name; accents and case ignored), only one person on the
-    site with that name, AND an organisation in common (the NWO organisation's ROR is one of the ROR ids of the
-    institutions on the person's papers, or their parents);
- 3. members without a first name: same first initial and last name, only one such person on the site, and an
-    organisation in common.
+ 2. otherwise the same full name (first name, prefix, last name; accents and case ignored) AND an organisation in
+    common (the NWO organisation's ROR is one of the ROR ids of the institutions on the person's papers, or their
+    parents), for only one person on the site;
+ 3. members without a first name: same first initial and last name and an organisation in common, for only one
+    person on the site.
 Name matches without a shared organisation are not used (counted in the output as 'name only, not used').
 
 Metascience-related projects: funding schemes of NWO's open science programmes (Open Science Fund, Open Science NL,
@@ -41,8 +41,14 @@ inst_lineage = {r[0]: [x.strip() for x in (r[1] or "").split(";") if x.strip()]
                 for r in db.execute("SELECT institution_id, lineage FROM oa_institutions")}
 listed_ids = {"P:" + r[0]: [x.strip() for x in (r[1] or "").split(";") if x.strip()]
               for r in db.execute("SELECT person_id, openalex_ids FROM oa_people")}
+# OpenAlex author records with the same ORCID are one person on the site (build_site_data.py): use all of them
+records_of_orcid = collections.defaultdict(set)
+for o, a in db.execute("SELECT DISTINCT orcid, author_id FROM oa_authorships WHERE orcid IS NOT NULL AND orcid != ''"):
+    records_of_orcid[o].add(a)
+orcid_of = {x["id"]: x.get("o") or "" for x in people}
 def author_ids(pid):
-    return listed_ids.get(pid, []) if pid.startswith("P:") else [pid[2:]]
+    ids = listed_ids.get(pid, []) if pid.startswith("P:") else [pid[2:]]
+    return sorted(set(ids) | records_of_orcid.get(orcid_of.get(pid), set()))
 def person_rors(pid):
     ids = author_ids(pid)
     if not ids:
@@ -95,12 +101,12 @@ for mid, d in members.items():
     if not d["first"] and d["initials"]:
         cands = set(by_initial.get(norm(d["initials"])[:1] + "|" + norm(d["last"]), []))
         kind = "initial, last name and organisation"
-    if len(cands) != 1:
-        continue
-    pid = next(iter(cands))
-    if d["rors"] & rors_of(pid):
-        match[mid] = pid; how[kind] += 1
-    else:
+    # of the people with this name, exactly one must have an organisation in common with the NWO member (several
+    # records can carry the same name, for example a second record with one paper at another institution)
+    shared = [c for c in cands if d["rors"] & rors_of(c)]
+    if len(shared) == 1:
+        match[mid] = shared[0]; how[kind] += 1
+    elif cands and not shared:
         name_only += 1
 print("NWO members matched to people on the site:", len(match), dict(how), "| name only, not used:", name_only, flush=True)
 

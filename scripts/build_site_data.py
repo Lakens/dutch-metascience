@@ -71,6 +71,39 @@ for wid, pos, aid, aname, orcid, countries, raw in db.execute("""
     JOIN metascience_final m ON m.work_id = a.work_id AND m.prompt_version = ? AND m.is_metascience = 1""", (VERSION,)):
     auth_rows[wid].append((pos, aid, aname, orcid, countries or ""))
     raw_aff[(wid, pos)] = (raw or "").strip()
+
+# ---------------------------------------------------------------- one person, several OpenAlex author records
+# OpenAlex sometimes splits one person into several author records. Records with the same ORCID are one person
+# (added 23 Nov 2026): they get the key of the person on our list with that ORCID, otherwise of the record with the
+# most metascience papers. Which papers count for the person does not change.
+aid_orcid = collections.defaultdict(collections.Counter)   # author record -> ORCID -> number of authorships
+aid_n, aid_name = collections.Counter(), collections.defaultdict(collections.Counter)
+for rows in auth_rows.values():
+    for pos, aid, aname, orcid, _ in rows:
+        if aid:
+            aid_n[aid] += 1; aid_name[aid][aname] += 1
+            if orcid:
+                aid_orcid[aid][orcid] += 1
+records_of = collections.defaultdict(list)                 # ORCID -> author records not on our list
+for aid, c in aid_orcid.items():
+    if aid not in listed:
+        records_of[c.most_common(1)[0][0]].append(aid)
+listed_by_orcid = {info["orcid"]: pk for pk, info in person_info.items() if info["orcid"]}
+alias, alias_name, alias_orcid = {}, {}, {}               # author record -> key of the joined person; key -> name, ORCID
+for orcid, aids in records_of.items():
+    if orcid in listed_by_orcid:
+        target = listed_by_orcid[orcid]
+    elif len(aids) >= 2:
+        main = max(aids, key=lambda a: (aid_n[a], a))
+        target = "A:" + main
+        alias_name[target], alias_orcid[target] = aid_name[main].most_common(1)[0][0], orcid
+    else:
+        continue
+    for a in aids:
+        if "A:" + a != target:
+            alias[a] = target
+print(f"author records joined to another record of the same person (same ORCID): {len(alias)}")
+
 inst_rows = collections.defaultdict(list)   # (work, position) -> institution ids
 for wid, pos, iid in db.execute("""
     SELECT ai.work_id, ai.position, ai.institution_id FROM oa_authorship_institutions ai
@@ -132,9 +165,9 @@ for (wid, title, year, venue, doi, n_auth, cited, wtype, kw, field, topic, cat, 
         nl_insts.update(i for i in insts if is_dutch_inst(i))
         pk = listed.get(aid)
         if pk is None and dutch_here and aid and ((wid, pos) not in weak or aid in dutch_on_own_text):
-            pk = "A:" + aid
+            pk = alias.get(aid, "A:" + aid)
             if pk not in person_info:
-                person_info[pk] = dict(name=aname, orcid=orcid or "", listed=False)
+                person_info[pk] = dict(name=alias_name.get(pk, aname), orcid=alias_orcid.get(pk) or orcid or "", listed=False)
         if pk and pk not in people:
             people.append(pk)
     if not people:      # no Dutch author and no one from our list: not part of the Dutch landscape
@@ -305,7 +338,7 @@ person_inst_last = collections.defaultdict(dict)                    # when a per
 paper_year = {p["id"]: p["y"] or 0 for p in papers}                 # person -> institution -> latest year
 for wid, people in paper_people.items():
     for pos, aid, *_ in auth_rows.get(wid, []):
-        pk = listed.get(aid) or ("A:" + aid if ("A:" + aid) in person_info else None)
+        pk = listed.get(aid) or alias.get(aid) or ("A:" + aid if ("A:" + aid) in person_info else None)
         if pk in people:
             for t in {top_level(i) for i in inst_rows.get((wid, pos), []) if is_dutch_inst(i)}:   # once per paper
                 (person_inst_shared if (wid, pos) in weak else person_inst)[pk][t] += 1

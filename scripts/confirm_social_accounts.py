@@ -213,6 +213,10 @@ hand_path = os.path.join(os.path.dirname(os.path.abspath(verdict_path)), "social
 if os.path.exists(hand_path):
     for r in csv.DictReader(open(hand_path, encoding="utf-8"), delimiter="\t"):
         accepted[r["person"].strip()][r["account"].strip().lower()] = "added by hand: " + r["reason"].strip()
+# people no longer on the site (their papers were removed, or their record was joined to another record of the same
+# person) are left out; the files above can still hold their old records
+for pid in [p for p in accepted if p not in people]:
+    del accepted[pid]
 
 # ---------------------------------------------------------------- copies, moves, newest version
 s = requests.Session()
