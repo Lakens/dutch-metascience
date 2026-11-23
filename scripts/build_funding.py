@@ -132,6 +132,11 @@ FAMILIES = [("Veni", r"\bveni\b"), ("Vidi", r"\bvidi\b"), ("Vici", r"\bvici\b"),
             ("Open Science", r"open science|replicati"), ("Open Competition", r"open competit|open competition|vrije competitie"),
             ("NWA", r"\bnwa\b|nationale wetenschapsagenda"),
             ("Gravitation & large programmes", r"zwaartekracht|gravitation|summit|groot")]
+# Standard amounts per grant: up to and including the 2008 round, and from the 2009 round on. Sources: NWO's 2008
+# announcement "More and larger subsidies" (Veni 208,000 -> 250,000; Vidi 600,000 -> 800,000; Vici 1,250,000 ->
+# 1,500,000 euro) and university news on the 2008 and 2009 rounds (Vidi 600,000 in 2008, 800,000 from the 2009 round).
+TALENT_AMOUNT = {"Veni": (208000, 250000), "Vidi": (600000, 800000), "Vici": (1250000, 1500000)}
+
 def family(scheme):
     for name, pat in FAMILIES:
         if re.search(pat, scheme or "", re.I):
@@ -184,6 +189,13 @@ for p in projects:
                sum=no_email((p.get("summary_en") or p.get("summary_nl") or "").strip()[:400]))
     if meta:
         rec["g"] = programme(p, fam)
+    # NWO's open data give no amount for projects that started before 2017. For Veni, Vidi and Vici the standard
+    # amount of the round (the year in the scheme name) is used instead, marked as an estimate (ae=1).
+    if not rec["a"] and fam in TALENT_AMOUNT:
+        rnd = re.search(r"\b(?:19|20)\d\d\b", rec["s"])
+        if rnd:
+            rec["a"] = TALENT_AMOUNT[fam][0 if int(rnd.group(0)) <= 2008 else 1]
+            rec["ae"] = 1
     out_projects.append(rec)
     for x in rec["ppl"]:
         if x["id"]:
@@ -191,7 +203,8 @@ for p in projects:
 out_projects.sort(key=lambda r: r["b"] or "9999")
 summary = dict(n_projects_nwo=len(projects), n_members_matched=len(match), match_kinds=dict(how), name_only_not_used=name_only,
                n_people_with_grants=len(people_funding), n_projects=len(out_projects),
-               n_meta=sum(r["m"] for r in out_projects), families=[f for f, _ in FAMILIES] + ["Other"],
+               n_meta=sum(r["m"] for r in out_projects), n_amount_estimated=sum(r.get("ae", 0) for r in out_projects),
+               families=[f for f, _ in FAMILIES] + ["Other"],
                programmes=[g for g, _ in PROGRAMMES],
                n_per_programme={g: sum(1 for r in out_projects if r.get("g") == g) for g, _ in PROGRAMMES},
                api="https://nwopen-api.nwo.nl/NWOpen-API/api/Projects", licence="CC0 1.0")
