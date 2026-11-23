@@ -284,6 +284,9 @@ links_out = [dict(site=d, posts=n, people=len(dom_people[d]), by={pl: dom_pl[pl]
 # papers on this site linked by at least two people (one person sharing their own paper is not shared widely)
 shared_papers = [dict(id=site_doi[d]["id"], t=site_doi[d]["t"], y=site_doi[d]["y"], doi=site_doi[d]["doi"], posts=n,
                       people=len(doi_people[d])) for d, n in doi_posts.most_common() if len(doi_people[d]) >= 2][:15]
+# for the Papers page: per paper on this site, the number of posts with a metascience term that link to it and the
+# number of people who wrote them (counts only; the posts themselves stay private)
+paper_shares = {site_doi[d]["id"]: [n, len(doi_people[d])] for d, n in doi_posts.items()}
 
 # ---------------------------------------------------------------- top posters per platform (people in the feeds)
 top = {}
@@ -416,7 +419,7 @@ out = dict(
     themes=themes_out, months={k: dict(v) for k, v in month_theme.items()}, month_total=dict(month_total),
     months_by={pl: {th: dict(c) for th, c in v.items()} for pl, v in month_theme_pl.items()},
     month_total_by={pl: dict(c) for pl, c in month_total_pl.items()},
-    rising=rising, peaks=peaks_out, clouds=clouds, links=links_out, shared_papers=shared_papers, top=top,
+    rising=rising, peaks=peaks_out, clouds=clouds, links=links_out, shared_papers=shared_papers, paper_shares=paper_shares, top=top,
     network=dict(nodes=nodes_out, edges=edges_out))
 with open(os.path.join(data_dir, "socials.json"), "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
