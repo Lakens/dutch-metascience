@@ -89,7 +89,7 @@
 
   <section class="card">
     <h2>Which themes are rising?</h2>
-    <p class="sub">The yearly change in each theme's share of all Dutch metascience papers over the last four years
+    <p class="sub">The yearly change in each theme's share of the metascience papers on this site over the last four years
     (<span class="chg"></span>), with a 95% interval. A theme is called rising or declining only when the whole interval
     lies above or below zero; otherwise the data cannot tell a change from year-to-year variation. A rising share means
     a theme gets relatively more attention, whatever the growth of the field as a whole. How this is estimated is
@@ -115,7 +115,7 @@
 
   <section class="card">
     <h2>Which themes attract new people?</h2>
-    <p class="sub">The number of Dutch authors who wrote their first paper in a theme in <span class="nrec"></span>,
+    <p class="sub">The number of authors at Dutch institutions who wrote their first paper on this site in a theme in <span class="nrec"></span>,
     divided by the number in <span class="nearly"></span>, with a 95% interval. A person can be new to metascience or
     come from another theme. The whole field grew, so the dashed line shows the ratio for all themes together: a theme
     to its right attracts new people faster than the field as a whole. Papers with more than
@@ -126,7 +126,7 @@
 
   <section class="card">
     <h2>How each theme developed</h2>
-    <p class="sub">Dots: the theme's share of all papers in each year (larger dots: more papers that year). Line and
+    <p class="sub">Dots: the theme's share of the papers on this site in each year (larger dots: more papers that year). Line and
     band: the estimated share with its 95% band. Below: the people who wrote their first paper in the theme each year.
     <span class="ly"></span> is not complete yet.</p>
     <div class="controls"><label>Theme <select id="tcl"></select></label></div>
@@ -366,8 +366,8 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
         customdata: d.fit.map((f) => [f[0], f[2]]), hovertemplate: "%{x:.0f}: estimated %{y:.1f}% (95% band %{customdata[0]:.1f}–%{customdata[1]:.1f}%)<extra></extra>" },
       { type: "scatter", mode: "markers", name: "share per year", x: yrs, y: yrs.map((y) => d.share[y]),
         marker: { color: cssVar("--text-secondary"), size: yrs.map((y) => 4 + 1.6 * Math.sqrt(d.n[y])), opacity: 0.75, line: { color: cssVar("--surface-1"), width: 1 } },
-        text: yrs.map((y) => `${d.n[y]} papers`), hovertemplate: "%{x}: %{y:.1f}% of all papers (%{text})<extra></extra>" }],
-      baseLayout({ hovermode: "closest", yaxis: Object.assign(baseLayout().yaxis, { title: "% of all metascience papers", rangemode: "tozero" }),
+        text: yrs.map((y) => `${d.n[y]} papers`), hovertemplate: "%{x}: %{y:.1f}% of the papers on this site (%{text})<extra></extra>" }],
+      baseLayout({ hovermode: "closest", yaxis: Object.assign(baseLayout().yaxis, { title: "% of the papers on this site", rangemode: "tozero" }),
         legend: { orientation: "h", y: -0.2 } }), PLOT_CONFIG);
     // people entering the theme
     const ey = yrs.filter((y) => y >= 2005);

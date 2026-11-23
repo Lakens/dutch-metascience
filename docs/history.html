@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Metascience History</title>
-<meta name="description" content="A history-book timeline of metascience per theme: historical events from Wikipedia and the landmark papers that Dutch metascientists cite most.">
+<meta name="description" content="A history-book timeline of metascience per theme: historical events from Wikipedia and the landmark papers that the papers on this site cite most.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <script src="assets/common.js"></script>
@@ -81,8 +81,8 @@
   <h1>History</h1>
   <p class="lede">A timeline of metascience as in a history book: events above the line, papers below it.
   Events come from Wikipedia and from an archive of open science blogs (debates that many bloggers joined at the same
-  time). Landmark papers are the works that Dutch metascience papers cite most, chosen as explained
-  below; next to them are the most cited papers that Dutch metascientists wrote themselves.
+  time). Landmark papers are works that the papers on this site cite most, chosen as explained
+  below; next to them are the most cited papers on this site.
   Choose one of the 20 themes, or see the combined timeline of all themes.</p>
 
   <section class="card">
@@ -299,7 +299,7 @@ Promise.all([load("history"), Me.ready])
       const rows = Object.entries(w.th).map(([t, s]) =>
         `<li>${esc(themeName[t])}: landmark paper, cited by ${fmt(s.n)} of the theme's papers (${Math.round(s.sh * 100)}%)</li>`).join("") +
         Object.entries(w.dth || {}).map(([t, r]) =>
-        `<li>${esc(themeName[t])}: number ${r} of the theme's most cited papers by Dutch metascientists</li>`).join("");
+        `<li>${esc(themeName[t])}: number ${r} of the theme's most cited papers on this site</li>`).join("");
       const dutchAuth = (w.dp || []).map((id, i) => `<a href="people.html#${encodeURIComponent(id)}">${esc(w.dn[i])}</a>`).join(", ");
       const isMine = me && (w.dp || []).includes(me.id);
       el.innerHTML = `<h3>${esc(w.t)}${w.nl ? '<span class="nl">NL</span>' : ""}</h3>
@@ -335,7 +335,7 @@ Promise.all([load("history"), Me.ready])
     ${s.max_guidelines} reporting guidelines or statements per theme; and a classic cited everywhere is shown only in
     the ${s.max_themes} themes where the largest share of papers cite it. Each theme shows at most ${s.n_per_theme}
     papers, fewer when it has no more clear landmarks; the combined timeline shows the ${s.n_combined} strongest of
-    each theme. The selection reflects what Dutch metascience papers cite, not a judgement of quality.
+    each theme. The selection reflects what the papers on this site cite, not a judgement of quality.
     <br><br>The most cited Dutch papers of a theme are the ${s.n_dutch} papers on this site in that theme (so with at
     least one Dutch author) that have the most citations in total. A paper that is already one of the theme's landmark
     papers is not repeated (it carries the NL mark there), and one family of papers (for example, a guideline published

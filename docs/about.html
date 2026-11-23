@@ -47,8 +47,8 @@
       papers, editorials and letters; not blog posts, OSF project pages, deposits on Zenodo or Figshare (such as
       project deliverables and slides), datasets or peer reviews. The same rule applies to the papers found by the
       search below (<span id="nnotpaper">some</span> items left out).</li>
-      <li><b>A search of OpenAlex</b> added every paper since 2005 with an author at a Dutch institution whose title or
-      abstract uses metascience terms (such as replicability, preregistration, publication bias, research integrity,
+      <li><b>A search of OpenAlex</b> added the papers since 2005 with an author at a Dutch institution that OpenAlex
+      returned for metascience terms in the title or abstract (such as replicability, preregistration, publication bias, research integrity,
       Bayes factor, scientometrics, research assessment). In November 2026 terms on research funding and grant review,
       reporting standards, research data and software, preprints and scholarly publishing, research careers and
       research evaluation were added (the full list is in <code>scripts/terms.py</code>).</li>
@@ -61,7 +61,7 @@
       through these added papers were not looked up again.</li>
       <li><b>An AI judged every paper</b> (about 63,000 titles and abstracts): is it metascience, and if so, which
       of eight themes? Papers it called metascience were then checked a second time with stricter instructions, and
-      every remaining paper was then checked once more by reading it (see below); <span id="npapers">about 6,300</span> remain. The model was gpt-oss:20b, run in Ollama on a GPU of SURF Research
+      every remaining paper was then checked once more by reading its title and abstract (see below); <span id="npapers">about 6,300</span> remain. The model was gpt-oss:20b, run in Ollama on a GPU of SURF Research
       Cloud, with written instructions that say what counts (for example: a replication of a published finding, a
       study of peer review, a method for better statistical inference) and what does not (a study that merely shares its
       data, a meta-analysis of a drug, the reproducibility of a lab measurement, DNA replication).</li>
@@ -110,7 +110,7 @@
     systematic reviews of a medical question), so a second, stricter check removed 2,301 of them. A random sample
     showed that this second check was still not good enough, and that it also removed about one in five papers
     that were metascience after all (mostly bibliometric and general statistics papers; these are missing).</p>
-    <p><b>A check of every paper by reading it.</b> All papers that remained and have a Dutch author were then judged
+    <p><b>A check of every paper's title and abstract.</b> All papers that remained and have a Dutch author were then judged
     one by one from title and abstract, following written rules (<code>scripts/hand_check_rules.md</code>). This was
     done by Claude, an AI assistant, working as 16 separate reviewers, and not by human experts; papers that came onto
     the site in later rebuilds were checked in the same way. To measure its
@@ -134,8 +134,8 @@
     total <span id="nexcl">571</span> papers were removed; the list, with a reason for each, is
     <code>scripts/excluded_by_hand.csv</code>.</p>
     <p><b>What remains.</b> Papers still judged "unclear" (about 60, mostly papers
-    without an abstract) stay on the site. From the checks above, we expect that roughly 1 to 2% of the papers shown
-    are clearly not metascience. The theme of each paper and its explanation
+    without an abstract) stay on the site. The checks above suggest that a small share of the papers shown are not metascience (perhaps a few percent; this
+    was not measured exactly), and metascience papers are missing too. The theme of each paper and its explanation
     were written by the language model and were not checked by hand.</p>
   </section>
 
@@ -151,7 +151,7 @@
       a second institution was often wrong. When two institutions are on equally many papers, a medical centre wins
       over the university in the same city (addresses such as "University Medical Center Groningen, University of
       Groningen" name both); otherwise the institution on the most recent paper is shown.</li>
-      <li><b>Everyone with a metascience paper is on the site.</b> Writing one paper on a metascience topic does not
+      <li><b>One metascience paper is enough to be on the site.</b> Writing one paper on a metascience topic does not
       make someone a metascientist; the number of papers shows how much of a person's work is metascience.</li>
       <li><b>Missing abstracts</b>: for <span id="noabs">some</span> of the metascience papers OpenAlex has no abstract,
       so the AI saw only the title, and term counts are lower bounds.</li>
@@ -205,7 +205,7 @@
     the "#" of hashtags are ignored. Plain "replication" is not a term, because it mostly means DNA replication.</p>
     <p><b>Who is named.</b> People are named on the Socials page only when they post regularly about metascience: at
     least 3 of their own posts contain a metascience term, and these are at least 1% of all their own posts. "Peer
-    review" and "impact factor" do not count for this, because almost every academic uses them. Everyone else is only
+    review" and "impact factor" do not count for this, because many academics use them. Everyone else is only
     counted in the totals.</p>
     <p><b>Limitations.</b> Only accounts we could find are included, so people who post under another name, or on
     other Mastodon servers that we could not search, are missing. Some name matches may still be wrong. A term in a post

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Metascience Funding</title>
-<meta name="description" content="NWO grants of Dutch metascientists and all metascience-related NWO projects: who got which grants, funding over time, and a timeline of funded projects.">
+<meta name="description" content="NWO grants linked to the researchers on this site and NWO projects identified as metascience-related: who got which grants, funding over time, and a timeline of funded projects.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
@@ -46,8 +46,8 @@
 <main>
   <h1>Funding</h1>
   <p class="lede">Grants from NWO, the Dutch Research Council, from its open project data (NWOpen, CC0). Two kinds of
-  projects are shown: all NWO grants of the researchers on this site, on any topic, and all NWO projects about research
-  on research, such as the Open Science funds and the Replication Studies programme, whoever received them. Which
+  projects are shown: the NWO grants we could link to researchers on this site, on any topic (some grants are missed,
+  and some may be linked to the wrong person), and the NWO projects we identified as research on research, such as the Open Science funds and the Replication Studies programme, whoever received them. Which
   ongoing projects work towards similar aims is shown on the <a href="inferences.html#projects">Inferences</a> page.</p>
   <div class="grid tiles" id="tiles"></div>
 
@@ -59,7 +59,7 @@
     older years. When you view the site as a person, a third view shows that person's grants, metascience-related or
     not.</p>
     <div class="controls">
-      <div class="seg" id="scope"><button aria-pressed="true" data-v="all">All grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
+      <div class="seg" id="scope"><button aria-pressed="true" data-v="all">Grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
       <div class="seg" id="measure"><button aria-pressed="true" data-v="n">Number of projects</button><button aria-pressed="false" data-v="a">Amount awarded</button></div>
     </div>
     <p class="small" id="ottotal"></p>
@@ -72,7 +72,7 @@
     <p class="sub">Every bar is a project, from its start to its end; scroll sideways and down. Hover for details,
     click for the summary. A faded bar has no end date in the NWO data (shown as one year).</p>
     <div class="controls">
-      <div class="seg" id="tlscope"><button aria-pressed="true" data-v="all">All grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
+      <div class="seg" id="tlscope"><button aria-pressed="true" data-v="all">Grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
       <input type="search" id="tlq" placeholder="Filter by title or person…" style="min-width:240px">
       <span class="muted small" id="tlcount"></span>
     </div>

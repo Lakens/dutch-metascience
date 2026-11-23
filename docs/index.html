@@ -30,10 +30,21 @@
   <button id="theme-toggle" type="button">Dark mode</button>
 </header>
 <main>
+  <section class="card" style="border-left: 4px solid var(--accent); margin-top: 8px">
+    <p style="margin:0 0 8px">This website was built by Daniel Lakens for the symposium <b>Research Prioritization in
+    Dutch Metascience</b> on 10 December. Its goal is to let attendees explore possible collaborations based on shared
+    interests.</p>
+    <p class="small" style="margin:0; color: var(--text-secondary)">We rely on classifications by OpenAlex, metadata from
+    NWO, keywords and ORCID data provided by authors, and data cleaning by Claude Opus 5.5. I have performed some basic
+    quality checks, but it was neither possible nor needed for the preparation of the symposium to validate all data by
+    hand. The data are provided for inspiration, not scholarship, and will contain errors and incorrect
+    classifications.</p>
+  </section>
   <h1>Metascience in the Netherlands</h1>
   <p class="lede">Research on research: replication, research practices, open science, peer review, integrity,
-  statistical inference, research evaluation and science policy. This site maps every metascience paper with at least
-  one author at a Dutch institution, found in OpenAlex and judged by a language model. Everything is interactive:
+  statistical inference, research evaluation and science policy. This site maps metascience papers with at least
+  one author at a Dutch institution that we found in OpenAlex, as judged by a language model and checked by AI
+  reviewers. Some papers are missing, and some papers shown are not metascience. Everything is interactive:
   hover for details, click legends to hide series, and follow the links to explore.</p>
 
   <div class="grid tiles" id="tiles"><div class="tile"><div class="v">…</div><div class="l">loading</div></div></div>
@@ -49,7 +60,7 @@
 
   <section class="card">
     <h2>How the field grew</h2>
-    <p class="sub">Metascience papers with a Dutch author per year, by theme. Switch to "share" to see how the mix of
+    <p class="sub">Metascience papers with an author at a Dutch institution per year, by theme. Switch to "share" to see how the mix of
     themes changed. The last year is not complete yet.</p>
     <div class="controls">
       <div class="seg" id="mode"><button aria-pressed="true" data-v="count">Number of papers</button><button aria-pressed="false" data-v="share">Share per year</button></div>
@@ -68,7 +79,7 @@
     </section>
     <section class="card">
       <h2>Newcomers per year</h2>
-      <p class="sub">The number of Dutch authors whose first metascience paper (in these data) appeared in that year.</p>
+      <p class="sub">The number of authors at Dutch institutions whose first metascience paper on this site appeared in that year.</p>
       <div id="newcomers" class="chart"></div>
       <h3 style="margin-top:18px">Explore</h3>
       <ul class="small">
@@ -76,9 +87,9 @@
         <li><a href="people.html">People</a>: each person's themes, timeline, co-authors and papers.</li>
         <li><a href="themes.html">Themes</a>: a map of all papers, theme clusters, keywords and institutions × themes.</li>
         <li><a href="time.html">Over time</a>: the rise of terms like preregistration, rising keywords, citations.</li>
-        <li><a href="history.html">History</a>: a timeline per theme of historical events (Wikipedia) and the landmark papers Dutch metascientists cite.</li>
+        <li><a href="history.html">History</a>: a timeline per theme of historical events (Wikipedia) and the landmark papers that the papers on this site cite most.</li>
         <li><a href="places.html">Places</a>: Dutch institutions on a map, their collaborations, and partner countries.</li>
-        <li><a href="funding.html">Funding</a>: NWO grants of these researchers and all metascience-related NWO projects, with a timeline.</li>
+        <li><a href="funding.html">Funding</a>: NWO grants we could link to these researchers and the NWO projects we identified as metascience-related, with a timeline.</li>
         <li><a href="inferences.html">Inferences</a>: who could work together, rising themes, and shared questions for joint projects.</li>
       </ul>
     </section>
@@ -129,7 +140,7 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
 
   const tiles = [
     [fmt(meta.n_papers), "metascience papers"],
-    [fmt(meta.n_people), "Dutch authors"],
+    [fmt(meta.n_people), "authors at Dutch institutions"],
     [fmt(meta.n_institutions), "Dutch institutions"],
     [fmt(meta.n_countries), "partner countries"],
     [`${meta.years[0]}–${meta.years[1]}`, "years covered"],
