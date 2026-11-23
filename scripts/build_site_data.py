@@ -211,9 +211,14 @@ n_exact_copies = len(dropped)
 # titles are at least 96% the same (difflib ratio, letters, digits and spaces only) and contain the same numbers. A
 # check of all pairs from 85% on (21 Nov 2026) showed that without these conditions different papers are joined:
 # "(part 1)" and "(Part 2)", "Transcript 1" and "Transcript 2", and two GIScience papers at 95%.
+# A note in brackets at the end of a title, such as "(in press for ...)", "(Preprint)" or "(Stage 2 Registered
+# Report)", is left out of this comparison (added 23 Nov 2026); a Stage 1 protocol is a different document and keeps
+# its note.
 import difflib
+TITLE_NOTE = re.compile(r"\s*[\(\[][^\)\]]*\b(in press|accepted|forthcoming|preprint|under review|submitted|to appear|"
+                        r"published in|stage 2)\b[^\)\]]*[\)\]]\s*$", re.I)
 def norm_words(t):
-    return re.sub(r"[^a-z0-9 ]", "", (t or "").lower()).strip()
+    return re.sub(r"[^a-z0-9 ]", "", TITLE_NOTE.sub("", t or "").lower()).strip()
 pref = lambda p: (p["ty"] == "preprint", -p["c"], p["id"])
 by_person = collections.defaultdict(list)
 for p in papers:
@@ -223,7 +228,7 @@ for p in papers:
 pairs = set()
 for plist in by_person.values():
     for a, b in itertools.combinations(plist, 2):
-        if "preprint" not in (a["ty"], b["ty"]) or re.findall(r"\d+", a["t"]) != re.findall(r"\d+", b["t"]):
+        if "preprint" not in (a["ty"], b["ty"]) or re.findall(r"\d+", norm_words(a["t"])) != re.findall(r"\d+", norm_words(b["t"])):
             continue
         sm = difflib.SequenceMatcher(None, norm_words(a["t"]), norm_words(b["t"]))
         if sm.real_quick_ratio() >= 0.96 and sm.quick_ratio() >= 0.96 and sm.ratio() >= 0.96:
