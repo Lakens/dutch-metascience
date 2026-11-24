@@ -12,7 +12,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 TEST = set(sys.argv[3].split(",")) if len(sys.argv) > 3 else set()  # test mode: these names only, no save
 MAILTO = os.environ.get("OPENALEX_MAILTO", "")
 OA_KEY = os.environ.get("OPENALEX_API_KEY", "").strip().strip('"').strip("'")
-UA = {"User-Agent": "metascience-landscape-script"}
+UA = {"User-Agent": "metascience-community-script"}
 
 cache = json.load(open(cache_path, encoding="utf-8")) if os.path.exists(cache_path) else {}
 session = requests.Session()

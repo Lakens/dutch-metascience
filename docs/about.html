@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About This Map</title>
-<meta name="description" content="How the Dutch Metascience Landscape was made, its limitations, and how to correct it.">
+<meta name="description" content="How the Dutch Metascience Community was made, its limitations, and how to correct it.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <script src="assets/common.js"></script>
@@ -12,7 +12,7 @@
 </head>
 <body>
 <header class="site">
-  <a class="brand" href="index.html" aria-label="Dutch Metascience Landscape, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Landscape" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
+  <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html">Overview</a>
     <a href="network.html">Who works with whom</a>
@@ -46,7 +46,12 @@
       Only scientific papers were kept: journal articles, reviews, preprints with a DOI, books, chapters, conference
       papers, editorials and letters; not blog posts, OSF project pages, deposits on Zenodo or Figshare (such as
       project deliverables and slides), datasets or peer reviews. The same rule applies to the papers found by the
-      search below (<span id="nnotpaper">some</span> items left out).</li>
+      search below (<span id="nnotpaper">some</span> items left out). Notices about specific papers (retractions,
+      corrections, errata) are left out too, found through Crossref, which links a notice to the paper it concerns,
+      and by a hand check of titles; so are papers that were themselves retracted, according to Crossref and OpenAlex
+      (which uses the Retraction Watch database). Crossref marked <span id="nnotices">some</span> notices among the
+      candidates (those found by title are counted among the papers removed by hand, below), and
+      <span id="nretracted">no</span> retracted papers were found among the candidates.</li>
       <li><b>A search of OpenAlex</b> added the papers since 2005 with an author at a Dutch institution that OpenAlex
       returned for metascience terms in the title or abstract (such as replicability, preregistration, publication bias, research integrity,
       Bayes factor, scientometrics, research assessment). In November 2026 terms on research funding and grant review,
@@ -164,7 +169,7 @@
     <p>The site shows only public bibliographic information (names as they appear on papers, ORCID identifiers,
     institutions on papers, titles, years, DOIs, co-authorships, citation counts) and the AI judgements. It contains no
     email addresses, job titles or memberships. If you want to be removed or corrected, open an issue in the
-    <a href="https://github.com/Lakens/dutch-metascience-landscape/issues">GitHub repository</a>.</p>
+    <a href="https://github.com/Lakens/dutch-metascience-community/issues">GitHub repository</a>.</p>
     <p>The personal view ("Find yourself" on the overview page) only highlights public data that is already on the
     site. The chosen person is kept in your browser and in the page address (<code>?me=</code>), so a link can be
     shared; nothing is sent to a server, because the site has none. Anyone can choose any name.</p>
@@ -216,11 +221,11 @@
 
   <section class="card">
     <h2>Data and code</h2>
-    <p>All scripts are in the <a href="https://github.com/Lakens/dutch-metascience-landscape">repository</a>; the
+    <p>All scripts are in the <a href="https://github.com/Lakens/dutch-metascience-community">repository</a>; the
     data files behind every chart are in <code>docs/data/</code>. OpenAlex data are CC0. Built in <span id="built"></span>.</p>
   </section>
 </main>
-<footer>Dutch Metascience Landscape</footer>
+<footer>Dutch Metascience Community</footer>
 <script>
 load("meta").then((m) => {
   document.getElementById("built").textContent = m.built || "November 2026";
@@ -228,6 +233,8 @@ load("meta").then((m) => {
   if (m.n_excluded_by_hand != null) document.getElementById("nexcl").textContent = fmt(m.n_excluded_by_hand);
   if (m.n_abroad != null) document.getElementById("nabroad").textContent = fmt(m.n_abroad);
   if (m.n_not_paper != null) document.getElementById("nnotpaper").textContent = fmt(m.n_not_paper);
+  if (m.n_notices != null) document.getElementById("nnotices").textContent = fmt(m.n_notices);
+  if (m.n_retracted != null) document.getElementById("nretracted").textContent = m.n_retracted ? fmt(m.n_retracted) : "no";
   if (m.n_copies != null) document.getElementById("ncopies").textContent = fmt(m.n_copies);
   if (m.n_no_abstract != null) document.getElementById("noabs").textContent =
     `${fmt(m.n_no_abstract)} of the ${fmt(m.n_papers)} (${Math.round(100 * m.n_no_abstract / m.n_papers)}%)`;

@@ -1,9 +1,9 @@
-# Dutch Metascience Landscape
+# Dutch Metascience Community
 
 An interactive website that maps metascience (research on research) in the Netherlands: who works with whom, on
 which themes, at which institutions, and how the literature developed over time.
 
-**Website:** https://lakens.github.io/dutch-metascience-landscape/
+**Website:** https://lakens.github.io/dutch-metascience-community/
 
 ## What is on the site
 

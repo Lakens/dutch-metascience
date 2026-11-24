@@ -55,7 +55,7 @@
 </head>
 <body>
 <header class="site">
-  <a class="brand" href="index.html" aria-label="Dutch Metascience Landscape, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Landscape" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
+  <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html">Overview</a>
     <a href="network.html">Who works with whom</a>
@@ -328,8 +328,8 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
       marker: { color, size, opacity: 0.9 }, hovertemplate: "%{text}<extra></extra>" });
     const all = current.length === papers.length;
     Plotly.react("map", [tr(rest, cssVar("--other"), 4, "other papers"), tr(sel, all ? cssVar("--other") : cssVar("--series-1"), 5, "results")],
-      baseLayout({ showlegend: false, hovermode: "closest", margin: { l: 10, r: 10, t: 10, b: 10 },
-        xaxis: { visible: false }, yaxis: { visible: false, scaleanchor: "x" } }), PLOT_CONFIG);
+      baseLayout({ showlegend: false, hovermode: "closest", dragmode: "zoom", margin: { l: 10, r: 10, t: 10, b: 10 },
+        xaxis: { visible: false }, yaxis: { visible: false, scaleanchor: "x" } }), MAP_CONFIG);
     if (!mapReady) {
       mapReady = true;
       el("map").on("plotly_click", (ev) => { const id = ev.points[0] && ev.points[0].customdata; if (id) openPaper(id); });

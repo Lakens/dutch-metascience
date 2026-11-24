@@ -1,7 +1,8 @@
 """Prepare the JSON data for the website from the databases.
 
-Usage: python -I build_site_data.py <raw database.sqlite> <output data folder>
-Needs OPENALEX_API_KEY (institution coordinates and parents). Publishes only public bibliographic data and the
+Usage: python -I build_site_data.py <raw database.sqlite> <output data folder> <notice_flags.json>
+Needs OPENALEX_API_KEY (institution coordinates and parents). <notice_flags.json> comes from fetch_notice_flags.py
+(run it first): notices such as retractions and corrections, and retracted papers, are left out. Publishes only public bibliographic data and the
 AI judgements: never emails, roles or community memberships from the source spreadsheet.
 """
 import sys, os, re, json, collections, itertools, math, sqlite3
@@ -11,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oa_store import oa_get, short
 
 sys.stdout.reconfigure(encoding="utf-8")
-raw_path, out_dir = sys.argv[1], sys.argv[2]
+raw_path, out_dir, notice_path = sys.argv[1], sys.argv[2], sys.argv[3]
 os.makedirs(out_dir, exist_ok=True)
 db = sqlite3.connect(raw_path)
 VERSION = "v2+v4"  # metascience = v2 and the stricter check v4 both say so (view metascience_final)
@@ -62,6 +63,47 @@ n_before_sci = len(cands)
 cands = [c for c in cands if is_scientific(c[7], c[4], c[3])]
 n_not_paper = n_before_sci - len(cands)
 print(f"left out as not a scientific paper (deposits, reports, datasets and the like): {n_not_paper}")
+
+# notices and retracted papers (added 24 Nov 2026). OpenAlex gives most notices the type "retraction" or "erratum"
+# (left out above), but some only "article". fetch_notice_flags.py asked Crossref and OpenAlex about every candidate:
+# a notice is a work that Crossref says retracts or corrects another work; a paper is retracted when OpenAlex
+# (Retraction Watch) says so, or Crossref lists a retraction, withdrawal or removal notice for it.
+# scripts/kept_after_notice_check.csv lists works kept after a hand check (such as a full revised article that
+# Crossref marks as a correction). Notices without a Crossref mark are found by their title (printed below) and
+# judged by hand: notices go into excluded_by_hand.csv, papers that only share the wording into the kept list.
+notice = json.load(open(notice_path, encoding="utf-8"))
+KEPT_NOTICE = {r["work_id"] for r in csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                     "kept_after_notice_check.csv"), encoding="utf-8"))}
+unchecked = sorted({c[0] for c in cands} - set(notice["ids"]))
+if unchecked:
+    raise SystemExit(f"STOPPED: {len(unchecked)} papers were not checked for notices and retractions "
+                     f"(run fetch_notice_flags.py again): {unchecked[:10]}")
+RETRACTED_BY = {"retraction", "withdrawal", "removal"}
+def notice_reason(wid):
+    f = notice["flags"].get(wid)
+    if not f or wid in KEPT_NOTICE:
+        return None
+    if f["openalex_retracted"] or RETRACTED_BY & set(f["updated_by"]):
+        return "retracted"
+    if f["notice"]:
+        return "notice"
+    return None
+reasons = {c[0]: notice_reason(c[0]) for c in cands}
+for c in cands:
+    if reasons[c[0]]:
+        print(f"  left out ({reasons[c[0]]}): {c[0]} {c[1][:110]}")
+n_notices = sum(1 for r in reasons.values() if r == "notice")
+n_retracted = sum(1 for r in reasons.values() if r == "retracted")
+cands = [c for c in cands if not reasons[c[0]]]
+print(f"left out as notices (retraction, correction and the like): {n_notices} | as retracted papers: {n_retracted}")
+NOTICE_TITLE = re.compile(r"^\W*(retraction|retracted|notice of retraction|withdrawn|withdrawal|correction|corrigend(um|a)|errat(um|a)|"
+                          r"addendum|(editorial )?expression of concern)\b|\b(retraction (of|note|notice)|requested retraction|"
+                          r"response to the retraction|(correction|erratum|corrigendum|addendum) (to|for|of)|expression of concern)\b", re.I)
+to_check = [c for c in cands if c[0] not in KEPT_NOTICE and NOTICE_TITLE.search(c[1] or "")]
+if to_check:
+    print(f"  CHECK BY HAND: {len(to_check)} titles read like a notice (add to excluded_by_hand.csv or kept_after_notice_check.csv):")
+    for c in to_check:
+        print(f"    {c[0]} {c[1][:120]}")
 
 auth_rows = collections.defaultdict(list)
 raw_aff = {}                                # (work, position) -> the affiliation text as the publisher gave it
@@ -170,7 +212,7 @@ for (wid, title, year, venue, doi, n_auth, cited, wtype, kw, field, topic, cat, 
                 person_info[pk] = dict(name=alias_name.get(pk, aname), orcid=alias_orcid.get(pk) or orcid or "", listed=False)
         if pk and pk not in people:
             people.append(pk)
-    if not people:      # no Dutch author and no one from our list: not part of the Dutch landscape
+    if not people:      # no Dutch author and no one from our list: not part of the Dutch community
         continue
     if not nl_insts and not listed_unknown:
         # no Dutch institution, and the institutions of the people from our list on it are known (for example a paper
@@ -249,7 +291,7 @@ papers = [p for p in papers if p["id"] not in dropped]
 for wid in dropped:
     del paper_people[wid], paper_nl_insts[wid], paper_countries[wid]
 print(f"left out as copies of another paper: {len(dropped)} papers")
-print("papers in the Dutch metascience landscape:", len(papers), flush=True)
+print("papers in the Dutch metascience community:", len(papers), flush=True)
 # every paper on the site should have a hand-check verdict (scripts/hand_check_verdicts.tsv). Papers that come onto the
 # site in a later rebuild (new data, changed rules) have none; on 21 Nov 2026 there were 332 such papers. List them,
 # so they can be checked with scripts/hand_check_rules.md before the site is published.
@@ -496,6 +538,7 @@ meta = dict(n_papers=len(papers), n_people=len(people_out), n_listed=sum(r["l"] 
             categories=sorted(set(p["cat"] for p in papers)), max_authors_for_links=MAX_AUTHORS_FOR_LINKS,
             model="gpt-oss:20b (Ollama, SURF Research Cloud)", prompt_version=VERSION, built="November 2026",
             n_excluded_by_hand=n_excluded_by_hand, n_not_paper=n_not_paper, n_abroad=n_abroad, n_copies=len(dropped),
+            n_notices=n_notices, n_retracted=n_retracted,
             n_mixed_affiliation_papers=len({w for w, _ in weak}), n_no_abstract=sum(1 for p in papers if not db.execute(
                 "SELECT abstract FROM oa_works WHERE work_id=?", (p["id"],)).fetchone()[0]))
 

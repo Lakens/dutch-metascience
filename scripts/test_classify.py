@@ -28,7 +28,7 @@ seed_rows = [("our papers",) + tuple(db.execute("SELECT work_id, title, abstract
 r = requests.get("https://api.openalex.org/works", params={
     "filter": terms.search_filter(), "sample": 50, "seed": 42, "per-page": 50,
     "select": "id,display_name,abstract_inverted_index,publication_year,primary_topic", "api_key": OA_KEY},
-    headers={"User-Agent": "metascience-landscape-script"}, timeout=90)
+    headers={"User-Agent": "metascience-community-script"}, timeout=90)
 r.raise_for_status()
 print("OpenAlex search hits in total:", r.json()["meta"]["count"], flush=True)
 search_rows = [("OpenAlex search", w["id"].rsplit("/", 1)[-1], w["display_name"], abstract(w.get("abstract_inverted_index")),

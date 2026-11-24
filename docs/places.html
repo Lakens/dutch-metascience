@@ -13,7 +13,7 @@
 </head>
 <body>
 <header class="site">
-  <a class="brand" href="index.html" aria-label="Dutch Metascience Landscape, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Landscape" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
+  <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html">Overview</a>
     <a href="network.html">Who works with whom</a>
@@ -88,11 +88,11 @@ Promise.all([load("institutions"), load("countries"), load("meta"), Me.ready]).t
       marker: { size: show.map(([, n]) => 4 + 40 * Math.sqrt(n / maxK)), color: cssVar("--series-1"), opacity: 0.7,
         line: { width: show.map(([i]) => (myIns.has(i.id) ? 3 : 1)),
           color: show.map(([i]) => cssVar(myIns.has(i.id) ? "--text-primary" : "--surface-1")) } } }],
-      baseLayout({ margin: { l: 0, r: 0, t: 0, b: 0 }, geo: {
+      baseLayout({ margin: { l: 0, r: 0, t: 0, b: 0 }, dragmode: "zoom", geo: {
         projection: { type: "mercator" }, lonaxis: { range: [3.2, 7.4] }, lataxis: { range: [50.7, 53.65] },
         showland: true, landcolor: cssVar("--surface-2"), showocean: true, oceancolor: cssVar("--surface-1"),
         showcountries: true, countrycolor: cssVar("--axis"), showcoastlines: true, coastlinecolor: cssVar("--axis"),
-        showlakes: true, lakecolor: cssVar("--surface-1"), bgcolor: "rgba(0,0,0,0)", resolution: 50 } }), PLOT_CONFIG);
+        showlakes: true, lakecolor: cssVar("--surface-1"), bgcolor: "rgba(0,0,0,0)", resolution: 50 } }), MAP_CONFIG);
   }
   slider.addEventListener("input", drawMap);
   let timer = null;
@@ -148,9 +148,9 @@ Promise.all([load("institutions"), load("countries"), load("meta"), Me.ready]).t
       colorscale: seqScale(), marker: { line: { color: cssVar("--surface-1"), width: 0.5 } },
       colorbar: { title: { text: "papers", side: "right" }, thickness: 10, outlinewidth: 0, tickvals: [0, 1, 2, 3],
         ticktext: ["1", "10", "100", "1000"], tickfont: { color: cssVar("--text-muted") } } }],
-      baseLayout({ margin: { l: 0, r: 0, t: 0, b: 0 }, geo: { projection: { type: "natural earth" }, showframe: false,
+      baseLayout({ margin: { l: 0, r: 0, t: 0, b: 0 }, dragmode: "zoom", geo: { projection: { type: "natural earth" }, showframe: false,
         showcoastlines: false, showland: true, landcolor: cssVar("--surface-2"), bgcolor: "rgba(0,0,0,0)",
-        showcountries: true, countrycolor: cssVar("--surface-1") } }), PLOT_CONFIG);
+        showcountries: true, countrycolor: cssVar("--surface-1") } }), MAP_CONFIG);
   }
 
   document.getElementById("itable").innerHTML = "<thead><tr><th>Institution</th><th>City</th><th>Type</th><th class='num'>Papers</th><th>Main theme</th></tr></thead><tbody>" +

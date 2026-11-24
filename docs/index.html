@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dutch Metascience Landscape</title>
+<title>Dutch Metascience Community</title>
 <meta name="description" content="An interactive map of metascience research in the Netherlands: who works with whom, on which themes, and how the field developed.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
@@ -12,7 +12,7 @@
 </head>
 <body>
 <header class="site">
-  <a class="brand" href="index.html" aria-label="Dutch Metascience Landscape, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Landscape" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
+  <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html" aria-current="page">Overview</a>
     <a href="network.html">Who works with whom</a>
@@ -60,10 +60,12 @@
 
   <section class="card">
     <h2>How the field grew</h2>
-    <p class="sub">Metascience papers with an author at a Dutch institution per year, by theme. Switch to "share" to see how the mix of
-    themes changed. The last year is not complete yet.</p>
+    <p class="sub">Metascience papers with an author at a Dutch institution per year, by theme, for every 1,000 publications
+    with an author at a Dutch institution in OpenAlex (same kinds of work as on this site). Dutch output as a whole also grew,
+    so this shows whether metascience grew faster than research in general. Switch to "number of papers" for the counts, or to
+    "share" to see how the mix of themes changed. The last year is not complete yet.</p>
     <div class="controls">
-      <div class="seg" id="mode"><button aria-pressed="true" data-v="count">Number of papers</button><button aria-pressed="false" data-v="share">Share per year</button></div>
+      <div class="seg" id="mode"><button aria-pressed="true" data-v="rate">Per 1,000 Dutch publications</button><button aria-pressed="false" data-v="count">Number of papers</button><button aria-pressed="false" data-v="share">Share per year</button></div>
     </div>
     <div class="legend" id="legend"></div>
     <div id="growth" class="chart"></div>
@@ -99,9 +101,9 @@
 Theme labels are AI judgements and can be wrong; see <a href="about.html">About</a>.</footer>
 
 <script>
-let mode = "count";
+let mode = "rate";
 const active = new Set(CATEGORIES);
-Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), load("institutions"), Me.ready]).then(([meta, papers, people, clusters, insts, me]) => {
+Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), load("institutions"), load("publication_totals"), Me.ready]).then(([meta, papers, people, clusters, insts, totals, me]) => {
   // ---- find yourself ----
   const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
   const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
@@ -153,16 +155,23 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
   papers.forEach((p) => { if (byCat[p.cat] && p.y in byCat[p.cat]) byCat[p.cat][p.y]++; });
   const tot = Object.fromEntries(years.map((y) => [y, CATEGORIES.reduce((s, c) => s + byCat[c][y], 0)]));
 
+  // all publications with an author at a Dutch institution per year (fetch_publication_totals.py)
+  const allNL = Object.fromEntries(years.map((y) => [y, totals.n[y] || 0]));
+  const value = (c, y) => mode === "share" ? (tot[y] ? 100 * byCat[c][y] / tot[y] : 0)
+    : mode === "rate" ? (allNL[y] ? 1000 * byCat[c][y] / allNL[y] : 0) : byCat[c][y];
+  const unit = { share: ["%{y:.1f}%", "share of papers (%)"], rate: ["%{y:.2f} per 1,000", "metascience papers per 1,000 Dutch publications"],
+    count: ["%{y:.0f} papers", "papers"] };
   function drawGrowth() {
     categoryLegend(document.getElementById("legend"), active, drawGrowth);
     const traces = CATEGORIES.filter((c) => active.has(c)).map((c) => ({
-      x: years, y: years.map((y) => mode === "share" ? (tot[y] ? 100 * byCat[c][y] / tot[y] : 0) : byCat[c][y]),
+      x: years, y: years.map((y) => value(c, y)),
+      customdata: years.map((y) => byCat[c][y]),
       name: CAT_LABEL[c], type: "scatter", mode: "lines", stackgroup: "one", line: { width: 0.5, color: catColor(c) },
       fillcolor: catColor(c),
-      hovertemplate: `${esc(CAT_LABEL[c])}<br>%{x}: %{y:${mode === "share" ? ".1f" : ".0f"}}${mode === "share" ? "%" : " papers"}<extra></extra>`,
+      hovertemplate: `${esc(CAT_LABEL[c])}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>`,
     }));
     Plotly.react("growth", traces, baseLayout({ showlegend: false, hovermode: "x unified",
-      yaxis: Object.assign(baseLayout().yaxis, { title: mode === "share" ? "share of papers (%)" : "papers", range: mode === "share" ? [0, 100] : null }) }), PLOT_CONFIG);
+      yaxis: Object.assign(baseLayout().yaxis, { title: unit[mode][1], range: mode === "share" ? [0, 100] : null }) }), PLOT_CONFIG);
   }
   document.querySelectorAll("#mode button").forEach((b) => b.addEventListener("click", () => {
     mode = b.dataset.v; document.querySelectorAll("#mode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawGrowth();

@@ -17,7 +17,7 @@ import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 data_dir, out_path = sys.argv[1:3]
-UA = {"User-Agent": "metascience-landscape-script"}
+UA = {"User-Agent": "metascience-community-script"}
 people = json.load(open(os.path.join(data_dir, "people.json"), encoding="utf-8"))
 SERVERS = {"bluesky": 0.25, "mastodon.social": 1.05, "fediscience.org": 1.05, "akademienl.social": 1.05}
 

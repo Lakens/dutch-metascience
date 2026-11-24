@@ -74,6 +74,9 @@ research practice count.
   special issue.
 - A debate between authors about what one study shows (comments, replies, authors' responses about its
   substantive conclusions), unless it makes a general point about research practice (YES, see above).
+- A notice about specific papers (added 24 Nov 2026): a retraction notice, correction, erratum, corrigendum,
+  addendum, expression of concern or withdrawal, a request to retract, or a statement responding to the retraction
+  of one paper, even when the reason is misconduct. A STUDY of retractions or corrections is YES (see above).
 - Ethics, governance or trust concerning a technology (AI, biotechnology, dual use in industry) or a profession,
   not concerning research.
 - Education, management, business or economics topics that are not about research.

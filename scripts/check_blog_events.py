@@ -29,7 +29,7 @@ MIN_BLOGGERS, MIN_SHOWN_BLOGGERS, MAX_WORDS, MAX_TITLE = 5, 3, 45, 80
 # events kept with fewer than MIN_BLOGGERS bloggers, by decision of the site's maintainer (episode: reason); every other
 # check still applies, and the event is marked by_hand in the output
 ADDED_BY_HAND = {32: "the Förster case (4 bloggers) concerns a Dutch university and the Dutch research integrity board LOWI"}
-UA = {"User-Agent": "dutch-metascience-landscape/1.0 (https://github.com/Lakens/dutch-metascience-landscape)"}
+UA = {"User-Agent": "dutch-metascience-community/1.0 (https://github.com/Lakens/dutch-metascience-community)"}
 C = json.load(open(cand_path, encoding="utf-8"))
 E = {e["episode"]: e for e in C["episodes"]}
 blogs = {p["id"]: p for p in json.load(open(blogs_path, encoding="utf-8"))}

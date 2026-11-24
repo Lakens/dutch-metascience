@@ -19,7 +19,7 @@ MIN_CITING = 5
 part = out + ".partial"
 store = json.load(open(part, encoding="utf-8")) if os.path.exists(part) else {"refs": {}, "works": {}}
 s = requests.Session()
-s.headers["User-Agent"] = "metascience-landscape-script"
+s.headers["User-Agent"] = "metascience-community-script"
 
 def get(ids, select):
     for attempt in range(5):

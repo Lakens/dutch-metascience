@@ -13,7 +13,7 @@ import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 hits_path, out_path = sys.argv[1:3]
-UA = {"User-Agent": "metascience-landscape-script"}
+UA = {"User-Agent": "metascience-community-script"}
 out = json.load(open(out_path, encoding="utf-8")) if os.path.exists(out_path) else {}
 uris = sorted({h["uri"] for h in map(json.loads, open(hits_path, encoding="utf-8"))
                if h["account"].startswith("bluesky_") and h.get("uri", "").startswith("at://")} - set(out))

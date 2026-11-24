@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Dutch Metascience Landscape">
-  <title>Dutch Metascience Landscape</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Dutch Metascience Community">
+  <title>Dutch Metascience Community</title>
   <style>
     .ink { fill: #1b2430; } .ink-line { stroke: #1b2430; }
     @media (prefers-color-scheme: dark) { .ink { fill: #eef2f4; } .ink-line { stroke: #eef2f4; } }

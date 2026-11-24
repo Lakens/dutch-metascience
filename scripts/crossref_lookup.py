@@ -26,7 +26,7 @@ def get(params):
     for attempt in range(6):
         try:
             r = session.get("https://api.openalex.org/works", params={**params, "api_key": KEY},
-                            headers={"User-Agent": "metascience-landscape-script"}, timeout=90)
+                            headers={"User-Agent": "metascience-community-script"}, timeout=90)
             if r.status_code == 429 or r.status_code >= 500:
                 time.sleep(5 * (attempt + 1)); continue
             r.raise_for_status()
@@ -42,7 +42,7 @@ def get_one(doi):
     for attempt in range(6):
         try:
             r = session.get(f"https://api.openalex.org/works/doi:{doi}", params={"select": FIELDS, "api_key": KEY},
-                            headers={"User-Agent": "metascience-landscape-script"}, timeout=90)
+                            headers={"User-Agent": "metascience-community-script"}, timeout=90)
             if r.status_code == 404:
                 return None
             if r.status_code == 429 or r.status_code >= 500:

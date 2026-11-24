@@ -18,7 +18,7 @@ import requests
 sys.stdout.reconfigure(encoding="utf-8")
 final_path, out_dir = sys.argv[1:3]
 os.makedirs(out_dir, exist_ok=True)
-UA = {"User-Agent": "metascience-landscape-script"}
+UA = {"User-Agent": "metascience-community-script"}
 final = json.load(open(final_path, encoding="utf-8"))
 
 def plain(h):

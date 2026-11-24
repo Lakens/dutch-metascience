@@ -82,6 +82,7 @@ function baseLayout(extra = {}) {
   const ax = { gridcolor: grid, linecolor: axis, zerolinecolor: axis, tickfont: { color: cssVar("--text-muted") }, automargin: true };
   return Object.assign({
     paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+    dragmode: false,   // no zooming or panning by dragging; the maps set "zoom" and use MAP_CONFIG
     font: { family: 'system-ui, -apple-system, "Segoe UI", sans-serif', color: ink, size: 13 },
     margin: { l: 50, r: 20, t: 10, b: 40 },
     hoverlabel: { bgcolor: cssVar("--surface-1"), bordercolor: cssVar("--axis"), font: { color: cssVar("--text-primary") } },
@@ -89,7 +90,10 @@ function baseLayout(extra = {}) {
     xaxis: Object.assign({}, ax), yaxis: Object.assign({}, ax),
   }, extra);
 }
-const PLOT_CONFIG = { displaylogo: false, responsive: true, modeBarButtonsToRemove: ["lasso2d", "select2d"] };
+// charts: hover labels only, no zoom (no toolbar, no scroll zoom, no double-click reset)
+const PLOT_CONFIG = { displaylogo: false, responsive: true, displayModeBar: false, scrollZoom: false, doubleClick: false };
+// maps (paper map, Places maps): zoom and pan stay available
+const MAP_CONFIG = { displaylogo: false, responsive: true, modeBarButtonsToRemove: ["lasso2d", "select2d"] };
 
 // ---- an HTML legend for the categories (click to hide a category) ----
 function categoryLegend(el, active, onToggle) {
