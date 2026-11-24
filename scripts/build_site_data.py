@@ -46,10 +46,10 @@ cands = db.execute("""
 import csv
 EXCLUDED = {r["work_id"] for r in csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                                    "excluded_by_hand.csv"), encoding="utf-8"))}
-n_before = len(cands)
-cands = [c for c in cands if c[0] not in EXCLUDED]
-n_excluded_by_hand = n_before - len(cands)
-print(f"left out by hand check: {n_excluded_by_hand} papers")
+# (applied after the versions of each paper are grouped, below: if any version of a paper was excluded, the whole
+# paper is left out, so that no other version takes its place; changed 26 Nov 2026)
+n_excluded_by_hand = sum(1 for c in cands if c[0] in EXCLUDED)
+print(f"versions excluded by hand check: {n_excluded_by_hand}")
 # only scientific papers: the same rules as build_clean.py (SCIENTIFIC), which the publication lists of the people on
 # our list already passed; papers found by the OpenAlex search must pass them too
 KEEP_TYPES = ("article", "review", "preprint", "book", "book-chapter", "conference-paper", "editorial", "letter")
@@ -94,12 +94,15 @@ for c in cands:
         print(f"  left out ({reasons[c[0]]}): {c[0]} {c[1][:110]}")
 n_notices = sum(1 for r in reasons.values() if r == "notice")
 n_retracted = sum(1 for r in reasons.values() if r == "retracted")
-cands = [c for c in cands if not reasons[c[0]]]
+# notices are documents of their own and are left out here; a retracted version takes all versions of its paper
+# with it, after the grouping below
+RETRACTED_IDS = {w for w, r in reasons.items() if r == "retracted"}
+cands = [c for c in cands if reasons[c[0]] != "notice"]
 print(f"left out as notices (retraction, correction and the like): {n_notices} | as retracted papers: {n_retracted}")
 NOTICE_TITLE = re.compile(r"^\W*(retraction|retracted|notice of retraction|withdrawn|withdrawal|correction|corrigend(um|a)|errat(um|a)|"
                           r"addendum|(editorial )?expression of concern)\b|\b(retraction (of|note|notice)|requested retraction|"
                           r"response to the retraction|(correction|erratum|corrigendum|addendum) (to|for|of)|expression of concern)\b", re.I)
-to_check = [c for c in cands if c[0] not in KEPT_NOTICE and NOTICE_TITLE.search(c[1] or "")]
+to_check = [c for c in cands if c[0] not in KEPT_NOTICE and c[0] not in EXCLUDED and NOTICE_TITLE.search(c[1] or "")]
 if to_check:
     print(f"  CHECK BY HAND: {len(to_check)} titles read like a notice (add to excluded_by_hand.csv or kept_after_notice_check.csv):")
     for c in to_check:
@@ -189,7 +192,8 @@ def combined_block(wid):
 # institution counts only for authors who are at a Dutch institution on another paper with their own text
 mixed_papers = {c[0] for c in cands if shared_mixed(c[0])}
 weak = {(w, r[0]) for w in mixed_papers for r in auth_rows.get(w, [])} | {a for c in cands for a in combined_block(c[0])}
-dutch_on_own_text = {aid for c in cands for pos, aid, *_ in auth_rows.get(c[0], [])
+# (only papers not excluded by hand count as evidence about a person, as before the grouping change of 26 Nov 2026)
+dutch_on_own_text = {aid for c in cands if c[0] not in EXCLUDED for pos, aid, *_ in auth_rows.get(c[0], [])
                      if aid and (c[0], pos) not in weak and any(is_dutch_inst(i) for i in inst_rows.get((c[0], pos), []))}
 print(f"papers with one shared affiliation text naming the Netherlands and other countries: {len(mixed_papers)}; "
       f"papers with such authorships (also combined blocks starting with 'From'): {len({w for w, _ in weak})}")
@@ -291,6 +295,33 @@ papers = [p for p in papers if p["id"] not in dropped]
 for wid in dropped:
     del paper_people[wid], paper_nl_insts[wid], paper_countries[wid]
 print(f"left out as copies of another paper: {len(dropped)} papers")
+# one paper, all its versions: a paper is left out when ANY of its versions was excluded by hand or retracted, so a
+# decision about one version holds for the paper (26 Nov 2026). All versions stay in the raw database; table
+# paper_copies records which version is shown for each copy.
+versions = collections.defaultdict(set)
+for c, k in copy_of.items():
+    versions[k].add(c)
+removed_paper = {}
+for p in papers:
+    members = {p["id"]} | versions.get(p["id"], set())
+    if members & EXCLUDED:
+        removed_paper[p["id"]] = "excluded by hand"
+    elif members & RETRACTED_IDS:
+        removed_paper[p["id"]] = "retracted"
+for wid, why in removed_paper.items():
+    if wid not in EXCLUDED and wid not in RETRACTED_IDS:
+        print(f"  left out because another version was {why}: {wid} {byid[wid]['t'][:90]}")
+papers = [p for p in papers if p["id"] not in removed_paper]
+for wid in removed_paper:
+    del paper_people[wid], paper_nl_insts[wid], paper_countries[wid]
+copy_of = {c: k for c, k in copy_of.items() if k not in removed_paper}
+print(f"papers left out because a version was excluded or retracted: {len(removed_paper)}")
+db.execute("CREATE TABLE IF NOT EXISTS paper_copies (work_id TEXT PRIMARY KEY, shown_as TEXT, status TEXT)")
+db.execute("DELETE FROM paper_copies")
+db.executemany("INSERT INTO paper_copies VALUES (?, ?, ?)",
+               [(c, k, "copy of the version shown") for c, k in copy_of.items()] +
+               [(c, k, "paper left out (" + removed_paper[k] + ")") for k in removed_paper for c in versions.get(k, ())])
+db.commit()
 print("papers in the Dutch metascience community:", len(papers), flush=True)
 # every paper on the site should have a hand-check verdict (scripts/hand_check_verdicts.tsv). Papers that come onto the
 # site in a later rebuild (new data, changed rules) have none; on 21 Nov 2026 there were 332 such papers. List them,
