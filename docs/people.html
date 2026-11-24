@@ -125,7 +125,9 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
     });
     Plotly.react("timeline", traces, baseLayout({ showlegend: false, margin: { l: 10, r: 10, t: 10, b: 40 },
       yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map((c) => CAT_LABEL[c]) }),
-      xaxis: Object.assign(baseLayout().xaxis, { dtick: 2 }) }), PLOT_CONFIG);
+      // horizontal year labels (rotated labels are hard to read); the axis covers only the years with papers
+      xaxis: Object.assign(baseLayout().xaxis, { tickangle: 0, nticks: 8, tickformat: "d", showgrid: true,
+        range: (() => { const ys = ps.map((x) => x.y).filter(Boolean); return [Math.min(...ys) - 1, Math.max(...ys) + 1]; })() }) }), PLOT_CONFIG);
     const el = document.getElementById("timeline");
     el.removeAllListeners && el.removeAllListeners("plotly_click");
     el.on("plotly_click", (d) => window.open(d.points[0].customdata, "_blank", "noopener"));
@@ -177,12 +179,15 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
     const n = +document.getElementById("heatn").value;
     const sel = people.slice(0, n);   // people.json is sorted by number of papers
     const z = sel.map((p) => CATEGORIES.map((c) => (100 * (p.cats[c] || 0)) / p.k));
-    Plotly.react("heat", [{ type: "heatmap", z, x: CATEGORIES.map((c) => CAT_LABEL[c]), y: sel.map((p) => `${p.n} (${p.k})`),
+    // theme names on two or three short lines, so they fit horizontally under their column
+    const lines = (s) => s.split(" ").reduce((a, w) => { const l = a[a.length - 1]; if (l && (l + " " + w).length <= 14) a[a.length - 1] = l + " " + w; else a.push(w); return a; }, []).join("<br>");
+    Plotly.react("heat", [{ type: "heatmap", z, x: CATEGORIES.map((c) => lines(CAT_LABEL[c])), y: sel.map((p) => `${p.n} (${p.k})`),
       customdata: sel.map((p) => CATEGORIES.map(() => p.id)), colorscale: seqScale(), zmin: 0, zmax: 100, xgap: 2, ygap: 2,
       colorbar: { title: { text: "% of papers", side: "right" }, thickness: 10, outlinewidth: 0, tickfont: { color: cssVar("--text-muted") } },
-      hovertemplate: "%{y}<br>%{x}: %{z:.0f}% of papers<extra></extra>" }],
-      baseLayout({ height: Math.max(500, sel.length * 18 + 140), margin: { l: 10, r: 10, t: 10, b: 120 },
-        yaxis: Object.assign(baseLayout().yaxis, { autorange: "reversed" }), xaxis: Object.assign(baseLayout().xaxis, { side: "bottom", tickangle: -30 }) }), PLOT_CONFIG);
+      text: sel.map(() => CATEGORIES.map((c) => CAT_LABEL[c])), hovertemplate: "%{y}<br>%{text}: %{z:.0f}% of papers<extra></extra>" }],
+      baseLayout({ height: Math.max(500, sel.length * 18 + 140), margin: { l: 10, r: 10, t: 10, b: 70 },
+        yaxis: Object.assign(baseLayout().yaxis, { autorange: "reversed" }),
+        xaxis: Object.assign(baseLayout().xaxis, { side: "bottom", tickangle: 0, tickfont: { size: 11, color: cssVar("--text-muted") } }) }), PLOT_CONFIG);
     const el = document.getElementById("heat");
     el.removeAllListeners && el.removeAllListeners("plotly_click");
     el.on("plotly_click", (d) => { location.hash = encodeURIComponent(d.points[0].customdata); window.scrollTo({ top: 0, behavior: "smooth" }); });

@@ -42,6 +42,9 @@
 
   <section class="card">
     <h2>The rise of terms</h2>
+    <p class="sub">Papers on this site per year that use each term in their title or abstract. Each panel has its own
+    vertical scale, so that rare terms stay visible: compare the shape of the curves, not their height (the total under
+    each term gives the size). The last year is not complete yet.</p>
     <div class="controls">
       <div class="seg" id="tmode"><button aria-pressed="true" data-v="count">Papers</button><button aria-pressed="false" data-v="share">Share of that year's papers</button></div>
       <label>From <select id="from"><option>2000</option><option selected>2005</option><option>2010</option></select></label>
@@ -148,7 +151,8 @@ Promise.all([load("terms"), load("keywords"), load("papers"), load("people"), lo
     }
     Plotly.react("cites", traces,
       baseLayout({ showlegend: !!me, legend: { orientation: "h", y: 1.08, x: 0 }, hovermode: "closest",
-        yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "citations + 1", dtick: 1 }) }), PLOT_CONFIG);
+        yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "citations + 1",
+          tickvals: [1, 10, 100, 1000, 10000, 100000], ticktext: ["1", "10", "100", "1,000", "10,000", "100,000"] }) }), PLOT_CONFIG);
   }
 
   // ---- landmark papers: the 3 most cited papers per cluster ----

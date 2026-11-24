@@ -97,7 +97,8 @@
     <p class="sub">Posts per month with a term of each theme, from 2020 (the month of download is left out, because it is
     not complete). Most people started on Mastodon in late 2022
     and on Bluesky in 2023 or 2024, so the counts mostly show how many people were active. The share of all their posts
-    on that platform is a better measure of interest (shown for months with at least 100 posts on the platform).</p>
+    on that platform is a better measure of interest (shown for months with at least 100 posts on the platform). Each panel
+    has its own vertical scale, so that small themes stay visible: compare the shape of the lines, not their height.</p>
     <div class="controls"><div class="seg" id="mmode"><button aria-pressed="true" data-v="count">Posts</button><button aria-pressed="false" data-v="share">Share of all their posts</button></div></div>
     <div class="pl-legend"><span><span class="dot" style="background:var(--bluesky)"></span>Bluesky</span><span><span class="dot" style="background:var(--mastodon)"></span>Mastodon</span></div>
     <div class="multiples" id="mult"></div>
@@ -208,8 +209,8 @@ Promise.all([load("socials")]).then(([S]) => {
     document.getElementById("terms").style.height = h + "px";
     Plotly.react("terms", traces, baseLayout({ barmode: measure === "people" ? "group" : "stack", height: h, showlegend: true,
       legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0, traceorder: "normal" }, margin: { l: 10, r: 20, t: 50, b: 40 },
-      yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map((x) => x.name) }),
-      xaxis: Object.assign(baseLayout().xaxis, { title: measure === "posts" ? "posts" : "people" }) }), PLOT_CONFIG);
+      yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map((x) => x.name), showgrid: false }),
+      xaxis: Object.assign(baseLayout().xaxis, { title: measure === "posts" ? "posts" : "people", showgrid: true }) }), PLOT_CONFIG);
   }
 
   // ---- word clouds ----
@@ -272,10 +273,13 @@ Promise.all([load("socials")]).then(([S]) => {
       line: { color: cssVar("--axis"), width: 1, dash: "dot" } });
     Plotly.react("vs", traces, baseLayout({ hovermode: "closest", legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0 },
       margin: { l: 60, r: 20, t: 60, b: 50 },
-      xaxis: Object.assign(baseLayout().xaxis, { type: "log", title: "% of papers on this site", range: [-1.3, 1.9] }),
-      yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "% of metascience posts", range: [-1.3, 1.9] }) }), PLOT_CONFIG)
+      xaxis: Object.assign(baseLayout().xaxis, { type: "log", title: "% of papers on this site", range: [-1.3, 1.9], showgrid: true, ...LOG_TICKS }),
+      yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "% of metascience posts", range: [-1.3, 1.9], ...LOG_TICKS }) }), PLOT_CONFIG)
       .then(declutterVs);
   }
+  // every tick has its full value: Plotly's default log ticks print "2" and "5" for 0.2, 2, 20 and 0.5, 5, 50
+  const LOG_TICK_V = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50];
+  const LOG_TICKS = { tickvals: LOG_TICK_V, ticktext: LOG_TICK_V.map(String) };
   // where labels overlap, only the label of the more used term is shown (all are named on hover)
   const usedness = {}; S.themes.forEach((t) => t.terms.forEach((x) => (usedness[x.name] = x.posts + x.papers)));
   function declutterVs() {
@@ -311,7 +315,8 @@ Promise.all([load("socials")]).then(([S]) => {
       x: r.map((x) => x.by[pl]), customdata: r.map((x) => [x.posts, x.people]), marker: { color: plColor(pl) },
       hovertemplate: `<b>%{y}</b><br>%{x} posts on ${label}<br>%{customdata[0]} posts by %{customdata[1]} people in all<extra></extra>` })),
       baseLayout({ barmode: "stack", height: 580, showlegend: true, legend: { orientation: "h", y: 1.02, yanchor: "bottom", x: 0, traceorder: "normal" },
-        margin: { l: 10, r: 20, t: 40, b: 40 }, xaxis: Object.assign(baseLayout().xaxis, { title: "posts" }) }), PLOT_CONFIG);
+        margin: { l: 10, r: 20, t: 40, b: 40 }, xaxis: Object.assign(baseLayout().xaxis, { title: "posts", showgrid: true }),
+        yaxis: Object.assign(baseLayout().yaxis, { showgrid: false }) }), PLOT_CONFIG);
   }
 
   document.getElementById("shared").innerHTML = S.shared_papers.map((p) => `<li><a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>

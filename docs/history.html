@@ -18,6 +18,8 @@
   .hist .tick::before { content: ""; position: absolute; left: 50%; top: -9px; width: 1px; height: 6px; background: var(--axis); }
   .hist .gap { position: absolute; font-size: 0.72rem; color: var(--text-muted); transform: translateX(-50%); }
   .hist .stem { position: absolute; width: 1px; background: var(--grid); }
+  /* stretches of years without items are drawn shorter; a dashed line marks them (the axis is not to scale) */
+  .hist .empty { position: absolute; height: 0; border-top: 2px dashed var(--axis); background: var(--surface-1); padding-top: 2px; }
   .hist .dot { position: absolute; width: 9px; height: 9px; border-radius: 50%; transform: translate(-50%, -50%);
                border: 2px solid var(--surface-1); }
   .hist .dot.ev { background: var(--series-3); border-radius: 2px; }
@@ -83,7 +85,8 @@
   Events come from Wikipedia and from an archive of open science blogs (debates that many bloggers joined at the same
   time). Landmark papers are works that the papers on this site cite most, chosen as explained
   below; next to them are the most cited papers on this site.
-  Choose one of the 20 themes, or see the combined timeline of all themes.</p>
+  Choose one of the 20 themes, or see the combined timeline of all themes. The line is not to scale: each year gets the
+  space its cards need, so busy years are wide, and runs of years without items (dashed) are drawn short.</p>
 
   <section class="card">
     <div class="controls">
@@ -222,6 +225,14 @@ Promise.all([load("history"), Me.ready])
     const height = axisY + 26 + nDown * LANE + 10;
     host.style.width = width + "px"; host.style.height = height + "px";
     let html = `<div class="axis" style="top:${axisY}px"></div>`;
+    // runs of at least 3 years without items: dashed, so the shortened stretches are visible
+    const itemYearsAll = new Set(its.map((d) => d.year));
+    for (let y = sc.y0; y <= maxY; y++) {
+      if (itemYearsAll.has(y)) continue;
+      let e = y; while (e + 1 <= maxY && !itemYearsAll.has(e + 1)) e++;
+      if (e - y >= 2) html += `<div class="empty" style="left:${X(y)}px;width:${X(e + 1) - X(y)}px;top:${axisY - 2}px"></div>`;
+      y = e;
+    }
     // ticks: round years (every 100, 50, 10, 5 or 1 years) that are at least 46 px apart; years with items first
     const ticks = []; let lastX = -1e9;
     const stepOf = (y) => y < 1900 ? 50 : y < 1990 ? 10 : 1;

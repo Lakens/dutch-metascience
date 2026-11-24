@@ -9,6 +9,12 @@
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
 <script src="assets/common.js"></script>
+<style>
+  .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .multiples .m { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 0; }
+  .multiples .m h3 { font-size: 0.92rem; margin: 0; display: flex; align-items: center; gap: 6px; }
+  .multiples .m .sp { height: 150px; }
+</style>
 </head>
 <body>
 <header class="site">
@@ -63,12 +69,13 @@
     <p class="sub">Metascience papers with an author at a Dutch institution per year, by theme, for every 1,000 publications
     with an author at a Dutch institution in OpenAlex (same kinds of work as on this site). Dutch output as a whole also grew,
     so this shows whether metascience grew faster than research in general. Switch to "number of papers" for the counts, or to
-    "share" to see how the mix of themes changed. The last year is not complete yet.</p>
+    "share" to see how the mix of themes changed. One panel per theme, all with the same vertical scale; the light grey
+    area behind each theme is all themes together. The last year is not complete yet.</p>
     <div class="controls">
       <div class="seg" id="mode"><button aria-pressed="true" data-v="rate">Per 1,000 Dutch publications</button><button aria-pressed="false" data-v="count">Number of papers</button><button aria-pressed="false" data-v="share">Share per year</button></div>
     </div>
-    <div class="legend" id="legend"></div>
-    <div id="growth" class="chart"></div>
+    <p class="small muted" id="growthunit" style="margin:4px 0 8px"></p>
+    <div class="multiples" id="growth"></div>
   </section>
 
   <div class="grid two">
@@ -161,17 +168,30 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
     : mode === "rate" ? (allNL[y] ? 1000 * byCat[c][y] / allNL[y] : 0) : byCat[c][y];
   const unit = { share: ["%{y:.1f}%", "share of papers (%)"], rate: ["%{y:.2f} per 1,000", "metascience papers per 1,000 Dutch publications"],
     count: ["%{y:.0f} papers", "papers"] };
+  // one small panel per theme (Wilke: in a stack only the bottom layer and the total can be read); every panel has the
+  // same vertical scale, and shows all themes together in light grey behind the theme
+  const allValue = (y) => mode === "rate" ? (allNL[y] ? 1000 * tot[y] / allNL[y] : 0) : tot[y];
   function drawGrowth() {
-    categoryLegend(document.getElementById("legend"), active, drawGrowth);
-    const traces = CATEGORIES.filter((c) => active.has(c)).map((c) => ({
-      x: years, y: years.map((y) => value(c, y)),
-      customdata: years.map((y) => byCat[c][y]),
-      name: CAT_LABEL[c], type: "scatter", mode: "lines", stackgroup: "one", line: { width: 0.5, color: catColor(c) },
-      fillcolor: catColor(c),
-      hovertemplate: `${esc(CAT_LABEL[c])}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>`,
-    }));
-    Plotly.react("growth", traces, baseLayout({ showlegend: false, hovermode: "x unified",
-      yaxis: Object.assign(baseLayout().yaxis, { title: unit[mode][1], range: mode === "share" ? [0, 100] : null }) }), PLOT_CONFIG);
+    document.getElementById("growthunit").textContent = `Vertical scale in every panel: ${unit[mode][1]}.`;
+    const top = mode === "share" ? Math.max(...CATEGORIES.flatMap((c) => years.map((y) => value(c, y)))) : Math.max(...years.map(allValue));
+    const host = document.getElementById("growth"); host.innerHTML = "";
+    CATEGORIES.forEach((c) => {
+      const div = document.createElement("div"); div.className = "m";
+      const n = years.reduce((s, y) => s + byCat[c][y], 0);
+      div.innerHTML = `<h3><span class="swatch" style="background:${catColor(c)}"></span>${esc(CAT_LABEL[c])}</h3>
+        <div class="muted small">${fmt(n)} papers</div><div class="sp"></div>`;
+      host.appendChild(div);
+      const traces = [];
+      if (mode !== "share") traces.push({ x: years, y: years.map(allValue), type: "scatter", mode: "lines", fill: "tozeroy",
+        line: { width: 0, color: cssVar("--grid") }, fillcolor: cssVar("--grid"), name: "all themes",
+        hovertemplate: `all themes: ${unit[mode][0]}<extra></extra>` });
+      traces.push({ x: years, y: years.map((y) => value(c, y)), customdata: years.map((y) => byCat[c][y]), type: "scatter", mode: "lines",
+        fill: "tozeroy", line: { width: 1.5, color: catColor(c) }, fillcolor: catColor(c) + "99", name: CAT_LABEL[c],
+        hovertemplate: `${esc(CAT_LABEL[c])}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>` });
+      Plotly.newPlot(div.querySelector(".sp"), traces, baseLayout({ margin: { l: 34, r: 6, t: 6, b: 22 }, showlegend: false, height: 150,
+        hovermode: "x unified", xaxis: Object.assign(baseLayout().xaxis, { range: [years[0], years[years.length - 1]], nticks: 4 }),
+        yaxis: Object.assign(baseLayout().yaxis, { range: [0, top * 1.05], nticks: 4 }) }), PLOT_CONFIG);
+    });
   }
   document.querySelectorAll("#mode button").forEach((b) => b.addEventListener("click", () => {
     mode = b.dataset.v; document.querySelectorAll("#mode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawGrowth();

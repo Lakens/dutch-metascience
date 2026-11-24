@@ -106,8 +106,8 @@
     A ratio of 2 means the subject takes up twice as large a part of the metascience posts as before. Shares of the
     metascience posts are used, not of all posts, because people now post much more about other things than in 2023.
     The 95% interval comes from resampling people, so that one very active person cannot decide the result; a subject is
-    called rising or declining only when the whole interval lies above or below 1. Terms with fewer than 30 posts or
-    fewer than 5 people are left out.</p>
+    called rising or declining only when the whole interval lies above or below 1. An arrow at the edge means the interval
+    runs further than the chart shows (hover for its value). Terms with fewer than 30 posts or fewer than 5 people are left out.</p>
     <div class="controls"><div class="seg" id="srlevel"><button aria-pressed="false" data-v="themes">Themes</button><button aria-pressed="true" data-v="terms">Terms</button></div></div>
     <div class="legend" id="srkey"></div>
     <div id="srchart" class="chart" style="min-height:640px"></div>
@@ -138,7 +138,10 @@
   <section class="card">
     <h2>Rising keywords</h2>
     <p class="sub">Keywords whose share of the papers grew most from <span class="wearly"></span> to
-    <span class="wrec"></span> (at least 10 recent papers). Keywords marked "new" first appeared in 2023 or later.</p>
+    <span class="wrec"></span> (at least 10 recent papers). The dot shows how many times larger the keyword's share of the
+    papers became (log scale; one paper is added to each count, so that a keyword absent before does not give an endless
+    ratio); the numbers are the papers with the keyword in the two periods, which differ in length. Keywords marked "new"
+    first appeared in 2023 or later.</p>
     <div id="kwchart" class="chart" style="min-height:520px"></div>
   </section>
 
@@ -329,7 +332,7 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
       hovertemplate: `<b>%{text}</b><br>%{customdata[4]}<br>share ${TM.change_from}: %{customdata[0]:.1f}% → ${TM.change_to}: %{customdata[1]:.1f}%<br>` +
         "change per year: %{x:+.2f} points (95% interval %{customdata[2]} to %{customdata[3]})<extra></extra>" }],
       baseLayout({ showlegend: false, hovermode: "closest", margin: { l: leftM(), r: 20, t: 10, b: 40 },
-        xaxis: Object.assign(baseLayout().xaxis, { title: narrow() ? "change per year (points)" : "change in share per year (percentage points)", zeroline: true, zerolinecolor: cssVar("--axis") }) }), PLOT_CONFIG);
+        xaxis: Object.assign(baseLayout().xaxis, { title: narrow() ? "change per year (points)" : "change in share per year (percentage points)", zeroline: true, zerolinecolor: cssVar("--axis"), showgrid: true }) }), PLOT_CONFIG);
   }
   function drawEntries() {
     const t = inf.trend.filter((d) => d.entry_change.ratio).sort((a, b) => a.entry_change.ratio - b.entry_change.ratio);
@@ -348,7 +351,7 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
         annotations: [{ x: Math.log10(fr), xref: "x", y: 1, yref: "paper", yanchor: "bottom", showarrow: false,
           text: `all themes: ${fr.toFixed(2)}`, font: { size: 11, color: cssVar("--text-muted") } }],
         xaxis: Object.assign(baseLayout().xaxis, { type: "log", title: narrow() ? "ratio (log scale)" : `people entering ${span(TM.new_recent)} ÷ ${span(TM.new_early)} (log scale)`,
-          tickvals: [0.25, 0.33, 0.5, 0.67, 1, 1.5, 2, 3, 4], ticktext: ["¼", "⅓", "½", "⅔", "1", "1.5", "2", "3", "4"] }) }), PLOT_CONFIG);
+          tickvals: [0.25, 0.33, 0.5, 0.67, 1, 1.5, 2, 3, 4], ticktext: ["¼", "⅓", "½", "⅔", "1", "1.5", "2", "3", "4"], showgrid: true }) }), PLOT_CONFIG);
     document.getElementById("entrykey").innerHTML = [["--series-1", "faster than all themes together"], ["--other", "cannot tell"],
       ["--series-2", "slower than all themes together"]].map(([c, l]) => `<span class="item"><span class="swatch" style="background:${cssVar(c)}"></span>${l}</span>`).join("");
   }
@@ -400,13 +403,19 @@ Promise.all([load("inferences"), load("people"), load("papers"), load("clusters"
   function drawKw() {
     const r = inf.rising.slice(0, 18).reverse();
     const ne = new Set(inf.new_keywords.map((d) => d.k));
-    Plotly.react("kwchart", [
-      { type: "bar", orientation: "h", name: `${w.early[0]}–${w.early[1]}`, y: r.map((d) => d.k + (ne.has(d.k) ? "  (new)" : "")), x: r.map((d) => d.early),
-        marker: { color: cssVar("--other") }, hovertemplate: "%{y}: %{x} papers<extra></extra>" },
-      { type: "bar", orientation: "h", name: `${w.recent[0]}–${w.recent[1]}`, y: r.map((d) => d.k + (ne.has(d.k) ? "  (new)" : "")), x: r.map((d) => d.recent),
-        marker: { color: cssVar("--series-1") }, hovertemplate: "%{y}: %{x} papers<extra></extra>" }],
-      baseLayout({ barmode: "group", margin: { l: 230, r: 20, t: 10, b: 40 }, legend: { orientation: "h", y: -0.12 },
-        xaxis: Object.assign(baseLayout().xaxis, { title: "papers with this keyword" }) }), PLOT_CONFIG);
+    const names = r.map((d) => d.k + (ne.has(d.k) ? "  (new)" : ""));
+    const top = Math.max(...r.map((d) => d.ratio));
+    Plotly.react("kwchart", [{ type: "scatter", mode: "markers+text", y: names, x: r.map((d) => d.ratio),
+      text: r.map((d) => `${d.early} → ${d.recent} papers`), textposition: "middle right", textfont: { size: 11, color: cssVar("--text-muted") },
+      customdata: r.map((d) => [d.early, d.recent]),
+      marker: { size: 10, color: cssVar("--series-1"), line: { color: cssVar("--surface-1"), width: 2 } },
+      hovertemplate: `<b>%{y}</b><br>share ×%{x:.1f}<br>${w.early[0]}–${w.early[1]}: %{customdata[0]} papers · ${w.recent[0]}–${w.recent[1]}: %{customdata[1]} papers<extra></extra>` }],
+      baseLayout({ showlegend: false, hovermode: "closest", margin: { l: 230, r: 20, t: 10, b: 40 },
+        shapes: [{ type: "line", x0: 1, x1: 1, yref: "paper", y0: 0, y1: 1, line: { color: cssVar("--axis"), width: 1 } }],
+        yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: names }),
+        xaxis: Object.assign(baseLayout().xaxis, { type: "log", showgrid: true, range: [0, Math.log10(top * 2.6)],
+          tickvals: [1, 2, 4, 8, 16, 32], ticktext: ["1", "2", "4", "8", "16", "32"],
+          title: `share ${w.recent[0]}–${w.recent[1]} ÷ share ${w.early[0]}–${w.early[1]} (log scale)` }) }), PLOT_CONFIG);
   }
 
   // ---- shared goals and questions ----
@@ -483,7 +492,12 @@ load("socials").then((S) => {
     const label = (d) => (level === "themes" ? cap(d.name) : d.name);
     const h = Math.max(260, rows.length * 22 + 90);
     document.getElementById("srchart").style.minHeight = h + "px";
-    Plotly.react("srchart", [{ type: "scatter", mode: "markers", y: rows.map(label), x: rows.map((d) => d.ratio),
+    // intervals that run past the edge of the chart end in an arrow at the edge
+    const XMIN = 0.15, XMAX = 10;
+    const beyond = (side) => { const r = rows.filter((d) => (side > 0 ? d.hi > XMAX : d.lo < XMIN));
+      return { type: "scatter", mode: "markers", y: r.map(label), x: r.map(() => (side > 0 ? XMAX * 0.97 : XMIN * 1.03)), hoverinfo: "skip",
+        marker: { symbol: side > 0 ? "triangle-right" : "triangle-left", size: 8, color: cssVar("--text-muted") } }; };
+    Plotly.react("srchart", [beyond(1), beyond(-1), { type: "scatter", mode: "markers", y: rows.map(label), x: rows.map((d) => d.ratio),
       error_x: { type: "data", symmetric: false, array: rows.map((d) => d.hi - d.ratio), arrayminus: rows.map((d) => d.ratio - d.lo),
         color: cssVar("--text-muted"), thickness: 1.5, width: 0 },
       marker: { size: 10, color: rows.map((d) => color(d.status)), line: { color: cssVar("--surface-1"), width: 2 } },
@@ -493,7 +507,8 @@ load("socials").then((S) => {
         "ratio %{x:.2f} (95% interval %{customdata[5]:.2f} to %{customdata[6]})<extra></extra>" }],
       baseLayout({ height: h, showlegend: false, hovermode: "closest", margin: { l: 10, r: 20, t: 10, b: 40 },
         shapes: [{ type: "line", x0: 1, x1: 1, yref: "paper", y0: 0, y1: 1, line: { color: cssVar("--axis"), width: 1 } }],
-        xaxis: Object.assign(baseLayout().xaxis, { type: "log", range: [Math.log10(0.15), Math.log10(10)],
+        yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map(label) }),
+        xaxis: Object.assign(baseLayout().xaxis, { type: "log", range: [Math.log10(XMIN), Math.log10(XMAX)], showgrid: true,
           title: narrow() ? "ratio (log scale)" : "share in the last two years ÷ share in the two years before (log scale)",
           tickvals: [0.25, 0.33, 0.5, 0.67, 1, 1.5, 2, 3, 4, 8], ticktext: ["¼", "⅓", "½", "⅔", "1", "1.5", "2", "3", "4", "8"] }) }), PLOT_CONFIG);
   }

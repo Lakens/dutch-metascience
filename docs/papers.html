@@ -294,8 +294,8 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
     el("themes").style.minHeight = h + "px";
     Plotly.react("themes", [{ type: "bar", orientation: "h", y: ks.map(themeName), x: ks.map((k) => c[k]), customdata: ks,
       marker: { color: cssVar("--series-1") }, hovertemplate: "%{y}: %{x} papers<extra></extra>" }],
-      baseLayout({ height: h, margin: { l: 10, r: 20, t: 10, b: 40 }, yaxis: Object.assign(baseLayout().yaxis, { automargin: true, tickfont: { size: 11, color: cssVar("--text-secondary") } }),
-        xaxis: Object.assign(baseLayout().xaxis, { title: "papers" }) }), PLOT_CONFIG);
+      baseLayout({ height: h, margin: { l: 10, r: 20, t: 10, b: 40 }, yaxis: Object.assign(baseLayout().yaxis, { automargin: true, showgrid: false, tickfont: { size: 11, color: cssVar("--text-secondary") } }),
+        xaxis: Object.assign(baseLayout().xaxis, { title: "papers", showgrid: true }) }), PLOT_CONFIG);
   }
   function topList(title, counts, label, onPick, n = 10) {
     const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, n);

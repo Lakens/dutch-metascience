@@ -87,7 +87,9 @@ function baseLayout(extra = {}) {
     margin: { l: 50, r: 20, t: 10, b: 40 },
     hoverlabel: { bgcolor: cssVar("--surface-1"), bordercolor: cssVar("--axis"), font: { color: cssVar("--text-primary") } },
     legend: { orientation: "h", y: -0.18, font: { color: ink } },
-    xaxis: Object.assign({}, ax), yaxis: Object.assign({}, ax),
+    // grid lines across the key variable only (Wilke ch. 23): horizontal lines by default; charts whose key
+    // variable is on the x axis (horizontal bars, intervals, scatter plots) turn the vertical lines on
+    xaxis: Object.assign({}, ax, { showgrid: false }), yaxis: Object.assign({}, ax),
   }, extra);
 }
 // charts: hover labels only, no zoom (no toolbar, no scroll zoom, no double-click reset)

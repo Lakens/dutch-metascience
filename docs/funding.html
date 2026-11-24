@@ -11,6 +11,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="assets/common.js"></script>
 <style>
+  .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 10px; }
+  .multiples .m { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 0; }
+  .multiples .m h3 { font-size: 0.92rem; margin: 0; display: flex; align-items: center; gap: 6px; }
+  .multiples .m .sp { height: 140px; }
   .tl-wrap { position: relative; overflow: auto; max-height: 560px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-1); }
   .tl-axis { position: sticky; top: 0; z-index: 2; background: var(--surface-1); display: block; }
   .tl-chart { display: block; }
@@ -58,8 +62,9 @@
 
   <section class="card">
     <h2>NWO funding over time</h2>
-    <p class="sub">Projects by the year they started, coloured by funding scheme (all grants) or by open science programme
-    (metascience-related projects). The number above each bar is the total for that year. The last year is not
+    <p class="sub">Projects by the year they started: all schemes together at the top (the number above each bar is the
+    total for that year), and below one panel per funding scheme (all grants) or open science programme
+    (metascience-related projects), all panels with the same vertical scale. The last year is not
     complete. NWO's open data give amounts only for projects that started in 2017 or later; for older Veni, Vidi and
     Vici grants the standard amount of their round is used as an estimate (see below), and all other older projects
     count as zero, so the amount view underestimates older years. When you view the site as a person, a third view shows that person's grants, metascience-related or
@@ -69,8 +74,8 @@
       <div class="seg" id="measure"><button aria-pressed="true" data-v="n">Number of projects</button><button aria-pressed="false" data-v="a">Amount awarded</button></div>
     </div>
     <p class="small" id="ottotal"></p>
-    <div class="legend" id="famlegend"></div>
-    <div id="overtime" class="chart" style="min-height:420px"></div>
+    <div id="overtime" class="chart" style="min-height:320px"></div>
+    <div class="multiples" id="otpanels"></div>
   </section>
 
   <section class="card">
@@ -176,7 +181,6 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
   const amountOf = (ps) => ps.reduce((s, p) => s + (p.a || 0), 0);
   const pct = (a, b) => (b ? ` (${Math.round((100 * a) / b)}%)` : "");
   function drawOverTime() {
-    document.getElementById("famlegend").innerHTML = legendHtml(scope);
     const ps = scope === "person" ? projects.filter((p) => p.ppl.some((x) => x.id === meId))
       : projects.filter((p) => (scope === "meta" ? p.m : p.ppl.some((x) => x.id)) && year(p.b) >= 2000);
     const yrs = [...new Set(ps.map((p) => year(p.b)))].sort((a, b) => a - b);
@@ -184,9 +188,10 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
       .reduce((s, p) => s + (measure === "n" ? 1 : (p.a || 0) / 1e6), 0)));
     const tot = yrs.map((y, i) => vals.reduce((s, v) => s + v[i], 0));   // the total of each year
     const unit = measure === "n" ? " projects" : " million euro", num = measure === "n" ? ".0f" : ".2f";
-    const traces = groups(scope).map((f, gi) => ({ type: "bar", name: f, x: yrs, y: vals[gi], customdata: tot,
-      marker: { color: groupColor(f, scope), line: { color: cssVar("--surface-1"), width: 1 } },
-      hovertemplate: `${esc(f)}, %{x}: %{y:${num}}${unit}<br>year total: %{customdata:${num}}${unit}<extra></extra>` }));
+    // the total of all schemes in one bar per year; the schemes each in their own panel below (Wilke: in a stack only
+    // the bottom layer and the total can be read)
+    const traces = [{ type: "bar", name: "all schemes", x: yrs, y: tot, marker: { color: cssVar("--text-muted") },
+      hovertemplate: `%{x}: %{y:${num}}${unit}<extra></extra>` }];
     // the year totals written above the bars, when the bars are wide enough for them (otherwise only in the hover)
     // (only years with a total: Plotly does not show a text again that was empty in the previous drawing)
     const label = (v) => (measure === "n" ? fmt(v) : v >= 10 ? v.toFixed(0) : v.toFixed(1));
@@ -206,10 +211,27 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
         `${fmt(metaPs.length)} metascience-related${pct(metaPs.length, ps.length)}. Awarded (where known or estimated): ${amountText(aAll)}, ` +
         `of which ${amountText(aMeta)} metascience-related${pct(aMeta, aAll)}` +
         `${scope === "person" ? "; amounts are of whole projects, whatever the person's role" : ""}.`;
-    Plotly.react("overtime", traces, baseLayout({ barmode: "stack", showlegend: false, hovermode: "closest",
-      margin: { l: 50, r: 20, t: 24, b: 40 },
-      yaxis: Object.assign(baseLayout().yaxis, { title: measure === "n" ? "projects started" : "million euro (known or estimated)",
+    const ytitle = measure === "n" ? "projects started" : "million euro (known or estimated)";
+    const xr = yrs.length ? [yrs[0] - 0.5, yrs[yrs.length - 1] + 0.5] : undefined;
+    Plotly.react("overtime", traces, baseLayout({ showlegend: false, hovermode: "closest", height: 320,
+      margin: { l: 50, r: 20, t: 24, b: 40 }, xaxis: Object.assign(baseLayout().xaxis, { range: xr }),
+      yaxis: Object.assign(baseLayout().yaxis, { title: ytitle,
         range: [0, Math.max(1e-9, ...tot) * 1.1], dtick: measure === "n" && Math.max(0, ...tot) <= 8 ? 1 : undefined }) }), PLOT_CONFIG);
+    const host = document.getElementById("otpanels"); host.innerHTML = "";
+    const top = Math.max(1e-9, ...vals.flat());
+    groups(scope).forEach((f, gi) => {
+      const sum = vals[gi].reduce((s, v) => s + v, 0);
+      if (!sum) return;
+      const div = document.createElement("div"); div.className = "m";
+      div.innerHTML = `<h3><span class="swatch" style="background:${groupColor(f, scope)}"></span>${esc(f)}</h3>
+        <div class="muted small">${measure === "n" ? `${fmt(sum)} projects` : `€${label(sum)} million`}</div><div class="sp"></div>`;
+      host.appendChild(div);
+      Plotly.newPlot(div.querySelector(".sp"), [{ type: "bar", x: yrs, y: vals[gi], marker: { color: groupColor(f, scope) },
+        hovertemplate: `${esc(f)}, %{x}: %{y:${num}}${unit}<extra></extra>` }],
+        baseLayout({ margin: { l: 34, r: 6, t: 6, b: 22 }, showlegend: false, height: 140, bargap: 0.15,
+          xaxis: Object.assign(baseLayout().xaxis, { range: xr, nticks: 4 }),
+          yaxis: Object.assign(baseLayout().yaxis, { range: [0, top * 1.08], nticks: 4 }) }), PLOT_CONFIG);
+    });
   }
   const seg = (id, set) => document.querySelectorAll(`#${id} button`).forEach((b) => b.addEventListener("click", () => {
     document.querySelectorAll(`#${id} button`).forEach((x) => x.setAttribute("aria-pressed", x === b)); set(b.dataset.v);
