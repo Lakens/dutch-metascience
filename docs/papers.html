@@ -429,7 +429,7 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
     const head = ["openalex_id", "doi", "title", "year", "journal", "type", "citations", "cited_by_papers_on_site", "n_authors",
       "authors_on_site", "dutch_institutions", "theme", "category", "keywords", "open_access", "countries_abroad", "summary_by_ai"];
     const lines = current.map((p) => [p.id, p.doi, p.t, p.y, p.v, p.ty, p.c, p.cb, p.na, p.p.map((x) => (byP[x] || {}).n || "").join("; "),
-      (p.in || []).map((i) => iname[i] || i).join("; "), themeName(p.cl), p.cat, (p.kw || []).join("; "), p.oa ? "yes" : "no", p.co.join("; "), p.ex].map(q).join(","));
+      (p.in || []).map((i) => iname[i] || i).join("; "), themeName(p.cl), CAT_LABEL[p.cat] || p.cat, (p.kw || []).join("; "), p.oa ? "yes" : "no", p.co.join("; "), p.ex].map(q).join(","));
     download("metascience_papers.csv", "﻿" + [head.join(","), ...lines].join("\r\n"), "text/csv;charset=utf-8");
   });
   el("bib").addEventListener("click", () => {

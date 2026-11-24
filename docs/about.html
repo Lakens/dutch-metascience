@@ -64,8 +64,8 @@
       publication lists of the starting list at least 60% of the papers with that keyword were judged metascience (the
       list is in <code>scripts/author_lists_input.json</code>). This was done once; people who reached two papers only
       through these added papers were not looked up again.</li>
-      <li><b>An AI judged every paper</b> (about 63,000 titles and abstracts): is it metascience, and if so, which
-      of eight themes? Papers it called metascience were then checked a second time with stricter instructions, and
+      <li><b>An AI judged every paper</b> (about 63,000 titles and abstracts): is it metascience? (It also chose one of
+      eight first categories, since replaced; see "Categories" below.) Papers it called metascience were then checked a second time with stricter instructions, and
       every remaining paper was then checked once more by reading its title and abstract (see below); <span id="npapers">about 6,300</span> remain. The model was gpt-oss:20b, run in Ollama on a GPU of SURF Research
       Cloud, with written instructions that say what counts (for example: a replication of a published finding, a
       study of peer review, a method for better statistical inference) and what does not (a study that merely shares its
@@ -138,6 +138,19 @@
     settled by one decision per group. "Unclear" is now used only when title and abstract do not tell enough. In
     total <span id="nexcl">571</span> papers were removed; the list, with a reason for each, is
     <code>scripts/excluded_by_hand.csv</code>.</p>
+    <p><b>Categories.</b> In November 2026 the eight first categories were replaced by twelve, because one of them
+    ("research practices and bias") held over a third of all papers and mixed very different work. The twelve are:
+    replication &amp; reproducibility; bias &amp; questionable practices; statistical methods; reporting &amp;
+    registration; methods &amp; quality standards; open science; AI &amp; software tools; peer review &amp; publishing;
+    scientometrics &amp; evaluation; research integrity &amp; ethics; the research system (policy, funding, careers,
+    culture); and science &amp; society (trust, communication, public participation in research). Each has a written
+    definition with rules for the borders between neighbours (<code>scripts/category_rules.md</code>); a paper goes to
+    the category of what it studies, not the field it is in. Claude reviewers read the title and abstract of every
+    paper and chose one category. Two reviewers who judged the same 250 papers independently chose the same category
+    for 96%; a second reviewer for a random 10% of the other papers (876) agreed with the first for 93%, and for all
+    papers that both marked as sure. Papers that fitted no category (308) were checked again under the rules above:
+    108 were judged not metascience after all and removed, together with 4 other versions of those papers (counted in
+    the total above).</p>
     <p><b>What remains.</b> Papers still judged "unclear" (about 60, mostly papers
     without an abstract) stay on the site. The checks above suggest that a small share of the papers shown are not metascience (perhaps a few percent; this
     was not measured exactly), and metascience papers are missing too. The theme of each paper and its explanation

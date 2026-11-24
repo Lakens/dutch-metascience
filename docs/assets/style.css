@@ -13,6 +13,11 @@
   --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100;
   --series-5: #e87ba4; --series-6: #008300; --series-7: #6250d6; --series-8: #e34948;
   --other: #b9b8b0;
+  /* the 12 categories, in families (blues: replication, bias, statistics; greens: reporting, methods; teals: open, tools;
+     oranges: publishing, scientometrics; reds/purples: integrity, system, society); chosen so that every pair stays
+     distinguishable (CIEDE2000 >= 10) for normal vision, deuteranopia and protanopia, separately for light and dark */
+  --cat-1: #0087e1; --cat-2: #5ab4ff; --cat-3: #5a2dff; --cat-4: #2d6900; --cat-5: #a5d296; --cat-6: #00c3c3;
+  --cat-7: #0f8787; --cat-8: #f09600; --cat-9: #b4785a; --cat-10: #964b5a; --cat-11: #872d87; --cat-12: #ff78b4;
   --seq-0: #f0efec; --seq-1: #cde2fb; --seq-2: #86b6ef; --seq-3: #3987e5; --seq-4: #1c5cab; --seq-5: #0d366b;
   --radius: 10px;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -26,6 +31,8 @@
     --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
     --series-5: #d55181; --series-6: #0ca30c; --series-7: #9085e9; --series-8: #e66767;
     --other: #4a4a46;
+    --cat-1: #4b87b4; --cat-2: #4bc3ff; --cat-3: #b469ff; --cat-4: #4b965a; --cat-5: #b4f0a5; --cat-6: #00e1e1;
+    --cat-7: #2d9696; --cat-8: #ffe100; --cat-9: #ff871e; --cat-10: #e18787; --cat-11: #ff0096; --cat-12: #ff96c3;
     --seq-0: #232321; --seq-1: #104281; --seq-2: #1c5cab; --seq-3: #2a78d6; --seq-4: #6da7ec; --seq-5: #cde2fb;
   }
 }
@@ -37,6 +44,8 @@
   --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
   --series-5: #d55181; --series-6: #0ca30c; --series-7: #9085e9; --series-8: #e66767;
   --other: #4a4a46;
+  --cat-1: #4b87b4; --cat-2: #4bc3ff; --cat-3: #b469ff; --cat-4: #4b965a; --cat-5: #b4f0a5; --cat-6: #00e1e1;
+  --cat-7: #2d9696; --cat-8: #ffe100; --cat-9: #ff871e; --cat-10: #e18787; --cat-11: #ff0096; --cat-12: #ff96c3;
   --seq-0: #232321; --seq-1: #104281; --seq-2: #1c5cab; --seq-3: #2a78d6; --seq-4: #6da7ec; --seq-5: #cde2fb;
 }
 
@@ -106,6 +115,8 @@ input[type="search"] { width: 260px; max-width: 100%; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.85rem; color: var(--text-secondary); margin: 8px 0; }
 .legend .item { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
 .legend .item.off { opacity: 0.35; }
+.legend .item.on { color: var(--text-primary); font-weight: 600; }
+.legend .item.hint { cursor: default; font-style: italic; }
 .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
 .badge {
   display: inline-block; font-size: 0.75rem; padding: 1px 8px; border-radius: 999px;

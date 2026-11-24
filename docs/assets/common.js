@@ -1,19 +1,13 @@
 // Shared code for every page: data loading, theme, category colours, chart defaults.
 
-const CATEGORIES = [
-  "replication and reproducibility", "research practices and bias", "open science",
-  "peer review and publishing", "research integrity and misconduct", "statistical methods",
-  "scientometrics and research evaluation", "science policy and ethics",
-];
+// the 12 categories (decided 25 Nov 2026; definitions in scripts/category_rules.md), in colour-family order
+const CATEGORIES = ["replication", "bias", "statistics", "reporting", "methods", "open", "tools", "publishing",
+  "scientometrics", "integrity", "system", "society"];
 const CAT_LABEL = {
-  "replication and reproducibility": "Replication & reproducibility",
-  "research practices and bias": "Research practices & bias",
-  "open science": "Open science",
-  "peer review and publishing": "Peer review & publishing",
-  "research integrity and misconduct": "Research integrity & misconduct",
-  "statistical methods": "Statistical methods",
-  "scientometrics and research evaluation": "Scientometrics & evaluation",
-  "science policy and ethics": "Science policy & ethics",
+  replication: "Replication & reproducibility", bias: "Bias & questionable practices", statistics: "Statistical methods",
+  reporting: "Reporting & registration", methods: "Methods & quality standards", open: "Open science",
+  tools: "AI & software tools", publishing: "Peer review & publishing", scientometrics: "Scientometrics & evaluation",
+  integrity: "Research integrity & ethics", system: "Research system", society: "Science & society",
 };
 
 function cssVar(name) {
@@ -21,7 +15,7 @@ function cssVar(name) {
 }
 function catColor(cat) {
   const i = CATEGORIES.indexOf(cat);
-  return i < 0 ? cssVar("--other") : cssVar(`--series-${i + 1}`);
+  return i < 0 ? cssVar("--other") : cssVar(`--cat-${i + 1}`);
 }
 function seriesColor(i) { return i < 8 ? cssVar(`--series-${i + 1}`) : cssVar("--other"); }
 function seqScale() { return [0, 1, 2, 3, 4, 5].map((i) => [i / 5, cssVar(`--seq-${i}`)]); }
@@ -97,17 +91,26 @@ const PLOT_CONFIG = { displaylogo: false, responsive: true, displayModeBar: fals
 // maps (paper map, Places maps): zoom and pan stay available
 const MAP_CONFIG = { displaylogo: false, responsive: true, modeBarButtonsToRemove: ["lasso2d", "select2d"] };
 
-// ---- an HTML legend for the categories (click to hide a category) ----
-function categoryLegend(el, active, onToggle) {
+// ---- an HTML legend for the categories: click categories to colour them; the rest stays grey ----
+// (12 colours cannot be told apart on small dots, so dot charts colour only the chosen categories; Wilke ch. 19)
+function categoryLegend(el, chosen, onToggle) {
   el.innerHTML = "";
   for (const c of CATEGORIES) {
     const it = document.createElement("span");
-    it.className = "item" + (active.has(c) ? "" : " off");
-    it.innerHTML = `<span class="swatch" style="background:${catColor(c)}"></span>${esc(CAT_LABEL[c])}`;
-    it.addEventListener("click", () => { active.has(c) ? active.delete(c) : active.add(c); onToggle(); });
+    it.className = "item" + (chosen.has(c) ? " on" : "");
+    it.setAttribute("role", "button"); it.setAttribute("aria-pressed", chosen.has(c));
+    it.innerHTML = `<span class="swatch" style="background:${chosen.has(c) ? catColor(c) : cssVar("--other")}"></span>${esc(CAT_LABEL[c])}`;
+    it.addEventListener("click", () => { chosen.has(c) ? chosen.delete(c) : chosen.add(c); onToggle(); });
     el.appendChild(it);
   }
+  const hint = document.createElement("span");
+  hint.className = "item hint muted small";
+  hint.innerHTML = chosen.size ? '<a href="#" class="clear">clear</a>' : "click categories to colour them";
+  if (chosen.size) hint.querySelector("a").addEventListener("click", (e) => { e.preventDefault(); chosen.clear(); onToggle(); });
+  el.appendChild(hint);
 }
+// colour of a dot: its category colour when that category is chosen, grey otherwise
+const dotColor = (cat, chosen) => (chosen.has(cat) ? catColor(cat) : cssVar("--other"));
 
 // ---- a floating tooltip for the D3 charts ----
 const Tip = {

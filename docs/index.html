@@ -66,11 +66,11 @@
 
   <section class="card">
     <h2>How the field grew</h2>
-    <p class="sub">Metascience papers with an author at a Dutch institution per year, by theme, for every 1,000 publications
+    <p class="sub">Metascience papers with an author at a Dutch institution per year, by category, for every 1,000 publications
     with an author at a Dutch institution in OpenAlex (same kinds of work as on this site). Dutch output as a whole also grew,
     so this shows whether metascience grew faster than research in general. Switch to "number of papers" for the counts, or to
-    "share" to see how the mix of themes changed. One panel per theme, all with the same vertical scale; the light grey
-    area behind each theme is all themes together. The last year is not complete yet.</p>
+    "share" to see how the mix of categories changed. One panel per category, all with the same vertical scale; the
+    light grey area behind each category is all categories together. The last year is not complete yet.</p>
     <div class="controls">
       <div class="seg" id="mode"><button aria-pressed="true" data-v="rate">Per 1,000 Dutch publications</button><button aria-pressed="false" data-v="count">Number of papers</button><button aria-pressed="false" data-v="share">Share per year</button></div>
     </div>
@@ -183,8 +183,8 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
       host.appendChild(div);
       const traces = [];
       if (mode !== "share") traces.push({ x: years, y: years.map(allValue), type: "scatter", mode: "lines", fill: "tozeroy",
-        line: { width: 0, color: cssVar("--grid") }, fillcolor: cssVar("--grid"), name: "all themes",
-        hovertemplate: `all themes: ${unit[mode][0]}<extra></extra>` });
+        line: { width: 0, color: cssVar("--grid") }, fillcolor: cssVar("--grid"), name: "all categories",
+        hovertemplate: `all categories: ${unit[mode][0]}<extra></extra>` });
       traces.push({ x: years, y: years.map((y) => value(c, y)), customdata: years.map((y) => byCat[c][y]), type: "scatter", mode: "lines",
         fill: "tozeroy", line: { width: 1.5, color: catColor(c) }, fillcolor: catColor(c) + "99", name: CAT_LABEL[c],
         hovertemplate: `${esc(CAT_LABEL[c])}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>` });

@@ -302,6 +302,17 @@ unchecked = sorted((p["id"], p["t"]) for p in papers if p["id"] not in CHECKED)
 print(f"papers on the site without a hand-check verdict (should be 0): {len(unchecked)}")
 for wid, t in unchecked:
     print(f"  {wid} {t[:100]}")
+# the category of each paper: one of the 12 categories of scripts/category_rules.md (25 Nov 2026), judged by Claude
+# reviewers and stored in table paper_category by import_categories.py. They replace the 8 categories of the first
+# classification. A paper on the site without a category stops the build: judge it with scripts/category_rules.md first.
+CATEGORY = dict(db.execute("SELECT work_id, category FROM paper_category"))
+no_cat = sorted((p["id"], p["t"]) for p in papers if CATEGORY.get(p["id"]) in (None, "", "NONE"))
+if no_cat:
+    raise SystemExit(f"STOPPED: {len(no_cat)} papers on the site have no category (judge them with category_rules.md, "
+                     f"then run import_categories.py): " + "; ".join(f"{w} {t[:60]}" for w, t in no_cat[:20]))
+for p in papers:
+    p["cat"] = CATEGORY[p["id"]]
+print("categories:", dict(collections.Counter(p["cat"] for p in papers).most_common()))
 
 # ---------------------------------------------------------------- institutions: parents and coordinates
 needed = set()

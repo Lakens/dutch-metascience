@@ -66,22 +66,24 @@
     <section class="card">
       <h2>Keywords that go together</h2>
       <p class="sub">The 150 most frequent OpenAlex keywords; a line joins keywords that appear together in at least
-      three papers. Colour: the theme in which the keyword is most common. Scroll to zoom (more keywords get a name), drag the background to move, hover a keyword to see its neighbours, drag a keyword to rearrange.</p>
+      three papers. Colour: the category in which the keyword is most common, for the categories chosen in the list
+      (the same choice as on the paper map; the others grey). Scroll to zoom (more keywords get a name), drag the background to move, hover a keyword to see its neighbours, drag a keyword to rearrange.</p>
+      <div class="legend" id="kwlegend"></div>
       <svg id="kw" style="width:100%;height:620px"></svg>
     </section>
     <section class="card">
       <h2>Which institution works on what</h2>
-      <p class="sub">Metascience papers of the 14 Dutch universities by the theme the AI assigned: themes on the left,
-      universities on the right, ordered so that universities with similar themes are close together (university medical
+      <p class="sub">Metascience papers of the 14 Dutch universities by category (see About): categories on the left,
+      universities on the right, ordered so that universities with similar categories are close together (university medical
       centres are separate organisations; see Places). Hover a flow for the number of papers.</p>
-      <div id="sankey" class="chart" style="min-height:700px"></div>
+      <div id="sankey" class="chart" style="min-height:860px"></div>
     </section>
   </div>
 </main>
 <footer>Data: OpenAlex (CC0). Themes, clusters and their names are AI judgements; see <a href="about.html">About</a>.</footer>
 
 <script>
-const active = new Set(CATEGORIES);
+const chosen = new Set();   // categories coloured on the map and the keyword network (the rest grey)
 Promise.all([load("papers"), load("clusters"), load("keywords"), load("institutions"), load("people"), Me.ready]).then(([papers, clusters, kw, insts, people, me]) => {
   const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
   const mapped = papers.filter((p) => p.x != null);
@@ -114,14 +116,22 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     });
   }
   let focus = () => true, filtering = false;
+  // one choice of categories for the paper map and the keyword network, with a legend next to each
+  let kwCircles = null;
+  const kwFill = (d) => (chosen.has(d.cat) ? catColor(d.cat) : cssVar("--text-muted"));
+  const refreshCats = () => { drawMap(); if (kwCircles) kwCircles.attr("fill", kwFill).attr("fill-opacity", (d) => (chosen.size && !chosen.has(d.cat) ? 0.45 : 0.9)); };
+  function renderLegends() {
+    categoryLegend(document.getElementById("legend"), chosen, refreshCats);
+    categoryLegend(document.getElementById("kwlegend"), chosen, refreshCats);
+  }
   function drawMap() {
-    categoryLegend(document.getElementById("legend"), active, drawMap);
+    renderLegends();
     const q = document.getElementById("q").value.trim().toLowerCase();
     const cl = document.getElementById("cl").value;
     const a = +y0s.value, b = +y1s.value;
     const inRange = (p) => !p.y || (p.y >= a && p.y <= b);
     const meField = !!me && me.mode === "field";
-    focus = (p) => active.has(p.cat) && inRange(p) && (!cl || String(p.cl) === cl) && (!q || textMatches(q, p.t || "")) &&
+    focus = (p) => inRange(p) && (!cl || String(p.cl) === cl) && (!q || textMatches(q, p.t || "")) &&
       (!meField || me.field.includes(p.cl));
     filtering = !!(q || cl || meField);
     shownPts = mapped.filter(focus);
@@ -145,10 +155,13 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
     ctx.globalAlpha = 0.9;
     const r = Math.min(7, (filtering ? 3.2 : 2.4) + 0.45 * Math.sqrt(k));
     const ring = cssVar("--surface-1");
-    const colors = Object.fromEntries(CATEGORIES.map((c) => [c, catColor(c)]));
-    for (const p of shownPts) {
+    // papers of the chosen categories in their colour, drawn last so they lie on top; the others in neutral grey
+    const colors = Object.fromEntries(CATEGORIES.map((c) => [c, chosen.has(c) ? catColor(c) : cssVar("--text-muted")]));
+    const order = chosen.size ? shownPts.filter((p) => !chosen.has(p.cat)).concat(shownPts.filter((p) => chosen.has(p.cat))) : shownPts;
+    for (const p of order) {
       const x = transform.applyX(p.px), y = transform.applyY(p.py);
       if (x < -8 || x > W + 8 || y < -8 || y > H + 8) continue;
+      ctx.globalAlpha = chosen.has(p.cat) ? 0.95 : 0.5;
       ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = colors[p.cat]; ctx.fill();
       if (k > 2.5) { ctx.lineWidth = 0.8; ctx.strokeStyle = ring; ctx.stroke(); }
     }
@@ -279,7 +292,7 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
       .call(d3.drag().on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
         .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; }).on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
     const myKw = new Set(me && me.mode !== "field" ? me.kw : []);
-    node.append("circle").attr("r", (d) => r(d.n)).attr("fill", (d) => catColor(d.cat))
+    kwCircles = node.append("circle").attr("r", (d) => r(d.n)).attr("fill", kwFill).attr("fill-opacity", (d) => (chosen.size && !chosen.has(d.cat) ? 0.45 : 0.9))
       .attr("stroke", (d) => cssVar(myKw.has(d.id) ? "--text-primary" : "--surface-1")).attr("stroke-width", (d) => (myKw.has(d.id) ? 3 : 2));
     // names in their own layer above all dots, with an outline in the background colour
     const kwText = box.append("g").style("pointer-events", "none").selectAll("text").data(nodes).join("text")
@@ -353,7 +366,7 @@ Promise.all([load("papers"), load("clusters"), load("keywords"), load("instituti
         color: cats.map(catColor).concat(unis.map(() => cssVar("--text-muted"))),
         hovertemplate: "%{label}: %{value} papers<extra></extra>" },
       link: { source: src, target: tgt, value: val, color: col, hovertemplate: "%{source.label} → %{target.label}: %{value} papers<extra></extra>" } }],
-      baseLayout({ margin: { l: 10, r: 10, t: 10, b: 10 }, font: { size: 12, color: cssVar("--text-primary") } }), PLOT_CONFIG);
+      baseLayout({ height: 860, margin: { l: 10, r: 10, t: 10, b: 20 }, font: { size: 12, color: cssVar("--text-primary") } }), PLOT_CONFIG);
   }
 
   const all = () => { drawMap(); drawCards(); drawKeywords(); drawSankey(); };

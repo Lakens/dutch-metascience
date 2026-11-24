@@ -42,7 +42,7 @@
   <div class="grid two">
     <section class="card">
       <h2>Papers over time</h2>
-      <p class="sub">Each dot is a paper, placed by year and theme; hover for the title, click to open it.</p>
+      <p class="sub">Each dot is a paper, placed by year and category; hover for the title, click to open it.</p>
       <div id="timeline" class="chart"></div>
     </section>
     <section class="card">
@@ -62,7 +62,7 @@
 
   <section class="card">
     <h2>Who works on what</h2>
-    <p class="sub">The share of each person's metascience papers per theme, for the people with the most papers.
+    <p class="sub">The share of each person's metascience papers per category, for the people with the most papers.
     Darker means a larger share. Click a row to open that profile.</p>
     <div class="controls">
       <label>Show <select id="heatn"><option>30</option><option selected>50</option><option>80</option></select> people</label>
@@ -120,10 +120,11 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
       return { type: "scatter", mode: "markers", name: CAT_LABEL[c],
         x: sel.map((x) => x.y + (Math.random() - 0.5) * 0.5), y: sel.map(() => CAT_LABEL[c]),
         text: sel.map((x) => `${wrap(x.t)}<br>${x.y} · ${esc(x.v)}`), customdata: sel.map(doiLink),
-        marker: { size: 10, color: catColor(c), line: { width: 2, color: cssVar("--surface-1") } },
+        // the row already shows the category, so every dot has the same colour (12 colours on small dots cannot be told apart)
+        marker: { size: 10, color: cssVar("--accent"), opacity: 0.85, line: { width: 1.5, color: cssVar("--surface-1") } },
         hovertemplate: "%{text}<extra></extra>" };
     });
-    Plotly.react("timeline", traces, baseLayout({ showlegend: false, margin: { l: 10, r: 10, t: 10, b: 40 },
+    Plotly.react("timeline", traces, baseLayout({ showlegend: false, margin: { l: 10, r: 10, t: 10, b: 40 }, height: 70 + 30 * CATEGORIES.length,
       yaxis: Object.assign(baseLayout().yaxis, { categoryorder: "array", categoryarray: rows.map((c) => CAT_LABEL[c]) }),
       // horizontal year labels (rotated labels are hard to read); the axis covers only the years with papers
       xaxis: Object.assign(baseLayout().xaxis, { tickangle: 0, nticks: 8, tickformat: "d", showgrid: true,
