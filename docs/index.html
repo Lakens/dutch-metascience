@@ -31,11 +31,6 @@
 </header>
 <main>
   <h1>Metascience in the Netherlands</h1>
-  <p class="lede">Research on research: replication, research practices, open science, peer review, integrity,
-  statistical inference, research evaluation and science policy. This site maps metascience papers with at least
-  one author at a Dutch institution that we found in OpenAlex, as judged by a language model and checked by AI
-  reviewers. Some papers are missing, and some papers shown are not metascience. Everything is interactive:
-  hover for details, click legends to hide series, and follow the links to explore.</p>
   <p class="lede">In preparation for the symposium 'Research Prioritization in Dutch Metascience' on 10 December, I made
   this website to describe who works on Metascience in The Netherlands and the themes Dutch metascientists study. The
   website contains a list of <span id="npapers">8,899</span> papers (co-)authored by Dutch metascientists, an annotated
@@ -121,7 +116,7 @@
     </ul>
   </section>
 </main>
-<footer>For data sources, data quality, and AI judgments, see the <a href="about.html">About</a> page.</footer>
+<footer>Papers and authors: OpenAlex (CC0) and Crossref. The map groups papers by text fingerprints of their titles and abstracts. See <a href="about.html">About</a> for data quality and AI judgments.</footer>
 
 <script>
 Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), load("institutions"), Me.ready]).then(([meta, papers, people, clusters, insts, me]) => {
