@@ -36,9 +36,14 @@
   one author at a Dutch institution that we found in OpenAlex, as judged by a language model and checked by AI
   reviewers. Some papers are missing, and some papers shown are not metascience. Everything is interactive:
   hover for details, click legends to hide series, and follow the links to explore.</p>
-  <p class="lede">This website was built by Daniel Lakens for the symposium <b>Research Prioritization in
-    Dutch Metascience</b> on 10 December. Its goal is to let attendees explore possible collaborations based on shared
-    interests.</p>
+  <p class="lede">In preparation for the symposium 'Research Prioritization in Dutch Metascience' on 10 December, I made
+  this website to describe who works on Metascience in The Netherlands and the themes Dutch metascientists study. The
+  website contains a list of <span id="npapers">8,899</span> papers (co-)authored by Dutch metascientists, an annotated
+  history of important events in metascience per subfield, and an overview of funding from the Dutch science funder
+  NWO. The 'Socials' page provides information on posts by Dutch metascientists on the open social media platforms
+  Mastodon and Bluesky.</p>
+  <p class="lede">The goal of this site is to allow attendees of the symposium to explore possible collaborations based
+  on shared interests. Some suggestions are provided in the 'Working Together' page.</p>
 
   <section class="card" id="find">
     <h2>Find yourself</h2>
@@ -155,6 +160,7 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
     Me.set(p).then(() => { location.href = `index.html?me=${encodeURIComponent(p.id)}#find`; });
   });
 
+  if (meta.n_papers) document.getElementById("npapers").textContent = fmt(meta.n_papers);   // the number in the introduction
   const years = [];
   for (let y = Math.max(meta.years[0], 1990); y <= meta.years[1]; y++) years.push(y);
 

@@ -10,6 +10,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="assets/common.js"></script>
+<style>
+  /* "Who works on what": a table of coloured cells in a box that scrolls (a chart of thousands of rows would be
+     taller than browsers can draw); category names and person names stay in view while scrolling */
+  .heatbox { max-height: 640px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-1); }
+  table.heat { border-collapse: separate; border-spacing: 2px; width: 100%; min-width: 760px; font-size: 0.8rem; table-layout: fixed; }
+  table.heat th { position: sticky; top: 0; z-index: 2; background: var(--surface-1); color: var(--text-muted);
+    font-weight: 500; vertical-align: bottom; padding: 6px 2px; line-height: 1.2; text-align: center;
+    box-shadow: 0 -2px 0 var(--surface-1), 0 2px 0 var(--surface-1);   /* covers the gaps between cells */ }
+  table.heat th.nm, table.heat td.nm { position: sticky; left: 0; background: var(--surface-1); text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; color: var(--text-secondary); }
+  table.heat th.nm { width: 220px; }
+  table.heat th.nm { z-index: 3; }
+  table.heat td { height: 18px; min-width: 34px; padding: 0; }
+  table.heat tr { cursor: pointer; }
+  table.heat tr:hover td.nm { color: var(--text-primary); font-weight: 600; }
+  .heatkey { display: inline-flex; align-items: center; gap: 6px; }
+  #heatbar { display: inline-block; width: 120px; height: 10px; border-radius: 2px; }
+</style>
 </head>
 <body>
 <header class="site">
@@ -62,12 +80,16 @@
 
   <section class="card">
     <h2>Who works on what</h2>
-    <p class="sub">The share of each person's metascience papers per category, for the people with the most papers.
-    Darker means a larger share. Click a row to open that profile.</p>
+    <p class="sub">The share of each person's metascience papers per category, people with the most papers first.
+    Darker means a larger share. Scroll through the list; hover a cell for its value, click a row to open that profile.</p>
     <div class="controls">
-      <label>Show <select id="heatn"><option>30</option><option selected>50</option><option>80</option></select> people</label>
+      <label>Show <select id="heatn"><option value="30">30 people</option><option value="50" selected>50 people</option>
+        <option value="80">80 people</option><option value="min2">everyone with 2 or more papers</option>
+        <option value="all">everyone</option></select></label>
+      <span class="muted small" id="heatcount"></span>
+      <span class="heatkey small muted">0% <span id="heatbar"></span> 100% of a person's papers</span>
     </div>
-    <div id="heat" class="chart" style="min-height:900px"></div>
+    <div class="heatbox" id="heat"></div>
   </section>
 
   <section class="card">
@@ -188,22 +210,28 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
   }
 
   function drawHeat() {
-    const n = +document.getElementById("heatn").value;
-    const sel = people.slice(0, n);   // people.json is sorted by number of papers
-    const z = sel.map((p) => CATEGORIES.map((c) => (100 * (p.cats[c] || 0)) / p.k));
-    // theme names on two or three short lines, so they fit horizontally under their column
-    const lines = (s) => s.split(" ").reduce((a, w) => { const l = a[a.length - 1]; if (l && (l + " " + w).length <= 14) a[a.length - 1] = l + " " + w; else a.push(w); return a; }, []).join("<br>");
-    Plotly.react("heat", [{ type: "heatmap", z, x: CATEGORIES.map((c) => lines(CAT_LABEL[c])), y: sel.map((p) => `${p.n} (${p.k})`),
-      customdata: sel.map((p) => CATEGORIES.map(() => p.id)), colorscale: seqScale(), zmin: 0, zmax: 100, xgap: 2, ygap: 2,
-      colorbar: { title: { text: "% of papers", side: "right" }, thickness: 10, outlinewidth: 0, tickfont: { color: cssVar("--text-muted") } },
-      text: sel.map(() => CATEGORIES.map((c) => CAT_LABEL[c])), hovertemplate: "%{y}<br>%{text}: %{z:.0f}% of papers<extra></extra>" }],
-      baseLayout({ height: Math.max(500, sel.length * 18 + 140), margin: { l: 10, r: 10, t: 10, b: 70 },
-        yaxis: Object.assign(baseLayout().yaxis, { autorange: "reversed" }),
-        xaxis: Object.assign(baseLayout().xaxis, { side: "bottom", tickangle: 0, tickfont: { size: 11, color: cssVar("--text-muted") } }) }), PLOT_CONFIG);
-    const el = document.getElementById("heat");
-    el.removeAllListeners && el.removeAllListeners("plotly_click");
-    el.on("plotly_click", (d) => { location.hash = encodeURIComponent(d.points[0].customdata); window.scrollTo({ top: 0, behavior: "smooth" }); });
+    const v = document.getElementById("heatn").value;
+    // people.json is sorted by number of papers
+    const sel = v === "all" ? people : v === "min2" ? people.filter((p) => p.k >= 2) : people.slice(0, +v);
+    document.getElementById("heatcount").textContent = `${fmt(sel.length)} people`;
+    const color = d3.piecewise(d3.interpolateRgb, [0, 1, 2, 3, 4, 5].map((i) => cssVar(`--seq-${i}`)));
+    document.getElementById("heatbar").style.background = `linear-gradient(90deg, ${[0, 0.25, 0.5, 0.75, 1].map((t) => color(t)).join(", ")})`;
+    const head = `<thead><tr><th class="nm">person (papers)</th>${CATEGORIES.map((c) => `<th>${esc(CAT_LABEL[c]).replace("Scientometrics", "Sciento&shy;metrics")}</th>`).join("")}</tr></thead>`;
+    const rows = sel.map((p) => {
+      const cells = CATEGORIES.map((c) => {
+        const pct = (100 * (p.cats[c] || 0)) / p.k;
+        return `<td style="background:${color(pct / 100)}" title="${esc(p.n)}: ${esc(CAT_LABEL[c])}, ${Math.round(pct)}% of papers"></td>`;
+      }).join("");
+      return `<tr data-id="${esc(p.id)}"><td class="nm">${esc(p.n)} (${p.k})</td>${cells}</tr>`;
+    }).join("");
+    const box = document.getElementById("heat");
+    box.innerHTML = `<table class="heat">${head}<tbody>${rows}</tbody></table>`;
+    box.scrollTop = 0;
   }
+  document.getElementById("heat").addEventListener("click", (e) => {
+    const tr = e.target.closest("tr[data-id]"); if (!tr) return;
+    location.hash = encodeURIComponent(tr.dataset.id); window.scrollTo({ top: 0, behavior: "smooth" });
+  });
   document.getElementById("heatn").addEventListener("change", drawHeat);
   // newcomers per year (moved here from the Overview, 26 Nov 2026)
   function drawNewcomers() {
