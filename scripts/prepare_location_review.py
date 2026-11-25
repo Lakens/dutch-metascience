@@ -14,7 +14,7 @@ import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 data_dir, final_path, posts_dir, profiles_path, out_path = sys.argv[1:6]
-UA = {"User-Agent": "metascience-community-script"}
+UA = {"User-Agent": "dutch-metascience-script"}
 people = {p["id"]: p for p in json.load(open(os.path.join(data_dir, "people.json"), encoding="utf-8"))}
 insts = {i["id"]: i["n"] for i in json.load(open(os.path.join(data_dir, "institutions.json"), encoding="utf-8"))["list"]}
 papers = json.load(open(os.path.join(data_dir, "papers.json"), encoding="utf-8"))

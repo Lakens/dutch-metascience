@@ -17,7 +17,7 @@ import requests
 sys.stdout.reconfigure(encoding="utf-8")
 out_path, in_paths = sys.argv[1], sys.argv[2:]
 s = requests.Session()
-s.headers["User-Agent"] = "dutch-metascience-community/1.0 (https://github.com/Lakens/dutch-metascience-community)"
+s.headers["User-Agent"] = "dutch-metascience/1.0 (https://github.com/Lakens/dutch-metascience)"
 
 def words(text):
     text = unicodedata.normalize("NFKC", text).lower()

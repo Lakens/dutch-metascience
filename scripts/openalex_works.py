@@ -11,7 +11,7 @@ xlsx, db_path = sys.argv[1], sys.argv[2]
 KEY = os.environ.get("OPENALEX_API_KEY", "").strip().strip('"').strip("'")
 if not KEY:
     raise SystemExit("STOPPED: OPENALEX_API_KEY is not set")
-UA = {"User-Agent": "metascience-community-script"}
+UA = {"User-Agent": "dutch-metascience-script"}
 session = requests.Session()
 FIELDS = ("id,doi,display_name,publication_year,publication_date,type,primary_location,authorships,"
           "is_authors_truncated,cited_by_count,primary_topic,topics,keywords,abstract_inverted_index,language,"

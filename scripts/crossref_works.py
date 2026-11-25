@@ -9,7 +9,7 @@ from openpyxl.styles import Font, PatternFill, Alignment
 
 sys.stdout.reconfigure(encoding="utf-8")
 xlsx, db_path, out_xlsx = sys.argv[1], sys.argv[2], sys.argv[3]
-UA = {"User-Agent": "metascience-community-script"}
+UA = {"User-Agent": "dutch-metascience-script"}
 session = requests.Session()
 
 def get(url, params):

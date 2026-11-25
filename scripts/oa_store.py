@@ -17,7 +17,7 @@ def oa_get(path, params):
     for attempt in range(6):
         try:
             r = _session.get("https://api.openalex.org/" + path, params={**params, "api_key": KEY},
-                             headers={"User-Agent": "metascience-community-script"}, timeout=90)
+                             headers={"User-Agent": "dutch-metascience-script"}, timeout=90)
             if r.status_code == 404:
                 return None
             if r.status_code == 429 or r.status_code >= 500:

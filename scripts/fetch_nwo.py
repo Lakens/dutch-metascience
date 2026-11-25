@@ -14,7 +14,7 @@ PER = 500
 part = out + ".partial"
 pages = json.load(open(part, encoding="utf-8")) if os.path.exists(part) else {}
 s = requests.Session()
-s.headers["User-Agent"] = "dutch-metascience-community (research project; python requests)"
+s.headers["User-Agent"] = "dutch-metascience (research project; python requests)"
 first = s.get(URL, params={"per_page": PER, "page": 1}, timeout=120).json()
 n_pages = first["meta"]["pages"]
 print("projects:", first["meta"]["count"], "| pages:", n_pages, flush=True)

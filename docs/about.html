@@ -4,15 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About This Site</title>
-<meta name="description" content="Why the Dutch Metascience Community site was built, how it was made, how far you can trust it, and how to correct it.">
+<meta name="description" content="Why the Dutch Metascience site was built, how it was made, how far you can trust it, and how to correct it.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <script src="assets/common.js"></script>
-<style> main section.card p, main section.card li { max-width: 860px; } </style>
 </head>
 <body>
 <header class="site">
-  <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
+  <a class="brand" href="index.html" aria-label="Dutch Metascience, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience" width="124" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="124" height="40"></a>
   <nav>
     <a href="index.html">Overview</a>
     <a href="people.html">People</a>
@@ -78,19 +77,19 @@
     browser; nothing is sent anywhere, because the site has no server. The Socials page uses public posts on Bluesky and
     Mastodon by people who work in the Netherlands now, and names only people who post regularly about metascience. If
     you want to be removed or corrected, or if a social media account was matched to you by mistake, please
-    <a href="https://github.com/Lakens/dutch-metascience-community/issues">open an issue on GitHub</a>.</p>
+    <a href="https://github.com/Lakens/dutch-metascience/issues">open an issue on GitHub</a>.</p>
   </section>
 
   <section class="card">
     <h2>More details</h2>
     <p>Every step is described in detail in the
-    <a href="https://github.com/Lakens/dutch-metascience-community#readme">README of the GitHub repository</a>,
+    <a href="https://github.com/Lakens/dutch-metascience#readme">README of the GitHub repository</a>,
     including the rules the AI reviewers followed and how their agreement was measured. All scripts are in the
     repository, and the data behind every chart are in <code>docs/data/</code>. OpenAlex data are CC0. Last built in
     <span id="built">November 2026</span>.</p>
   </section>
 </main>
-<footer>Dutch Metascience Community</footer>
+<footer>Dutch Metascience</footer>
 <script>
 load("meta").then((m) => {
   if (m.built) document.getElementById("built").textContent = m.built;

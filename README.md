@@ -1,9 +1,9 @@
-# Dutch Metascience Community
+# Dutch Metascience
 
 A website that maps metascience (research on research) in the Netherlands: who works on what, who works with whom,
 how the field grew, and where people could work together.
 
-**Website:** https://lakens.github.io/dutch-metascience-community/
+**Website:** https://lakens.github.io/dutch-metascience/
 
 I built this site for the symposium *Research Prioritization in Dutch Metascience* on 10 December 2026. Its goal is
 to let people explore possible collaborations based on shared interests. Most of the classification and data

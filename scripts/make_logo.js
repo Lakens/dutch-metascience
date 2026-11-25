@@ -1,4 +1,4 @@
-// Draws the final Dutch Metascience Community logo (two joined wind turbines with tulips as a bar chart on the left)
+// Draws the final Dutch Metascience logo (two joined wind turbines with tulips as a bar chart on the left)
 // and writes two scalable SVG files: the mark alone, and the mark with the name.
 // Usage: node make_logo.js <output folder>
 const fs = require("fs"), path = require("path");
@@ -77,22 +77,22 @@ const STYLE = `<style>
     .ink { fill: #1b2430; } .ink-line { stroke: #1b2430; }
     @media (prefers-color-scheme: dark) { .ink { fill: #eef2f4; } .ink-line { stroke: #eef2f4; } }
   </style>`;
-const TITLE = "Dutch Metascience Community";
+const TITLE = "Dutch Metascience";
 const markSvg = (body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="${TITLE}">
   <title>${TITLE}</title>
   ${STYLE}
   ${body}
 </svg>
 `;
-const nameSvg = (body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 120" role="img" aria-label="${TITLE}">
+const nameSvg = (body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 372 120" role="img" aria-label="${TITLE}">
   <title>${TITLE}</title>
   ${STYLE.replace("</style>", `  .name { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   </style>`)}
   <g>
   ${body}
   </g>
-  <text x="132" y="64" class="ink name" font-size="38" font-weight="700" letter-spacing="-0.5">Dutch Metascience</text>
-  <text x="134" y="96" class="ink name" font-size="21" font-weight="500" letter-spacing="5" opacity="0.7">COMMUNITY</text>
+  <text x="132" y="57" class="ink name" font-size="38" font-weight="700" letter-spacing="-0.5">Dutch</text>
+  <text x="132" y="98" class="ink name" font-size="38" font-weight="700" letter-spacing="-0.5">Metascience</text>
 </svg>
 `;
 // turbines: dutch-metascience-logo(-mark).svg; traditional mills: dutch-metascience-logo-mills(-mark).svg
