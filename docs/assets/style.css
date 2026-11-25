@@ -142,6 +142,8 @@ input[type="search"] { width: 260px; max-width: 100%; }
 .badge.listed { color: var(--series-1); border-color: var(--series-1); }
 .ai-note { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
 .split { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; }
+/* a network on its own, before a person is clicked (Overview, Socials) */
+.split.solo { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 960px) { .split { grid-template-columns: 1fr; } .grid.two { grid-template-columns: 1fr; } }
 .panel { max-height: 680px; overflow: auto; }
 .panel ul { padding-left: 18px; margin: 6px 0; }

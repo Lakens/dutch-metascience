@@ -63,8 +63,9 @@
     posts. Thicker lines mean more interactions. Orange lines join people who also wrote a paper together that is on this
     site; grey lines join people without a joint paper on this site (they may have written other papers together).
     Circles are larger for people with more metascience posts, and coloured by the platform the person uses. On Mastodon a reply always mentions the other person; on
-    Bluesky, replies are counted for metascience posts only. Scroll to zoom, drag to move, hover for details, click a
-    person to see who they interact with.</p>
+    Bluesky, replies are counted for metascience posts only. Scroll to zoom, drag to move, hover for details. Click a
+    person: the people they interact with light up in the network, and are listed beside it with the number of
+    mentions, reposts and replies between them.</p>
     <div class="controls">
       <label>At least <select id="nmin"><option>2</option><option selected>3</option><option>5</option><option>10</option><option>25</option></select> interactions</label>
       <div class="seg" id="nmode"><button aria-pressed="true" data-v="all">All pairs</button><button aria-pressed="false" data-v="noco">Only pairs without a joint paper on this site</button></div>
@@ -73,13 +74,10 @@
       <span class="muted small" id="ncount"></span>
     </div>
     <div class="pl-legend"><span><span class="dot" style="background:var(--bluesky)"></span>on Bluesky</span><span><span class="dot" style="background:var(--mastodon)"></span>on Mastodon</span><span><span class="dot" style="background:linear-gradient(90deg,var(--bluesky) 50%,var(--mastodon) 50%)"></span>on both</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--series-2)"></span>also a joint paper on this site</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--other)"></span>no joint paper on this site</span></div>
-    <div class="split">
+    <!-- the network has the full width until a person is clicked; then the box with their interactions appears beside it -->
+    <div class="split solo" id="nsplit">
       <div style="margin:0"><canvas class="net" id="net"></canvas></div>
-      <aside class="card panel" style="margin:0" id="npanel">
-        <h3>Click a person</h3>
-        <p class="muted small">The people they interact with light up in the network, and are listed here with the number
-        of mentions, reposts and replies between them.</p>
-      </aside>
+      <aside class="card panel" style="margin:0" id="npanel" hidden></aside>
     </div>
     <h3 style="margin-top:14px">Pairs who interact most without a joint paper on this site</h3>
     <div class="tablewrap"><table class="data" id="pairs"></table></div>
@@ -433,6 +431,9 @@ Promise.all([load("socials")]).then(([S]) => {
       build(); n = nodes.find((x) => x.id === id);
     }
     selected = n || null;
+    // the box is shown only while a person is selected; the canvas is measured again after the change
+    const panel = document.getElementById("npanel");
+    if (panel.hidden === !!n) { panel.hidden = !n; document.getElementById("nsplit").classList.toggle("solo", !n); size(); }
     if (n) {
       showPanel(n.p);
       if (center && n.x != null) {
