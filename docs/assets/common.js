@@ -77,7 +77,7 @@ function baseLayout(extra = {}) {
   return Object.assign({
     paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
     dragmode: false,   // no zooming or panning by dragging; the maps set "zoom" and use MAP_CONFIG
-    font: { family: 'system-ui, -apple-system, "Segoe UI", sans-serif', color: ink, size: 13 },
+    font: { family: '"Cabin", "Gill Sans", "Segoe UI", sans-serif', color: ink, size: 13 },
     margin: { l: 50, r: 20, t: 10, b: 40 },
     hoverlabel: { bgcolor: cssVar("--surface-1"), bordercolor: cssVar("--axis"), font: { color: cssVar("--text-primary") } },
     legend: { orientation: "h", y: -0.18, font: { color: ink } },

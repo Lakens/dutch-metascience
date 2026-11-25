@@ -286,7 +286,7 @@ Promise.all([load("papers"), load("clusters"), load("people"), Me.ready]).then((
     const cl = document.getElementById("cl").value;
     clusters.slice().sort((a, b) => (String(b.id) === cl) - (String(a.id) === cl) || b.k - a.k).forEach((c) => {
       const cc = clusterCenter[c.id]; if (!cc) return;
-      put(c.name, transform.applyX(cc[0]), transform.applyY(cc[1]), `${String(c.id) === cl ? 600 : 500} 12px system-ui, sans-serif`, true);
+      put(c.name, transform.applyX(cc[0]), transform.applyY(cc[1]), `${String(c.id) === cl ? 600 : 500} 12px Cabin, system-ui, sans-serif`, true);
     });
     if (k >= 2 || hovered) {
       const inView = shownPts.filter((p) => { const x = transform.applyX(p.px), y = transform.applyY(p.py); return x > 0 && x < W && y > 0 && y < H; });
@@ -295,7 +295,7 @@ Promise.all([load("papers"), load("clusters"), load("people"), Me.ready]).then((
       for (const p of inView) {
         if (n >= (k >= 2 ? 40 : 1)) break;
         const t = p.t.length > 60 ? p.t.slice(0, 58) + "…" : p.t;
-        if (put(t, transform.applyX(p.px), transform.applyY(p.py) - r - 9, "11px system-ui, sans-serif", false)) n++;
+        if (put(t, transform.applyX(p.px), transform.applyY(p.py) - r - 9, "11px Cabin, system-ui, sans-serif", false)) n++;
       }
     }
     ctx.restore();
@@ -344,6 +344,7 @@ Promise.all([load("papers"), load("clusters"), load("people"), Me.ready]).then((
   const startCl = new URLSearchParams(location.search).get("cl");
   if (startCl && clusters.some((c) => String(c.id) === startCl)) document.getElementById("cl").value = startCl;
   drawMap(); onThemeChange(drawMap);
+  if (document.fonts) document.fonts.ready.then(() => drawMap());   // the cluster names again, in the site font once it is loaded
   if (startCl) zoomToCluster(document.getElementById("cl").value);
 }).catch((e) => failed(document.getElementById("map-card"), e));
 </script>
@@ -473,7 +474,7 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
       // names in screen pixels; a name is drawn only where it does not overlap a name already drawn,
       // in order: selected, hovered, co-authors of the selected person, then by number of papers
       ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.font = "11px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.font = "11px Cabin, system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
       const isMe = (n) => me && n.id === me.id;
       const cand = nodes.filter((n) => isMe(n) || n === selected || n === hovered ||
         (nb ? nb.has(n.id) : n.p.k >= 2 && !outsideField(n.p)));

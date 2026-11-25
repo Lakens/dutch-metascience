@@ -156,8 +156,7 @@
     </div>
   </section>
 </main>
-<footer>Data: public posts on Bluesky and Mastodon by the people on this site, downloaded in November 2026. See
-<a href="https://github.com/Lakens/dutch-metascience-community#data-sources">the README</a> for how accounts were found, and <a href="about.html">About</a> for how to be removed.</footer>
+<footer>For data sources, data quality, and AI judgments, see the <a href="about.html">About</a> page.</footer>
 
 <script>
 Promise.all([load("socials")]).then(([S]) => {
@@ -397,7 +396,7 @@ Promise.all([load("socials")]).then(([S]) => {
       // names in screen pixels, skipped where they would overlap a name already drawn (selected, hovered and their
       // contacts first, then people with more metascience posts)
       ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.font = "11px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.font = "11px Cabin, system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
       const rank = (n) => (n === selected ? 3e9 : n === hovered ? 2e9 : nb && nb.has(n.id) ? 1e9 + n.p.posts : n.p.posts);
       const cand = nodes.filter((n) => !selected || n === selected || n === hovered || nb.has(n.id)).sort((a, b) => rank(b) - rank(a));
       const placed = [];
