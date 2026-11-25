@@ -66,7 +66,7 @@
     count as zero, so the amount view underestimates older years. When you view the site as a person, a third view shows that person's grants, metascience-related or
     not.</p>
     <div class="controls">
-      <div class="seg" id="scope"><button aria-pressed="true" data-v="all">Grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
+      <div class="seg" id="scope"><button aria-pressed="false" data-v="all">Grants of these researchers</button><button aria-pressed="true" data-v="meta">Metascience-related projects</button></div>
       <div class="seg" id="measure"><button aria-pressed="true" data-v="n">Number of projects</button><button aria-pressed="false" data-v="a">Amount awarded</button></div>
     </div>
     <p class="small" id="ottotal"></p>
@@ -79,7 +79,7 @@
     <p class="sub">Every bar is a project, from its start to its end; scroll sideways and down. Hover for details,
     click for the summary. A faded bar has no end date in the NWO data (shown as one year).</p>
     <div class="controls">
-      <div class="seg" id="tlscope"><button aria-pressed="true" data-v="all">Grants of these researchers</button><button aria-pressed="false" data-v="meta">Metascience-related projects</button></div>
+      <div class="seg" id="tlscope"><button aria-pressed="false" data-v="all">Grants of these researchers</button><button aria-pressed="true" data-v="meta">Metascience-related projects</button></div>
       <input type="search" id="tlq" placeholder="Filter by title or person…" style="min-width:240px">
       <span class="muted small" id="tlcount"></span>
     </div>
@@ -165,7 +165,7 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
     `${fmt(F.summary.name_only_not_used)} matches on name alone were not used.`;
 
   // ---- funding over time ----
-  let scope = "all", measure = "n", tlscope = "all";
+  let scope = "meta", measure = "n", tlscope = "meta";   // metascience-related projects by default
   const legendHtml = (sc) => groups(sc).map((f) =>
     `<span class="item"><span class="swatch" style="background:${groupColor(f, sc)}"></span>${esc(f)}</span>`).join("");
   const meId = me && me.mode !== "field" && F.people[me.id] ? me.id : null;
