@@ -3,184 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Metascience Over Time</title>
-<meta name="description" content="How Dutch metascience developed: the rise of terms, rising keywords, citations and landmark papers per topic.">
+<title>Page moved</title>
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url=index.html#terms">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
-<script src="assets/common.js"></script>
-<style>
-  .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-  .multiples .m { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 0; }
-  .multiples .m h3 { font-size: 0.92rem; margin: 0; }
-  .multiples .m .sp { height: 140px; }
-</style>
+<script>
+  // the Over time page was split up on 26 Nov 2026: terms and keyword ranks are on the Overview, citations and
+  // landmark papers on the Papers page. Old links land on the Overview (keeping a personal view in the address).
+  location.replace("index.html" + location.search + "#terms");
+</script>
 </head>
 <body>
-<header class="site">
-  <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
-  <nav>
-    <a href="index.html">Overview</a>
-    <a href="network.html">Who works with whom</a>
-    <a href="people.html">People</a>
-    <a href="papers.html">Papers</a>
-    <a href="themes.html">Themes</a>
-    <a href="time.html" aria-current="page">Over time</a>
-    <a href="history.html">History</a>
-    <a href="places.html">Places</a>
-    <a href="funding.html">Funding</a>
-    <a href="inferences.html">Inferences</a>
-    <a href="socials.html">Socials</a>
-    <a href="about.html">About</a>
-  </nav>
-  <button id="theme-toggle" type="button">Dark mode</button>
-</header>
 <main>
-  <h1>Over time</h1>
-  <p class="lede">How the vocabulary of the field changed. Counts are metascience papers on this site whose title
-  or abstract mentions the term (abstracts are missing for some papers, so the counts are a lower bound).</p>
-
-  <section class="card">
-    <h2>The rise of terms</h2>
-    <p class="sub">Papers on this site per year that use each term in their title or abstract. Each panel has its own
-    vertical scale, so that rare terms stay visible: compare the shape of the curves, not their height (the total under
-    each term gives the size). The last year is not complete yet.</p>
-    <div class="controls">
-      <div class="seg" id="tmode"><button aria-pressed="true" data-v="count">Papers</button><button aria-pressed="false" data-v="share">Share of that year's papers</button></div>
-      <label>From <select id="from"><option>2000</option><option selected>2005</option><option>2010</option></select></label>
-    </div>
-    <div class="multiples" id="mult"></div>
-  </section>
-
-  <section class="card">
-    <h2>Rising and falling keywords</h2>
-    <p class="sub">The rank of each keyword among the most frequent keywords in each period (1 = most frequent).
-    The eight keywords that lead the most recent period are coloured; hover any line for its name.</p>
-    <div id="bump" class="chart" style="min-height:560px"></div>
-  </section>
-
-  <section class="card">
-    <h2>What got cited</h2>
-    <p class="sub">Every paper by year and number of citations (log scale). Choose a theme to highlight it; click a dot
-    to open the paper. Recent papers have had less time to be cited.</p>
-    <div class="controls"><label>Theme <select id="ccat"><option value="">all themes</option></select></label></div>
-    <div id="cites" class="chart" style="min-height:520px"></div>
-  </section>
-
-  <section class="card">
-    <h2>Landmark papers in each cluster</h2>
-    <p class="sub">The three most cited papers in each of the 20 clusters of similar papers (see Themes), so that every
-    topic shows its own landmark papers instead of one list dominated by the most cited fields. Ranked by citations per
-    year since publication, so that old papers do not win only by being old.</p>
-    <div class="controls"><div class="seg" id="lmode"><button aria-pressed="true" data-v="peryear">Citations per year</button><button aria-pressed="false" data-v="total">Total citations</button></div></div>
-    <div class="cards landmarks" id="landmarks"></div>
-  </section>
+  <p>This page has moved. The rise of terms and the keyword ranks are on the <a href="index.html#terms">Overview</a>;
+  what got cited and the landmark papers are on the <a href="papers.html#cited">Papers</a> page.</p>
 </main>
-<footer>Data: OpenAlex (CC0). Citation counts as in OpenAlex at download time.</footer>
-
-<script>
-let tmode = "count";
-Promise.all([load("terms"), load("keywords"), load("papers"), load("people"), load("clusters"), Me.ready]).then(([terms, kw, papers, people, clusters, me]) => {
-  const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
-  function drawTerms() {
-    const from = +document.getElementById("from").value;
-    const allYears = Object.keys(terms.totals).map(Number).filter((y) => y >= from).sort((a, b) => a - b);
-    const names = Object.keys(terms.terms).sort((a, b) =>
-      Object.values(terms.terms[b]).reduce((s, x) => s + x, 0) - Object.values(terms.terms[a]).reduce((s, x) => s + x, 0));
-    const el = document.getElementById("mult"); el.innerHTML = "";
-    names.forEach((t, i) => {
-      const total = Object.values(terms.terms[t]).reduce((s, x) => s + x, 0);
-      const first = Object.keys(terms.terms[t]).map(Number).sort((a, b) => a - b)[0];
-      const div = document.createElement("div"); div.className = "m";
-      div.innerHTML = `<h3>${esc(t)}</h3><div class="muted small">${fmt(total)} papers${first ? ` · first in ${first}` : ""}</div><div class="sp"></div>`;
-      el.appendChild(div);
-      const y = allYears.map((yr) => { const n = terms.terms[t][yr] || 0; return tmode === "share" ? (terms.totals[yr] ? 100 * n / terms.totals[yr] : 0) : n; });
-      Plotly.newPlot(div.querySelector(".sp"), [{ x: allYears, y, type: "scatter", mode: "lines", fill: "tozeroy",
-        line: { color: cssVar("--series-1"), width: 2 }, fillcolor: cssVar("--seq-1"),
-        hovertemplate: `%{x}: %{y:${tmode === "share" ? ".1f" : ".0f"}}${tmode === "share" ? "%" : " papers"}<extra></extra>` }],
-        baseLayout({ margin: { l: 34, r: 6, t: 4, b: 22 }, showlegend: false, height: 140,
-          xaxis: Object.assign(baseLayout().xaxis, { range: [allYears[0], allYears[allYears.length - 1]], nticks: 4 }),
-          yaxis: Object.assign(baseLayout().yaxis, { nticks: 3, rangemode: "tozero" }) }),
-        { displayModeBar: false, responsive: true });
-    });
-  }
-  document.querySelectorAll("#tmode button").forEach((b) => b.addEventListener("click", () => {
-    tmode = b.dataset.v; document.querySelectorAll("#tmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawTerms();
-  }));
-  document.getElementById("from").addEventListener("change", drawTerms);
-
-  function drawBump() {
-    const periods = Object.keys(kw.periods);
-    const rank = {}; periods.forEach((p) => kw.periods[p].slice(0, 15).forEach(([k], i) => ((rank[k] = rank[k] || {})[p] = i + 1)));
-    const last = periods[periods.length - 1];
-    const leaders = kw.periods[last].slice(0, 8).map(([k]) => k);
-    const traces = Object.keys(rank).sort((a, b) => leaders.includes(a) - leaders.includes(b)).map((k) => {
-      const li = leaders.indexOf(k);
-      return { type: "scatter", mode: "lines+markers", name: k, x: periods, y: periods.map((p) => rank[k][p] ?? null),
-        connectgaps: false, line: { width: li >= 0 ? 2.5 : 1.5, color: li >= 0 ? seriesColor(li) : cssVar("--other") },
-        marker: { size: 8, color: li >= 0 ? seriesColor(li) : cssVar("--other"), line: { width: 2, color: cssVar("--surface-1") } },
-        hovertemplate: `<b>${esc(k)}</b><br>%{x}: rank %{y}<extra></extra>` };
-    });
-    const ann = leaders.map((k, i) => ({ x: last, y: rank[k][last], text: esc(k), xanchor: "left", xshift: 10, showarrow: false,
-      font: { size: 12, color: cssVar("--text-primary") } }));
-    Plotly.react("bump", traces, baseLayout({ showlegend: false, hovermode: "closest", annotations: ann, margin: { l: 40, r: 230, t: 10, b: 40 },
-      yaxis: Object.assign(baseLayout().yaxis, { title: "rank", dtick: 1, range: [15.5, 0.5] }) }), PLOT_CONFIG);
-  }
-
-  const csel = document.getElementById("ccat");
-  csel.innerHTML += CATEGORIES.map((c) => `<option value="${esc(c)}">${esc(CAT_LABEL[c])}</option>`).join("");
-  function drawCites() {
-    const c = csel.value;
-    const ps = papers.filter((p) => p.y && p.y >= 2000);
-    const hl = ps.filter((p) => !c || p.cat === c), bg = c ? ps.filter((p) => p.cat !== c) : [];
-    const jit = (p) => p.y + ((parseInt(p.id.slice(-3), 36) % 100) / 100 - 0.5) * 0.7;
-    const mk = (arr, color, size, op) => ({ type: "scattergl", mode: "markers", x: arr.map(jit), y: arr.map((p) => p.c + 1),
-      text: arr.map((p) => `<b>${wrap(p.t)}</b><br>${p.y} · ${fmt(p.c)} citations<br>${esc(CAT_LABEL[p.cat] || "")}<br>` +
-        esc(p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean).slice(0, 5).join(", "))),
-      customdata: arr.map(doiLink), hovertemplate: "%{text}<extra></extra>", marker: { size, color, opacity: op } });
-    const traces = [mk(bg, cssVar("--other"), 4, 0.4), mk(hl, c ? catColor(c) : cssVar("--series-1"), 6, 0.75)];
-    traces.forEach((t) => (t.showlegend = false));
-    if (me) {
-      // the person's papers (or the subfield's) on top: dark dots with a light ring, named in the legend
-      const mineP = ps.filter((p) => Me.hit(p, me));
-      const t = mk(mineP, cssVar("--text-primary"), me.mode === "field" ? 6 : 10, 0.9);
-      t.marker.line = { color: cssVar("--surface-1"), width: 1.5 };
-      t.name = me.mode === "field" ? `Your subfield (${fmt(mineP.length)} papers)` : `Your papers (${fmt(mineP.length)})`;
-      t.showlegend = true;
-      traces.push(t);
-    }
-    Plotly.react("cites", traces,
-      baseLayout({ showlegend: !!me, legend: { orientation: "h", y: 1.08, x: 0 }, hovermode: "closest",
-        yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "citations + 1",
-          tickvals: [1, 10, 100, 1000, 10000, 100000], ticktext: ["1", "10", "100", "1,000", "10,000", "100,000"] }) }), PLOT_CONFIG);
-  }
-
-  // ---- landmark papers: the 3 most cited papers per cluster ----
-  let lmode = "peryear";
-  const lastYear = Math.max(...papers.map((p) => p.y || 0));
-  const perYear = (p) => (p.c || 0) / Math.max(1, lastYear - p.y + 1);
-  function drawLandmarks() {
-    const score = lmode === "peryear" ? perYear : (p) => p.c || 0;
-    const mineFirst = (a, b) => (me ? me.field.includes(b.id) - me.field.includes(a.id) : 0) || b.k - a.k;
-    document.getElementById("landmarks").innerHTML = clusters.slice().sort(mineFirst).map((cl) => {
-      const top = papers.filter((p) => p.cl === cl.id && p.y).sort((a, b) => score(b) - score(a)).slice(0, 3);
-      const youTag = me && me.field.includes(cl.id) ? '<span class="you">your subfield</span>' : "";
-      return `<div class="c"><h3>${esc(cl.name)}${youTag}</h3><ol>` + top.map((p) => {
-        const names = p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean);
-        return `<li><a href="${doiLink(p)}" target="_blank" rel="noopener">${esc(p.t)}</a>
-          <span class="muted small">${p.y} · ${fmt(p.c || 0)} citations (${fmt(Math.round(perYear(p)))} per year)` +
-          `${names.length ? " · " + esc(names.slice(0, 3).join(", ")) + (names.length > 3 ? " et al." : "") : ""}</span></li>`;
-      }).join("") + "</ol></div>";
-    }).join("");
-  }
-  document.querySelectorAll("#lmode button").forEach((b) => b.addEventListener("click", () => {
-    lmode = b.dataset.v; document.querySelectorAll("#lmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawLandmarks();
-  }));
-  csel.addEventListener("change", drawCites);
-  const all = () => { drawTerms(); drawBump(); drawCites(); drawLandmarks(); };
-  all(); onThemeChange(all);
-  document.getElementById("cites").on("plotly_click", (d) => window.open(d.points[0].customdata, "_blank", "noopener"));
-}).catch((e) => failed(document.getElementById("mult"), e));
-</script>
 </body>
 </html>

@@ -62,7 +62,6 @@
     <a href="people.html">People</a>
     <a href="papers.html" aria-current="page">Papers</a>
     <a href="themes.html">Themes</a>
-    <a href="time.html">Over time</a>
     <a href="history.html">History</a>
     <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
@@ -146,6 +145,24 @@
     </div>
     <div style="overflow-x:auto"><table class="data" id="table"></table></div>
     <div class="bar-actions"><button class="btn" id="more" type="button">Show more</button><span class="muted small" id="shown"></span></div>
+  </section>
+
+  <section class="card" id="cited">
+    <h2>What got cited</h2>
+    <p class="sub">Every paper since 2000 by year and number of citations (log scale), with a small random offset within
+    its year so that dots overlap less. Choose a category to highlight it; click a dot to open the paper. Recent papers
+    have had less time to be cited.</p>
+    <div class="controls"><label>Category <select id="ccat"><option value="">all categories</option></select></label></div>
+    <div id="cites" class="chart" style="min-height:520px"></div>
+  </section>
+
+  <section class="card" id="landmarks-card">
+    <h2>Landmark papers in each category</h2>
+    <p class="sub">The three most cited papers on this site in each of the 12 categories, so that every category shows its
+    own landmark papers instead of one list dominated by the most cited fields. Ranked by citations per year since
+    publication, so that old papers do not win only by being old.</p>
+    <div class="controls"><div class="seg" id="lmode"><button aria-pressed="true" data-v="peryear">Citations per year</button><button aria-pressed="false" data-v="total">Total citations</button></div></div>
+    <div class="cards landmarks" id="landmarks"></div>
   </section>
 
   <section class="card">
@@ -451,6 +468,65 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
   if (openId && byW[openId]) openPaper(openId);
   onThemeChange(() => update(true));
 }).catch((e) => failed(document.querySelector("main"), e));
+</script>
+<script>
+// ---- what got cited, and the landmark papers per category (moved here from the former Over time page, 26 Nov 2026) ----
+const START_HASH = location.hash;   // read before the filters above rewrite the address
+Promise.all([load("papers"), load("people"), Me.ready]).then(([papers, people, me]) => {
+  const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
+  const csel = document.getElementById("ccat");
+  csel.innerHTML += CATEGORIES.map((c) => `<option value="${esc(c)}">${esc(CAT_LABEL[c])}</option>`).join("");
+  function drawCites() {
+    const c = csel.value;
+    const ps = papers.filter((p) => p.y && p.y >= 2000);
+    const hl = ps.filter((p) => !c || p.cat === c), bg = c ? ps.filter((p) => p.cat !== c) : [];
+    const jit = (p) => p.y + ((parseInt(p.id.slice(-3), 36) % 100) / 100 - 0.5) * 0.7;
+    const mk = (arr, color, size, op) => ({ type: "scattergl", mode: "markers", x: arr.map(jit), y: arr.map((p) => p.c + 1),
+      text: arr.map((p) => `<b>${wrap(p.t)}</b><br>${p.y} · ${fmt(p.c)} citations<br>${esc(CAT_LABEL[p.cat] || "")}<br>` +
+        esc(p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean).slice(0, 5).join(", "))),
+      customdata: arr.map(doiLink), hovertemplate: "%{text}<extra></extra>", marker: { size, color, opacity: op } });
+    const traces = [mk(bg, cssVar("--other"), 4, 0.4), mk(hl, c ? catColor(c) : cssVar("--series-1"), 6, 0.75)];
+    traces.forEach((t) => (t.showlegend = false));
+    if (me) {
+      // the person's papers (or the subfield's) on top: dark dots with a light ring, named in the legend
+      const mineP = ps.filter((p) => Me.hit(p, me));
+      const t = mk(mineP, cssVar("--text-primary"), me.mode === "field" ? 6 : 10, 0.9);
+      t.marker.line = { color: cssVar("--surface-1"), width: 1.5 };
+      t.name = me.mode === "field" ? `Your subfield (${fmt(mineP.length)} papers)` : `Your papers (${fmt(mineP.length)})`;
+      t.showlegend = true;
+      traces.push(t);
+    }
+    Plotly.react("cites", traces,
+      baseLayout({ showlegend: !!me, legend: { orientation: "h", y: 1.08, x: 0 }, hovermode: "closest",
+        yaxis: Object.assign(baseLayout().yaxis, { type: "log", title: "citations + 1",
+          tickvals: [1, 10, 100, 1000, 10000, 100000], ticktext: ["1", "10", "100", "1,000", "10,000", "100,000"] }) }), PLOT_CONFIG);
+  }
+  csel.addEventListener("change", drawCites);
+
+  let lmode = "peryear";
+  const lastYear = Math.max(...papers.map((p) => p.y || 0));
+  const perYear = (p) => (p.c || 0) / Math.max(1, lastYear - p.y + 1);
+  function drawLandmarks() {
+    const score = lmode === "peryear" ? perYear : (p) => p.c || 0;
+    document.getElementById("landmarks").innerHTML = CATEGORIES.map((c) => {
+      const top = papers.filter((p) => p.cat === c && p.y).sort((a, b) => score(b) - score(a)).slice(0, 3);
+      return `<div class="c"><h3><span class="swatch" style="background:${catColor(c)}"></span> ${esc(CAT_LABEL[c])}</h3><ol>` + top.map((p) => {
+        const names = p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean);
+        const mine = me && Me.hit(p, me) ? ' <span class="you">yours</span>' : "";
+        return `<li><a href="${doiLink(p)}" target="_blank" rel="noopener">${esc(p.t)}</a>${mine}
+          <span class="muted small">${p.y} · ${fmt(p.c || 0)} citations (${fmt(Math.round(perYear(p)))} per year)` +
+          `${names.length ? " · " + esc(names.slice(0, 3).join(", ")) + (names.length > 3 ? " et al." : "") : ""}</span></li>`;
+      }).join("") + "</ol></div>";
+    }).join("");
+  }
+  document.querySelectorAll("#lmode button").forEach((b) => b.addEventListener("click", () => {
+    lmode = b.dataset.v; document.querySelectorAll("#lmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawLandmarks();
+  }));
+  const all = () => { drawCites(); drawLandmarks(); };
+  all(); onThemeChange(all);
+  document.getElementById("cites").on("plotly_click", (d) => window.open(d.points[0].customdata, "_blank", "noopener"));
+  if (START_HASH === "#cited") document.getElementById("cited").scrollIntoView();
+}).catch((e) => failed(document.getElementById("cites"), e));
 </script>
 </body>
 </html>

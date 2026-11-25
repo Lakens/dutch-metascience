@@ -25,7 +25,6 @@
     <a href="people.html">People</a>
     <a href="papers.html">Papers</a>
     <a href="themes.html">Themes</a>
-    <a href="time.html">Over time</a>
     <a href="history.html">History</a>
     <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
@@ -66,16 +65,43 @@
 
   <section class="card">
     <h2>How the field grew</h2>
-    <p class="sub">Metascience papers with an author at a Dutch institution per year, by category, for every 1,000 publications
-    with an author at a Dutch institution in OpenAlex (same kinds of work as on this site). Dutch output as a whole also grew,
-    so this shows whether metascience grew faster than research in general. Switch to "number of papers" for the counts, or to
-    "share" to see how the mix of categories changed. One panel per category, all with the same vertical scale; the
-    light grey area behind each category is all categories together. The last year is not complete yet.</p>
+    <p class="sub">Metascience papers with an author at a Dutch institution per year, per 1,000 of all publications with
+    an author at a Dutch institution in OpenAlex (same kinds of work): whether the field grew faster than Dutch research
+    as a whole. The last year is not complete yet.</p>
+    <div id="growthall" class="chart" style="min-height:280px"></div>
+    <h3 style="margin-top:18px">Per category</h3>
+    <p class="sub">By default each
+    category's share of that year's metascience papers on this site: how the mix of the field changes. Switch to "per
+    1,000 Dutch publications" (all publications with an author at a Dutch institution in OpenAlex, same kinds of work)
+    to see whether a category grew faster than Dutch research as a whole, or to the number of papers. Each panel has its
+    own vertical scale, so that small categories stay visible: compare the shape of the curves, not their height (the
+    number under each name gives the size). The last year is not complete yet.</p>
     <div class="controls">
-      <div class="seg" id="mode"><button aria-pressed="true" data-v="rate">Per 1,000 Dutch publications</button><button aria-pressed="false" data-v="count">Number of papers</button><button aria-pressed="false" data-v="share">Share per year</button></div>
+      <div class="seg" id="mode"><button aria-pressed="true" data-v="share">Share of metascience papers</button><button aria-pressed="false" data-v="rate">Per 1,000 Dutch publications</button><button aria-pressed="false" data-v="count">Number of papers</button></div>
+      <label>From <select id="gfrom"><option>1990</option><option>2000</option><option selected>2005</option><option>2010</option></select></label>
     </div>
     <p class="small muted" id="growthunit" style="margin:4px 0 8px"></p>
     <div class="multiples" id="growth"></div>
+  </section>
+
+  <section class="card" id="terms">
+    <h2>The rise of terms</h2>
+    <p class="sub">Papers on this site per year that use each term in their title or abstract, by default as a share of
+    that year's metascience papers. Each panel has its own vertical scale, so that rare terms stay visible: compare the
+    shape of the curves, not their height (the total under each term gives the size). Abstracts are missing for some
+    papers, so the counts are a lower bound. The last year is not complete yet.</p>
+    <div class="controls">
+      <div class="seg" id="tmode"><button aria-pressed="true" data-v="share">Share of that year's papers</button><button aria-pressed="false" data-v="count">Papers</button></div>
+      <label>From <select id="tfrom"><option>2000</option><option selected>2005</option><option>2010</option></select></label>
+    </div>
+    <div class="multiples" id="mult"></div>
+  </section>
+
+  <section class="card" id="keywords">
+    <h2>Rising and falling keywords</h2>
+    <p class="sub">The rank of each keyword among the most frequent keywords in each period (1 = most frequent).
+    The eight keywords that lead the most recent period are coloured; hover any line for its name.</p>
+    <div id="bump" class="chart" style="min-height:560px"></div>
   </section>
 
   <div class="grid two">
@@ -93,9 +119,9 @@
       <h3 style="margin-top:18px">Explore</h3>
       <ul class="small">
         <li><a href="network.html">Who works with whom</a>: the co-authorship network, with communities and institutions.</li>
-        <li><a href="people.html">People</a>: each person's themes, timeline, co-authors and papers.</li>
+        <li><a href="people.html">People</a>: each person's categories, timeline, co-authors and papers.</li>
+        <li><a href="papers.html">Papers</a>: every paper with filters and details, what got cited, and the landmark papers per category.</li>
         <li><a href="themes.html">Themes</a>: a map of all papers, theme clusters, keywords and institutions × themes.</li>
-        <li><a href="time.html">Over time</a>: the rise of terms like preregistration, rising keywords, citations.</li>
         <li><a href="history.html">History</a>: a timeline per theme of historical events (Wikipedia) and the landmark papers that the papers on this site cite most.</li>
         <li><a href="places.html">Places</a>: Dutch institutions on a map, their collaborations, and partner countries.</li>
         <li><a href="funding.html">Funding</a>: NWO grants we could link to these researchers and the NWO projects we identified as metascience-related, with a timeline.</li>
@@ -108,7 +134,7 @@
 Theme labels are AI judgements and can be wrong; see <a href="about.html">About</a>.</footer>
 
 <script>
-let mode = "rate";
+let mode = "share";
 const active = new Set(CATEGORIES);
 Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), load("institutions"), load("publication_totals"), Me.ready]).then(([meta, papers, people, clusters, insts, totals, me]) => {
   // ---- find yourself ----
@@ -133,7 +159,7 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
         <li><a href="people.html${q}#${encodeURIComponent(me.id)}">Your profile</a>: themes, timeline, co-authors and papers.</li>
         <li><a href="network.html${q}">Who works with whom</a>: the network opens on you and your co-authors.</li>
         <li><a href="themes.html${q}">Themes</a>: your papers (or your subfield) on the map of all papers.</li>
-        <li><a href="time.html${q}">Over time</a>: your papers among all citations.</li>
+        <li><a href="papers.html${q}#cited">Papers</a>: your papers among all citations.</li>
         <li><a href="history.html${q}">History</a>: the timeline of your subfield, with the landmark papers you cite.</li>
         <li><a href="places.html${q}">Places</a>: your institution.</li>
         <li><a href="funding.html${q}">Funding</a>: your NWO grants.</li>
@@ -166,14 +192,21 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
   const allNL = Object.fromEntries(years.map((y) => [y, totals.n[y] || 0]));
   const value = (c, y) => mode === "share" ? (tot[y] ? 100 * byCat[c][y] / tot[y] : 0)
     : mode === "rate" ? (allNL[y] ? 1000 * byCat[c][y] / allNL[y] : 0) : byCat[c][y];
-  const unit = { share: ["%{y:.1f}%", "share of papers (%)"], rate: ["%{y:.2f} per 1,000", "metascience papers per 1,000 Dutch publications"],
+  const unit = { share: ["%{y:.1f}%", "share of that year's metascience papers (%)"], rate: ["%{y:.2f} per 1,000", "metascience papers per 1,000 Dutch publications"],
     count: ["%{y:.0f} papers", "papers"] };
-  // one small panel per theme (Wilke: in a stack only the bottom layer and the total can be read); every panel has the
-  // same vertical scale, and shows all themes together in light grey behind the theme
-  const allValue = (y) => mode === "rate" ? (allNL[y] ? 1000 * tot[y] / allNL[y] : 0) : tot[y];
+  // one small panel per category (Wilke: in a stack only the bottom layer and the total can be read); each panel has
+  // its own vertical scale (said in the caption), so that small categories stay readable
   function drawGrowth() {
-    document.getElementById("growthunit").textContent = `Vertical scale in every panel: ${unit[mode][1]}.`;
-    const top = mode === "share" ? Math.max(...CATEGORIES.flatMap((c) => years.map((y) => value(c, y)))) : Math.max(...years.map(allValue));
+    const from = +document.getElementById("gfrom").value, yrs = years.filter((y) => y >= from);
+    // main panel: the whole field per 1,000 Dutch publications, whatever the buttons below show (a share of the
+    // field's own papers would be 100% in every year)
+    Plotly.react("growthall", [{ x: yrs, y: yrs.map((y) => (allNL[y] ? 1000 * tot[y] / allNL[y] : 0)), customdata: yrs.map((y) => [tot[y], allNL[y]]),
+      type: "scatter", mode: "lines", fill: "tozeroy", line: { width: 2.5, color: cssVar("--accent") }, fillcolor: cssVar("--accent") + "33",
+      hovertemplate: "%{x}: %{y:.2f} per 1,000<br>(%{customdata[0]:,} of %{customdata[1]:,} publications)<extra></extra>" }],
+      baseLayout({ margin: { l: 56, r: 10, t: 10, b: 30 }, showlegend: false, height: 280,
+        xaxis: Object.assign(baseLayout().xaxis, { range: [yrs[0], yrs[yrs.length - 1]] }),
+        yaxis: Object.assign(baseLayout().yaxis, { rangemode: "tozero", title: "per 1,000 Dutch publications" }) }), PLOT_CONFIG);
+    document.getElementById("growthunit").textContent = `Vertical scale: ${unit[mode][1]}; each panel has its own scale.`;
     const host = document.getElementById("growth"); host.innerHTML = "";
     CATEGORIES.forEach((c) => {
       const div = document.createElement("div"); div.className = "m";
@@ -181,18 +214,15 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
       div.innerHTML = `<h3><span class="swatch" style="background:${catColor(c)}"></span>${esc(CAT_LABEL[c])}</h3>
         <div class="muted small">${fmt(n)} papers</div><div class="sp"></div>`;
       host.appendChild(div);
-      const traces = [];
-      if (mode !== "share") traces.push({ x: years, y: years.map(allValue), type: "scatter", mode: "lines", fill: "tozeroy",
-        line: { width: 0, color: cssVar("--grid") }, fillcolor: cssVar("--grid"), name: "all categories",
-        hovertemplate: `all categories: ${unit[mode][0]}<extra></extra>` });
-      traces.push({ x: years, y: years.map((y) => value(c, y)), customdata: years.map((y) => byCat[c][y]), type: "scatter", mode: "lines",
-        fill: "tozeroy", line: { width: 1.5, color: catColor(c) }, fillcolor: catColor(c) + "99", name: CAT_LABEL[c],
-        hovertemplate: `${esc(CAT_LABEL[c])}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>` });
-      Plotly.newPlot(div.querySelector(".sp"), traces, baseLayout({ margin: { l: 34, r: 6, t: 6, b: 22 }, showlegend: false, height: 150,
-        hovermode: "x unified", xaxis: Object.assign(baseLayout().xaxis, { range: [years[0], years[years.length - 1]], nticks: 4 }),
-        yaxis: Object.assign(baseLayout().yaxis, { range: [0, top * 1.05], nticks: 4 }) }), PLOT_CONFIG);
+      Plotly.newPlot(div.querySelector(".sp"), [{ x: yrs, y: yrs.map((y) => value(c, y)), customdata: yrs.map((y) => byCat[c][y]),
+        type: "scatter", mode: "lines", fill: "tozeroy", line: { width: 2, color: catColor(c) }, fillcolor: catColor(c) + "40", name: CAT_LABEL[c],
+        hovertemplate: `%{x}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>` }],
+        baseLayout({ margin: { l: 34, r: 6, t: 6, b: 22 }, showlegend: false, height: 150,
+          xaxis: Object.assign(baseLayout().xaxis, { range: [yrs[0], yrs[yrs.length - 1]], nticks: 4 }),
+          yaxis: Object.assign(baseLayout().yaxis, { rangemode: "tozero", nticks: 4 }) }), PLOT_CONFIG);
     });
   }
+  document.getElementById("gfrom").addEventListener("change", drawGrowth);
   document.querySelectorAll("#mode button").forEach((b) => b.addEventListener("click", () => {
     mode = b.dataset.v; document.querySelectorAll("#mode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawGrowth();
   }));
@@ -219,6 +249,58 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
   const all = () => { drawGrowth(); drawClusters(); drawNewcomers(); };
   all(); onThemeChange(all);
 }).catch((e) => failed(document.getElementById("growth"), e));
+</script>
+<script>
+// ---- the rise of terms and the keyword ranks (moved here from the former Over time page, 26 Nov 2026) ----
+let tmode = "share";
+Promise.all([load("terms"), load("keywords")]).then(([terms, kw]) => {
+  function drawTerms() {
+    const from = +document.getElementById("tfrom").value;
+    const allYears = Object.keys(terms.totals).map(Number).filter((y) => y >= from).sort((a, b) => a - b);
+    const names = Object.keys(terms.terms).sort((a, b) =>
+      Object.values(terms.terms[b]).reduce((s, x) => s + x, 0) - Object.values(terms.terms[a]).reduce((s, x) => s + x, 0));
+    const el = document.getElementById("mult"); el.innerHTML = "";
+    names.forEach((t) => {
+      const total = Object.values(terms.terms[t]).reduce((s, x) => s + x, 0);
+      const first = Object.keys(terms.terms[t]).map(Number).sort((a, b) => a - b)[0];
+      const div = document.createElement("div"); div.className = "m";
+      div.innerHTML = `<h3>${esc(t)}</h3><div class="muted small">${fmt(total)} papers${first ? ` · first in ${first}` : ""}</div><div class="sp"></div>`;
+      el.appendChild(div);
+      const y = allYears.map((yr) => { const n = terms.terms[t][yr] || 0; return tmode === "share" ? (terms.totals[yr] ? 100 * n / terms.totals[yr] : 0) : n; });
+      Plotly.newPlot(div.querySelector(".sp"), [{ x: allYears, y, type: "scatter", mode: "lines", fill: "tozeroy",
+        line: { color: cssVar("--series-1"), width: 2 }, fillcolor: cssVar("--seq-1"),
+        hovertemplate: `%{x}: %{y:${tmode === "share" ? ".1f" : ".0f"}}${tmode === "share" ? "%" : " papers"}<extra></extra>` }],
+        baseLayout({ margin: { l: 34, r: 6, t: 4, b: 22 }, showlegend: false, height: 140,
+          xaxis: Object.assign(baseLayout().xaxis, { range: [allYears[0], allYears[allYears.length - 1]], nticks: 4 }),
+          yaxis: Object.assign(baseLayout().yaxis, { nticks: 3, rangemode: "tozero" }) }), PLOT_CONFIG);
+    });
+  }
+  document.querySelectorAll("#tmode button").forEach((b) => b.addEventListener("click", () => {
+    tmode = b.dataset.v; document.querySelectorAll("#tmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawTerms();
+  }));
+  document.getElementById("tfrom").addEventListener("change", drawTerms);
+
+  function drawBump() {
+    const periods = Object.keys(kw.periods);
+    const rank = {}; periods.forEach((p) => kw.periods[p].slice(0, 15).forEach(([k], i) => ((rank[k] = rank[k] || {})[p] = i + 1)));
+    const last = periods[periods.length - 1];
+    const leaders = kw.periods[last].slice(0, 8).map(([k]) => k);
+    const traces = Object.keys(rank).sort((a, b) => leaders.includes(a) - leaders.includes(b)).map((k) => {
+      const li = leaders.indexOf(k);
+      return { type: "scatter", mode: "lines+markers", name: k, x: periods, y: periods.map((p) => rank[k][p] ?? null),
+        connectgaps: false, line: { width: li >= 0 ? 2.5 : 1.5, color: li >= 0 ? seriesColor(li) : cssVar("--other") },
+        marker: { size: 8, color: li >= 0 ? seriesColor(li) : cssVar("--other"), line: { width: 2, color: cssVar("--surface-1") } },
+        hovertemplate: `<b>${esc(k)}</b><br>%{x}: rank %{y}<extra></extra>` };
+    });
+    const ann = leaders.map((k) => ({ x: last, y: rank[k][last], text: esc(k), xanchor: "left", xshift: 10, showarrow: false,
+      font: { size: 12, color: cssVar("--text-primary") } }));
+    Plotly.react("bump", traces, baseLayout({ showlegend: false, hovermode: "closest", annotations: ann, margin: { l: 40, r: 230, t: 10, b: 40 },
+      xaxis: Object.assign(baseLayout().xaxis, { showgrid: true }),
+      yaxis: Object.assign(baseLayout().yaxis, { title: "rank", dtick: 1, range: [15.5, 0.5] }) }), PLOT_CONFIG);
+  }
+  const all = () => { drawTerms(); drawBump(); };
+  all(); onThemeChange(all);
+}).catch((e) => failed(document.getElementById("mult"), e));
 </script>
 </body>
 </html>
