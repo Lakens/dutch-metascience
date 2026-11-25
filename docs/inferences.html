@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Metascience Inferences</title>
-<meta name="description" content="Inferences from the Dutch metascience data: who could work together, which themes are rising, and which shared questions could become joint projects.">
+<title>Working More Together</title>
+<meta name="description" content="Working more together, from the Dutch metascience data: who could work together, which themes are rising, and which shared questions could become joint projects.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
@@ -32,21 +32,19 @@
   <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html">Overview</a>
-    <a href="network.html">Who works with whom</a>
     <a href="people.html">People</a>
     <a href="papers.html">Papers</a>
     <a href="themes.html">Themes</a>
     <a href="history.html">History</a>
-    <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
-    <a href="inferences.html" aria-current="page">Inferences</a>
+    <a href="inferences.html" aria-current="page">Working More Together</a>
     <a href="socials.html">Socials</a>
     <a href="about.html">About</a>
   </nav>
   <button id="theme-toggle" type="button">Dark mode</button>
 </header>
 <main>
-  <h1>Inferences</h1>
+  <h1>Working More Together</h1>
   <p class="lede">What the data suggest, beyond describing them: who could work together, which themes are rising,
   and which shared questions could become joint projects. These are suggestions computed from titles and abstracts,
   not judgements about anyone's work; use them as a starting point for a conversation.</p>
@@ -59,7 +57,7 @@
     data, or only a few: at most <span class="plittle"></span> of the papers of the one with fewer papers (one joint
     paper means little to someone with 100 papers, much to someone with 3). Papers with more than
     <span class="pmax"></span> authors do not count as writing together. "Closest in content" uses the same text
-    fingerprints as the map on the Themes page; each suggestion shows the clusters both work in and the two papers
+    fingerprints as the map on the Overview; each suggestion shows the clusters both work in and the two papers
     (one of each) that are most alike.</p>
     <div class="controls">
       <div class="seg" id="kind"><button aria-pressed="true" data-v="never">Never written together</button><button aria-pressed="false" data-v="little">Written together a little</button></div>
@@ -76,7 +74,7 @@
   <section class="card">
     <h2>Communities that could talk more</h2>
     <p class="sub">Each circle is a research community: a group of people who mostly write together, numbered by size
-    (group 1 is the largest; the same numbers as on <a href="network.html">Who works with whom</a>), with circle size
+    (group 1 is the largest; the same numbers as in <a href="index.html#network">Who works with whom</a> on the Overview), with circle size
     showing the number of people. Communities whose papers are alike in content lie close together (only
     approximately: the distances on the map correlate <span id="mapr"></span> with the differences in content; hover
     over a line for the exact similarity). Grey lines are joint papers, thicker for more. Two circles close together with no line, or a thin one,

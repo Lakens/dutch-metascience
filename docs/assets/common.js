@@ -103,10 +103,16 @@ function categoryLegend(el, chosen, onToggle) {
     it.addEventListener("click", () => { chosen.has(c) ? chosen.delete(c) : chosen.add(c); onToggle(); });
     el.appendChild(it);
   }
+  // all categories start in colour (the page fills `chosen`); a click turns one grey, the links set all or none
   const hint = document.createElement("span");
   hint.className = "item hint muted small";
-  hint.innerHTML = chosen.size ? '<a href="#" class="clear">clear</a>' : "click categories to colour them";
-  if (chosen.size) hint.querySelector("a").addEventListener("click", (e) => { e.preventDefault(); chosen.clear(); onToggle(); });
+  const links = [];
+  if (chosen.size < CATEGORIES.length) links.push('<a href="#" data-set="all">colour all</a>');
+  if (chosen.size) links.push('<a href="#" data-set="none">grey all</a>');
+  hint.innerHTML = (chosen.size === CATEGORIES.length ? "click a category to turn it grey · " : "") + links.join(" · ");
+  hint.querySelectorAll("a").forEach((a) => a.addEventListener("click", (e) => {
+    e.preventDefault(); chosen.clear(); if (a.dataset.set === "all") CATEGORIES.forEach((c) => chosen.add(c)); onToggle();
+  }));
   el.appendChild(hint);
 }
 // colour of a dot: its category colour when that category is chosen, grey otherwise

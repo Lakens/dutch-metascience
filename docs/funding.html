@@ -33,14 +33,12 @@
   <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html">Overview</a>
-    <a href="network.html">Who works with whom</a>
     <a href="people.html">People</a>
     <a href="papers.html">Papers</a>
     <a href="themes.html">Themes</a>
     <a href="history.html">History</a>
-    <a href="places.html">Places</a>
     <a href="funding.html" aria-current="page">Funding</a>
-    <a href="inferences.html">Inferences</a>
+    <a href="inferences.html">Working More Together</a>
     <a href="socials.html">Socials</a>
     <a href="about.html">About</a>
   </nav>
@@ -51,7 +49,7 @@
   <p class="lede">Grants from NWO, the Dutch Research Council, from its open project data (NWOpen, CC0). Two kinds of
   projects are shown: the NWO grants we could link to researchers on this site, on any topic (some grants are missed,
   and some may be linked to the wrong person), and the NWO projects we identified as research on research, such as the Open Science funds and the Replication Studies programme, whoever received them. Which
-  ongoing projects work towards similar aims is shown on the <a href="inferences.html#projects">Inferences</a> page.</p>
+  ongoing projects work towards similar aims is shown on the <a href="inferences.html#projects">Working More Together</a> page.</p>
   <p class="small" style="border-left: 4px solid var(--accent); background: var(--surface-1); padding: 10px 14px;
     border-radius: 6px; max-width: 900px"><b>Note on amounts.</b> NWO's open data (the NWOpen API) give no award amount
     for projects that started before 2017. For Veni, Vidi and Vici grants from before 2017 this page shows the standard
@@ -95,7 +93,7 @@
     <h2>Who got which grants</h2>
     <p class="sub">NWO grants of researchers on this site. "Led" counts projects where the person is main applicant or
     project leader; the amount is the total of those projects where NWO gives one or where it is estimated (older Veni,
-    Vidi and Vici grants; other projects from before 2017 have no amount and are not counted). Click a column to sort; click
+    Vidi and Vici grants; other projects from before 2017 have no amount and are not counted). Sorted by amount led; click a column to sort differently; click
     "timeline" to show a person's projects above. Researchers with only one metascience paper on this site are hidden
     by default: many of them are large grant holders in other fields.</p>
     <div class="controls"><input type="search" id="pq" placeholder="Find a person…" style="min-width:240px">
@@ -307,7 +305,7 @@ Promise.all([load("funding"), load("people"), Me.ready]).then(([F, people, me]) 
     return { id, n: byP[id].n, led: led.length, co: co.length, res: res.length, meta: ps.filter((p) => p.m).length,
       amt: led.reduce((s, p) => s + (p.a || 0), 0), tal, first: d3.min(ps, (p) => year(p.b)) };
   });
-  let sortKey = "meta", sortDir = -1;
+  let sortKey = "amt", sortDir = -1;   // largest amount led first
   const cols = [["n", "Researcher"], ["led", "Led"], ["co", "Co-applicant"], ["res", "Researcher on"], ["meta", "Metascience-related"], ["amt", "Amount led"], ["first", "First grant"]];
   function drawTable() {
     const q = document.getElementById("pq").value.trim().toLowerCase(), only = document.getElementById("ponly").checked;

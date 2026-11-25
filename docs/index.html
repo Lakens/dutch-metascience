@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.3/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="assets/common.js"></script>
 <style>
   .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
@@ -21,14 +22,12 @@
   <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html" aria-current="page">Overview</a>
-    <a href="network.html">Who works with whom</a>
     <a href="people.html">People</a>
     <a href="papers.html">Papers</a>
     <a href="themes.html">Themes</a>
     <a href="history.html">History</a>
-    <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
-    <a href="inferences.html">Inferences</a>
+    <a href="inferences.html">Working More Together</a>
     <a href="socials.html">Socials</a>
     <a href="about.html">About</a>
   </nav>
@@ -45,14 +44,63 @@
     hand. The data are provided for inspiration, not scholarship, and will contain errors and incorrect
     classifications.</p>
   </section>
+
+  <section class="card" id="map-card">
+    <h2>The map of the literature</h2>
+    <p class="sub">Every dot is a metascience paper. Each paper's title and abstract were turned into a numeric
+    fingerprint by a language model (bge-m3), and papers with similar fingerprints lie close together. The colours are
+    the 12 categories; the names on the map are the 20 clusters of similar papers (see <a href="themes.html">Themes</a>).
+    Click a category to turn it grey.</p>
+    <div class="controls">
+      <input type="search" id="q" placeholder="Highlight titles containing…" aria-label="Highlight titles containing">
+      <label>Cluster <select id="cl"><option value="">all clusters</option></select></label>
+      <label>From <select id="y0"></select></label><label>to <select id="y1"></select></label>
+      <span class="muted small" id="mapcount"></span>
+    </div>
+    <div class="legend" id="maplegend"></div>
+    <div class="card" style="margin:0;padding:8px;position:relative">
+      <canvas class="net" id="map"></canvas>
+      <button type="button" class="overlay-btn" id="mapreset">Reset view</button>
+    </div>
+    <p class="muted small">Scroll to zoom, drag to move, hover for the title, click a dot to open the paper. As you zoom
+    in, the titles of the most cited papers appear. The positions only mean "similar to nearby papers"; the axes have
+    no meaning.</p>
+  </section>
+
+  <section class="card" id="network">
+    <h2>Who works with whom</h2>
+    <p class="sub">Every dot is an author at a Dutch institution of metascience papers on this site; a line means they
+    wrote at least one paper together (papers with more than <span id="maxauth">30</span> authors are left out, so one
+    large project does not tie hundreds of people together). Scroll to zoom, drag to move, hover for details, click a
+    person to see their co-authors and papers.</p>
+    <div class="controls">
+      <label>At least <select id="minp"><option>1</option><option selected>2</option><option>3</option><option>5</option><option>10</option></select> papers</label>
+      <label>Colour by <select id="colorby">
+        <option value="comm" selected>co-author group</option>
+        <option value="inst">main institution</option></select></label>
+      <label><input type="checkbox" id="labels" checked> names</label>
+      <input type="search" id="netsearch" placeholder="Find a person…" aria-label="Find a person">
+      <span class="muted small" id="netcount"></span>
+    </div>
+    <div class="legend" id="netlegend"></div>
+    <div class="split">
+      <div class="card" style="margin:0;padding:8px"><canvas class="net" id="net"></canvas></div>
+      <aside class="card panel" style="margin:0" id="panel">
+        <h3>Click a person</h3>
+        <p class="muted small">Their co-authors light up in the network, and their details and papers appear here.</p>
+        <p class="muted small">The colours show groups of people who write together more than with others (Louvain method
+        on the co-authorship links). They are not formal groups and have no names; hover over a colour or a person to see
+        the group's size and its two most common themes.</p>
+      </aside>
+    </div>
+  </section>
+
   <h1>Metascience in the Netherlands</h1>
   <p class="lede">Research on research: replication, research practices, open science, peer review, integrity,
   statistical inference, research evaluation and science policy. This site maps metascience papers with at least
   one author at a Dutch institution that we found in OpenAlex, as judged by a language model and checked by AI
   reviewers. Some papers are missing, and some papers shown are not metascience. Everything is interactive:
   hover for details, click legends to hide series, and follow the links to explore.</p>
-
-  <div class="grid tiles" id="tiles"><div class="tile"><div class="v">…</div><div class="l">loading</div></div></div>
 
   <section class="card" id="find">
     <h2>Find yourself</h2>
@@ -61,27 +109,6 @@
     browser; nothing is sent anywhere. All data on this site are public, so you can also choose anyone else.</p>
     <div class="controls"><input type="search" id="findme" placeholder="Type part of your name…" aria-label="Find yourself"></div>
     <div id="mecard"></div>
-  </section>
-
-  <section class="card">
-    <h2>How the field grew</h2>
-    <p class="sub">Metascience papers with an author at a Dutch institution per year, per 1,000 of all publications with
-    an author at a Dutch institution in OpenAlex (same kinds of work): whether the field grew faster than Dutch research
-    as a whole. The last year is not complete yet.</p>
-    <div id="growthall" class="chart" style="min-height:280px"></div>
-    <h3 style="margin-top:18px">Per category</h3>
-    <p class="sub">By default each
-    category's share of that year's metascience papers on this site: how the mix of the field changes. Switch to "per
-    1,000 Dutch publications" (all publications with an author at a Dutch institution in OpenAlex, same kinds of work)
-    to see whether a category grew faster than Dutch research as a whole, or to the number of papers. Each panel has its
-    own vertical scale, so that small categories stay visible: compare the shape of the curves, not their height (the
-    number under each name gives the size). The last year is not complete yet.</p>
-    <div class="controls">
-      <div class="seg" id="mode"><button aria-pressed="true" data-v="share">Share of metascience papers</button><button aria-pressed="false" data-v="rate">Per 1,000 Dutch publications</button><button aria-pressed="false" data-v="count">Number of papers</button></div>
-      <label>From <select id="gfrom"><option>1990</option><option>2000</option><option selected>2005</option><option>2010</option></select></label>
-    </div>
-    <p class="small muted" id="growthunit" style="margin:4px 0 8px"></p>
-    <div class="multiples" id="growth"></div>
   </section>
 
   <section class="card" id="terms">
@@ -108,7 +135,7 @@
     <section class="card">
       <h2>Twenty themes, year by year</h2>
       <p class="sub">The papers fall into 20 clusters of similar content (from their abstracts); the colour shows how
-      many papers each cluster had per year. See <a href="themes.html">Themes</a> for the map behind it.
+      many papers each cluster had per year. The clusters are named on the <a href="#map-card">map at the top</a> of this page.
       <span id="cl-me"></span></p>
       <div id="clusterheat" class="chart tall"></div>
     </section>
@@ -118,14 +145,12 @@
       <div id="newcomers" class="chart"></div>
       <h3 style="margin-top:18px">Explore</h3>
       <ul class="small">
-        <li><a href="network.html">Who works with whom</a>: the co-authorship network, with communities and institutions.</li>
         <li><a href="people.html">People</a>: each person's categories, timeline, co-authors and papers.</li>
-        <li><a href="papers.html">Papers</a>: every paper with filters and details, what got cited, and the landmark papers per category.</li>
-        <li><a href="themes.html">Themes</a>: a map of all papers, theme clusters, keywords and institutions × themes.</li>
+        <li><a href="papers.html">Papers</a>: every paper with filters and details, how the field grew, what got cited, and the landmark papers per category.</li>
+        <li><a href="themes.html">Themes</a>: the 20 clusters of similar papers, and which institution works on which category.</li>
         <li><a href="history.html">History</a>: a timeline per theme of historical events (Wikipedia) and the landmark papers that the papers on this site cite most.</li>
-        <li><a href="places.html">Places</a>: Dutch institutions on a map, their collaborations, and partner countries.</li>
         <li><a href="funding.html">Funding</a>: NWO grants we could link to these researchers and the NWO projects we identified as metascience-related, with a timeline.</li>
-        <li><a href="inferences.html">Inferences</a>: who could work together, rising themes, and shared questions for joint projects.</li>
+        <li><a href="inferences.html">Working More Together</a>: who could work together, rising themes, and shared questions for joint projects.</li>
       </ul>
     </section>
   </div>
@@ -134,9 +159,7 @@
 Theme labels are AI judgements and can be wrong; see <a href="about.html">About</a>.</footer>
 
 <script>
-let mode = "share";
-const active = new Set(CATEGORIES);
-Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), load("institutions"), load("publication_totals"), Me.ready]).then(([meta, papers, people, clusters, insts, totals, me]) => {
+Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), load("institutions"), Me.ready]).then(([meta, papers, people, clusters, insts, me]) => {
   // ---- find yourself ----
   const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
   const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
@@ -157,13 +180,12 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
       <p><b>Your view of the site:</b></p>
       <ul class="small">
         <li><a href="people.html${q}#${encodeURIComponent(me.id)}">Your profile</a>: themes, timeline, co-authors and papers.</li>
-        <li><a href="network.html${q}">Who works with whom</a>: the network opens on you and your co-authors.</li>
-        <li><a href="themes.html${q}">Themes</a>: your papers (or your subfield) on the map of all papers.</li>
+        <li><a href="#map-card">The map at the top of this page</a>: your papers (or your subfield) among all papers.</li>
+        <li><a href="#network">Who works with whom</a> (above): the network opens on you and your co-authors.</li>
         <li><a href="papers.html${q}#cited">Papers</a>: your papers among all citations.</li>
         <li><a href="history.html${q}">History</a>: the timeline of your subfield, with the landmark papers you cite.</li>
-        <li><a href="places.html${q}">Places</a>: your institution.</li>
         <li><a href="funding.html${q}">Funding</a>: your NWO grants.</li>
-        <li><a href="inferences.html${q}">Inferences</a>: who you could work with.</li>
+        <li><a href="inferences.html${q}">Working More Together</a>: who you could work with.</li>
       </ul>
       <p class="small muted">Use the bar at the top of each page to switch between highlighting you and your subfield, or to stop.</p>`;
   }
@@ -173,59 +195,8 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
     Me.set(p).then(() => { location.href = `index.html?me=${encodeURIComponent(p.id)}#find`; });
   });
 
-  const tiles = [
-    [fmt(meta.n_papers), "metascience papers"],
-    [fmt(meta.n_people), "authors at Dutch institutions"],
-    [fmt(meta.n_institutions), "Dutch institutions"],
-    [fmt(meta.n_countries), "partner countries"],
-    [`${meta.years[0]}–${meta.years[1]}`, "years covered"],
-  ];
-  document.getElementById("tiles").innerHTML = tiles.map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
-
   const years = [];
   for (let y = Math.max(meta.years[0], 1990); y <= meta.years[1]; y++) years.push(y);
-  const byCat = {}; CATEGORIES.forEach((c) => (byCat[c] = Object.fromEntries(years.map((y) => [y, 0]))));
-  papers.forEach((p) => { if (byCat[p.cat] && p.y in byCat[p.cat]) byCat[p.cat][p.y]++; });
-  const tot = Object.fromEntries(years.map((y) => [y, CATEGORIES.reduce((s, c) => s + byCat[c][y], 0)]));
-
-  // all publications with an author at a Dutch institution per year (fetch_publication_totals.py)
-  const allNL = Object.fromEntries(years.map((y) => [y, totals.n[y] || 0]));
-  const value = (c, y) => mode === "share" ? (tot[y] ? 100 * byCat[c][y] / tot[y] : 0)
-    : mode === "rate" ? (allNL[y] ? 1000 * byCat[c][y] / allNL[y] : 0) : byCat[c][y];
-  const unit = { share: ["%{y:.1f}%", "share of that year's metascience papers (%)"], rate: ["%{y:.2f} per 1,000", "metascience papers per 1,000 Dutch publications"],
-    count: ["%{y:.0f} papers", "papers"] };
-  // one small panel per category (Wilke: in a stack only the bottom layer and the total can be read); each panel has
-  // its own vertical scale (said in the caption), so that small categories stay readable
-  function drawGrowth() {
-    const from = +document.getElementById("gfrom").value, yrs = years.filter((y) => y >= from);
-    // main panel: the whole field per 1,000 Dutch publications, whatever the buttons below show (a share of the
-    // field's own papers would be 100% in every year)
-    Plotly.react("growthall", [{ x: yrs, y: yrs.map((y) => (allNL[y] ? 1000 * tot[y] / allNL[y] : 0)), customdata: yrs.map((y) => [tot[y], allNL[y]]),
-      type: "scatter", mode: "lines", fill: "tozeroy", line: { width: 2.5, color: cssVar("--accent") }, fillcolor: cssVar("--accent") + "33",
-      hovertemplate: "%{x}: %{y:.2f} per 1,000<br>(%{customdata[0]:,} of %{customdata[1]:,} publications)<extra></extra>" }],
-      baseLayout({ margin: { l: 56, r: 10, t: 10, b: 30 }, showlegend: false, height: 280,
-        xaxis: Object.assign(baseLayout().xaxis, { range: [yrs[0], yrs[yrs.length - 1]] }),
-        yaxis: Object.assign(baseLayout().yaxis, { rangemode: "tozero", title: "per 1,000 Dutch publications" }) }), PLOT_CONFIG);
-    document.getElementById("growthunit").textContent = `Vertical scale: ${unit[mode][1]}; each panel has its own scale.`;
-    const host = document.getElementById("growth"); host.innerHTML = "";
-    CATEGORIES.forEach((c) => {
-      const div = document.createElement("div"); div.className = "m";
-      const n = years.reduce((s, y) => s + byCat[c][y], 0);
-      div.innerHTML = `<h3><span class="swatch" style="background:${catColor(c)}"></span>${esc(CAT_LABEL[c])}</h3>
-        <div class="muted small">${fmt(n)} papers</div><div class="sp"></div>`;
-      host.appendChild(div);
-      Plotly.newPlot(div.querySelector(".sp"), [{ x: yrs, y: yrs.map((y) => value(c, y)), customdata: yrs.map((y) => byCat[c][y]),
-        type: "scatter", mode: "lines", fill: "tozeroy", line: { width: 2, color: catColor(c) }, fillcolor: catColor(c) + "40", name: CAT_LABEL[c],
-        hovertemplate: `%{x}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>` }],
-        baseLayout({ margin: { l: 34, r: 6, t: 6, b: 22 }, showlegend: false, height: 150,
-          xaxis: Object.assign(baseLayout().xaxis, { range: [yrs[0], yrs[yrs.length - 1]], nticks: 4 }),
-          yaxis: Object.assign(baseLayout().yaxis, { rangemode: "tozero", nticks: 4 }) }), PLOT_CONFIG);
-    });
-  }
-  document.getElementById("gfrom").addEventListener("change", drawGrowth);
-  document.querySelectorAll("#mode button").forEach((b) => b.addEventListener("click", () => {
-    mode = b.dataset.v; document.querySelectorAll("#mode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawGrowth();
-  }));
 
   function drawClusters() {
     if (!clusters.length) { document.getElementById("clusterheat").innerHTML = '<p class="loading">No clusters yet.</p>'; return; }
@@ -246,9 +217,9 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
       hovertemplate: "%{x}: %{y} new authors<extra></extra>" }],
       baseLayout({ bargap: 0.15, yaxis: Object.assign(baseLayout().yaxis, { title: "authors with a first paper" }) }), PLOT_CONFIG);
   }
-  const all = () => { drawGrowth(); drawClusters(); drawNewcomers(); };
+  const all = () => { drawClusters(); drawNewcomers(); };
   all(); onThemeChange(all);
-}).catch((e) => failed(document.getElementById("growth"), e));
+}).catch((e) => failed(document.getElementById("clusterheat"), e));
 </script>
 <script>
 // ---- the rise of terms and the keyword ranks (moved here from the former Over time page, 26 Nov 2026) ----
@@ -301,6 +272,392 @@ Promise.all([load("terms"), load("keywords")]).then(([terms, kw]) => {
   const all = () => { drawTerms(); drawBump(); };
   all(); onThemeChange(all);
 }).catch((e) => failed(document.getElementById("mult"), e));
+</script>
+<script>
+// ---- the map of the literature (moved here from the Themes page, 26 Nov 2026) ----
+const chosen = new Set(CATEGORIES);   // categories in colour on the map; all by default, a click turns one grey
+Promise.all([load("papers"), load("clusters"), load("people"), Me.ready]).then(([papers, clusters, people, me]) => {
+  const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
+  const mapped = papers.filter((p) => p.x != null);
+  const yrs = [...new Set(papers.map((p) => p.y).filter(Boolean))].sort((a, b) => a - b);
+  const y0s = document.getElementById("y0"), y1s = document.getElementById("y1");
+  y0s.innerHTML = yrs.map((y) => `<option${y === yrs[0] ? " selected" : ""}>${y}</option>`).join("");
+  y1s.innerHTML = yrs.map((y) => `<option${y === yrs[yrs.length - 1] ? " selected" : ""}>${y}</option>`).join("");
+  const cname = Object.fromEntries(clusters.map((c) => [c.id, c.name]));
+  document.getElementById("cl").innerHTML += clusters.slice().sort((a, b) => a.name.localeCompare(b.name))
+    .map((c) => `<option value="${c.id}">${esc(c.name)} (${c.k})</option>`).join("");
+
+  // ---- the map: a canvas with the same zoom and drag as the co-author network ----
+  const canvas = document.getElementById("map"), ctx = canvas.getContext("2d");
+  let W, H, dpr, transform = d3.zoomIdentity, hovered = null, qt = null, shownPts = [];
+  const X0 = d3.min(mapped, (p) => p.x), X1 = d3.max(mapped, (p) => p.x);
+  const Y0 = d3.min(mapped, (p) => p.yy), Y1 = d3.max(mapped, (p) => p.yy);
+  const clusterCenter = {};
+  const mine = me ? mapped.filter((p) => p.p.includes(me.id)) : [];
+  function size() {
+    dpr = window.devicePixelRatio || 1; W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    // map units -> canvas pixels at zoom 1 (all papers fit, y upwards)
+    const s = 0.94 * Math.min(W / (X1 - X0), H / (Y1 - Y0));
+    const ox = W / 2 - s * (X0 + X1) / 2, oy = H / 2 + s * (Y0 + Y1) / 2;
+    mapped.forEach((p) => { p.px = ox + s * p.x; p.py = oy - s * p.yy; });
+    const med = (arr) => { const v = arr.slice().sort((x, y) => x - y); return v[Math.floor(v.length / 2)]; };
+    clusters.forEach((c) => {
+      const pts = mapped.filter((p) => p.cl === c.id);
+      if (pts.length) clusterCenter[c.id] = [med(pts.map((p) => p.px)), med(pts.map((p) => p.py))];
+    });
+  }
+  let focus = () => true, filtering = false;
+  function drawMap() {
+    categoryLegend(document.getElementById("maplegend"), chosen, drawMap);
+    const q = document.getElementById("q").value.trim().toLowerCase();
+    const cl = document.getElementById("cl").value;
+    const a = +y0s.value, b = +y1s.value;
+    const inRange = (p) => !p.y || (p.y >= a && p.y <= b);
+    const meField = !!me && me.mode === "field";
+    focus = (p) => inRange(p) && (!cl || String(p.cl) === cl) && (!q || textMatches(q, p.t || "")) &&
+      (!meField || me.field.includes(p.cl));
+    filtering = !!(q || cl || meField);
+    shownPts = mapped.filter(focus);
+    qt = d3.quadtree(shownPts, (p) => p.px, (p) => p.py);
+    document.getElementById("mapcount").textContent = `${fmt(shownPts.length)} of ${fmt(mapped.length)} papers highlighted` +
+      (!me ? "" : me.mode === "field" ? " · papers outside your subfield are grey" : ` · your ${fmt(mine.length)} papers have a black ring`);
+    draw();
+  }
+  function draw() {
+    const k = transform.k;
+    ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    // filtered-out papers in grey, then the highlighted ones in their theme colour
+    ctx.fillStyle = cssVar("--other"); ctx.globalAlpha = 0.3;
+    const rBg = Math.min(4, 1.6 + 0.35 * k);
+    for (const p of mapped) {
+      if (focus(p)) continue;
+      const x = transform.applyX(p.px), y = transform.applyY(p.py);
+      if (x < -5 || x > W + 5 || y < -5 || y > H + 5) continue;
+      ctx.fillRect(x - rBg / 2, y - rBg / 2, rBg, rBg);
+    }
+    ctx.globalAlpha = 0.9;
+    const r = Math.min(7, (filtering ? 3.2 : 2.4) + 0.45 * Math.sqrt(k));
+    const ring = cssVar("--surface-1");
+    // papers of the chosen categories in their colour, drawn last so they lie on top; the others in neutral grey
+    const colors = Object.fromEntries(CATEGORIES.map((c) => [c, chosen.has(c) ? catColor(c) : cssVar("--text-muted")]));
+    const order = chosen.size ? shownPts.filter((p) => !chosen.has(p.cat)).concat(shownPts.filter((p) => chosen.has(p.cat))) : shownPts;
+    for (const p of order) {
+      const x = transform.applyX(p.px), y = transform.applyY(p.py);
+      if (x < -8 || x > W + 8 || y < -8 || y > H + 8) continue;
+      ctx.globalAlpha = chosen.has(p.cat) ? 0.95 : 0.5;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = colors[p.cat]; ctx.fill();
+      if (k > 2.5) { ctx.lineWidth = 0.8; ctx.strokeStyle = ring; ctx.stroke(); }
+    }
+    if (me && me.mode !== "field") {
+      ctx.globalAlpha = 1;
+      for (const p of mine) {
+        const x = transform.applyX(p.px), y = transform.applyY(p.py);
+        if (x < -10 || x > W + 10 || y < -10 || y > H + 10) continue;
+        ctx.beginPath(); ctx.arc(x, y, r + 1.5, 0, 2 * Math.PI); ctx.fillStyle = colors[p.cat]; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = cssVar("--text-primary"); ctx.stroke();
+      }
+    }
+    if (hovered) {
+      const x = transform.applyX(hovered.px), y = transform.applyY(hovered.py);
+      ctx.globalAlpha = 1; ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 2 * Math.PI);
+      ctx.lineWidth = 2; ctx.strokeStyle = cssVar("--text-primary"); ctx.stroke();
+    }
+    // names: cluster names first (the chosen cluster, then larger clusters), then, when zoomed in, titles of the
+    // most cited papers; a name is drawn only where it does not overlap one already drawn
+    const placed = [];
+    const put = (text, x, y, font, strong) => {
+      ctx.font = font; const w = ctx.measureText(text).width;
+      const box = [x - w / 2 - 3, y - 9, x + w / 2 + 3, y + 7];
+      if (box[2] < 0 || box[0] > W || box[3] < 0 || box[1] > H) return false;
+      if (placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) return false;
+      placed.push(box);
+      ctx.globalAlpha = strong ? 0.9 : 0.8; ctx.fillStyle = ring; ctx.fillRect(box[0], box[1], box[2] - box[0], box[3] - box[1]);
+      ctx.globalAlpha = 1; ctx.fillStyle = cssVar(strong ? "--text-primary" : "--text-secondary");
+      ctx.fillText(text, x, y); return true;
+    };
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const cl = document.getElementById("cl").value;
+    clusters.slice().sort((a, b) => (String(b.id) === cl) - (String(a.id) === cl) || b.k - a.k).forEach((c) => {
+      const cc = clusterCenter[c.id]; if (!cc) return;
+      put(c.name, transform.applyX(cc[0]), transform.applyY(cc[1]), `${String(c.id) === cl ? 600 : 500} 12px system-ui, sans-serif`, true);
+    });
+    if (k >= 2 || hovered) {
+      const inView = shownPts.filter((p) => { const x = transform.applyX(p.px), y = transform.applyY(p.py); return x > 0 && x < W && y > 0 && y < H; });
+      inView.sort((a, b) => (b === hovered) - (a === hovered) || (b.c || 0) - (a.c || 0));
+      let n = 0;
+      for (const p of inView) {
+        if (n >= (k >= 2 ? 40 : 1)) break;
+        const t = p.t.length > 60 ? p.t.slice(0, 58) + "…" : p.t;
+        if (put(t, transform.applyX(p.px), transform.applyY(p.py) - r - 9, "11px system-ui, sans-serif", false)) n++;
+      }
+    }
+    ctx.restore();
+  }
+  const zoom = d3.zoom().scaleExtent([0.8, 60]).on("zoom", (e) => {
+    if (!e.sourceEvent) { hovered = null; Tip.hide(); }
+    transform = e.transform; draw();
+  });
+  d3.select(canvas).call(zoom).on("dblclick.zoom", null);
+  function pointAt(ev) {
+    if (!qt) return null;
+    const [mx, my] = d3.pointer(ev, canvas), [x, y] = transform.invert([mx, my]);
+    return qt.find(x, y, 8 / transform.k) || null;
+  }
+  canvas.addEventListener("mousemove", (ev) => {
+    const p = pointAt(ev);
+    if (p !== hovered) { hovered = p; draw(); }
+    if (p) {
+      Tip.show(`<b>${esc(p.t)}</b><br>${p.y || ""} · ${esc(p.v)}<br>${esc(CAT_LABEL[p.cat])} · ${esc(cname[p.cl] || "")}<br>` +
+        `<span class="muted">${esc(p.p.map((id) => byPerson[id] ? byPerson[id].n : "").filter(Boolean).slice(0, 6).join(", "))}</span>`, ev);
+      canvas.style.cursor = "pointer";
+    } else { Tip.hide(); canvas.style.cursor = "grab"; }
+  });
+  canvas.addEventListener("mouseleave", () => { Tip.hide(); if (hovered) { hovered = null; draw(); } });
+  canvas.addEventListener("click", (ev) => { const p = pointAt(ev); if (p) window.open(doiLink(p), "_blank", "noopener"); });
+  function zoomToCluster(id) {
+    const pts = mapped.filter((p) => String(p.cl) === String(id));
+    if (!id || !pts.length) { d3.select(canvas).transition().duration(600).call(zoom.transform, d3.zoomIdentity); return; }
+    const xs = pts.map((p) => p.px).sort((a, b) => a - b), ys = pts.map((p) => p.py).sort((a, b) => a - b);
+    const q = (arr, f) => arr[Math.round(f * (arr.length - 1))];
+    const x0 = q(xs, 0.05), x1 = q(xs, 0.95), y0 = q(ys, 0.05), y1 = q(ys, 0.95);
+    const k = Math.min(12, 0.8 * Math.min(W / Math.max(1, x1 - x0), H / Math.max(1, y1 - y0)));
+    d3.select(canvas).transition().duration(700)
+      .call(zoom.transform, d3.zoomIdentity.translate(W / 2 - k * (x0 + x1) / 2, H / 2 - k * (y0 + y1) / 2).scale(k));
+  }
+  document.getElementById("mapreset").addEventListener("click", () =>
+    d3.select(canvas).transition().duration(600).call(zoom.transform, d3.zoomIdentity));
+  document.getElementById("cl").addEventListener("change", (e) => zoomToCluster(e.target.value));
+  window.addEventListener("resize", () => { size(); drawMap(); });
+  size();
+
+  ["q", "cl"].forEach((id) => document.getElementById(id).addEventListener("input", drawMap));
+  [y0s, y1s].forEach((s) => s.addEventListener("change", drawMap));
+
+  // a cluster in the address (index.html?cl=3#map-card, used by the cluster cards on the Themes page)
+  const startCl = new URLSearchParams(location.search).get("cl");
+  if (startCl && clusters.some((c) => String(c.id) === startCl)) document.getElementById("cl").value = startCl;
+  drawMap(); onThemeChange(drawMap);
+  if (startCl) zoomToCluster(document.getElementById("cl").value);
+}).catch((e) => failed(document.getElementById("map-card"), e));
+</script>
+<script>
+// ---- who works with whom (moved here from its own page, 26 Nov 2026) ----
+Promise.all([load("people"), load("edges"), load("papers"), load("institutions"), load("meta"), load("clusters"), Me.ready]).then(([people, edges, papers, insts, meta, clusters, me]) => {
+  document.getElementById("maxauth").textContent = meta.max_authors_for_links;
+  const instName = Object.fromEntries(insts.list.map((i) => [i.id, i.n]));
+  const byId = Object.fromEntries(people.map((p) => [p.id, p]));
+  const papersOf = {}; papers.forEach((p) => p.p.forEach((id) => (papersOf[id] = papersOf[id] || []).push(p)));
+  const neighborsAll = {}; edges.forEach(([a, b, w]) => {
+    (neighborsAll[a] = neighborsAll[a] || []).push([b, w]); (neighborsAll[b] = neighborsAll[b] || []).push([a, w]);
+  });
+
+  // colour groups: top 7 communities / institutions get a colour, the rest is "other"
+  const commSize = {}; people.forEach((p) => (commSize[p.cm] = (commSize[p.cm] || 0) + 1));
+  const topComms = Object.keys(commSize).map(Number).filter((c) => c >= 0).sort((a, b) => commSize[b] - commSize[a]).slice(0, 7);
+  const instSize = {}; people.forEach((p) => p.ins[0] && (instSize[p.ins[0]] = (instSize[p.ins[0]] || 0) + 1));
+  const topInsts = Object.keys(instSize).sort((a, b) => instSize[b] - instSize[a]).slice(0, 7);
+  // groups have no names: a number (cm + 1; the site data number them by size, so group 1 is the largest) and their
+  // two most common themes, counting each of the group's papers once
+  const clName = Object.fromEntries(clusters.map((c) => [c.id, c.name]));
+  const themeCache = {};
+  function commThemes(c) {
+    if (!(c in themeCache)) {
+      const seen = new Set(), cnt = {};
+      for (const p of people) if (p.cm === c) for (const x of papersOf[p.id] || []) {
+        if (seen.has(x.id) || x.cl == null) continue;
+        seen.add(x.id); cnt[x.cl] = (cnt[x.cl] || 0) + 1;
+      }
+      themeCache[c] = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([k]) => clName[k]);
+    }
+    return themeCache[c];
+  }
+  const commText = (c) => (commSize[c] > 1 ? `Group ${c + 1} (${fmt(commSize[c])} people): ${commThemes(c).join("; ")}` : "");
+  function groupOf(p, by) {
+    if (by === "comm") { const i = topComms.indexOf(p.cm); return i < 0 ? 8 : i; }
+    const i = topInsts.indexOf(p.ins[0]); return i < 0 ? 8 : i;
+  }
+  function legendItems(by) {
+    if (by === "comm") return topComms.map((c, i) => [i, "", commText(c)]).concat([[8, "smaller groups"]]);
+    return topInsts.map((id, i) => [i, instName[id] || id]).concat([[8, "Other institutions"]]);
+  }
+
+  const canvas = document.getElementById("net"), ctx = canvas.getContext("2d");
+  let W, H, dpr, nodes = [], links = [], sim, transform = d3.zoomIdentity, selected = null, hovered = null;
+  let userMoved = false;   // until the reader zooms or drags, the view keeps the whole network in the frame
+  // personal view: "me" mode opens on the person; "field" mode fades everyone whose main cluster is outside the subfield
+  let meFocus = me && me.mode !== "field" && byId[me.id] ? me.id : null;
+  const topCl = (p) => { let b = null, bn = -1; for (const [c, n] of Object.entries(p.cls || {})) if (n > bn) { bn = n; b = +c; } return b; };
+  const outsideField = (p) => !!me && me.mode === "field" && !me.field.includes(topCl(p));
+  function size() {
+    dpr = window.devicePixelRatio || 1; W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+  }
+  size();
+
+  function build() {
+    const minp = +document.getElementById("minp").value;
+    const keep = new Set(people.filter((p) => p.k >= minp).map((p) => p.id));
+    const old = Object.fromEntries(nodes.map((n) => [n.id, n]));
+    nodes = people.filter((p) => keep.has(p.id)).map((p) => Object.assign(old[p.id] || {}, { id: p.id, p, r: 2 + Math.sqrt(p.k) * 1.7 }));
+    const idx = new Set(nodes.map((n) => n.id));
+    links = edges.filter(([a, b]) => idx.has(a) && idx.has(b)).map(([a, b, w]) => ({ source: a, target: b, w }));
+    document.getElementById("netcount").textContent = `${fmt(nodes.length)} people, ${fmt(links.length)} links`;
+    if (sim) sim.stop();
+    sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id((d) => d.id).distance(34).strength((l) => Math.min(1, 0.15 + 0.1 * l.w)))
+      .force("charge", d3.forceManyBody().strength(-48).distanceMax(500))
+      .force("collide", d3.forceCollide((d) => d.r + 2))
+      .force("x", d3.forceX(0).strength(0.06)).force("y", d3.forceY(0).strength(0.06))
+      .alphaDecay(nodes.length > 3000 ? 0.04 : 0.022)
+      .on("tick", () => {
+        ticks++; if (!userMoved && ticks % 15 === 0) fit();
+        if (meFocus && !userMoved && ticks === 120) { const id = meFocus; meFocus = null; select(id, true); }   // layout mostly settled
+        draw();
+      })
+      .on("end", () => {
+        if (!userMoved) fit();
+        if (meFocus && !userMoved) { const id = meFocus; meFocus = null; select(id, true); }
+      });
+    let ticks = 0;
+    if (!userMoved) fit();
+  }
+
+  function fit() {
+    // keep 98% of the dots in view (a few far-away pairs should not shrink the whole network)
+    if (!nodes.length || nodes[0].x == null) return;
+    const xs = nodes.map((n) => n.x).sort((a, b) => a - b), ys = nodes.map((n) => n.y).sort((a, b) => a - b);
+    const q = (arr, f) => arr[Math.min(arr.length - 1, Math.max(0, Math.round(f * (arr.length - 1))))];
+    const x0 = q(xs, 0.01), x1 = q(xs, 0.99), y0 = q(ys, 0.01), y1 = q(ys, 0.99);
+    const k = Math.min(4, 0.9 * Math.min(W / Math.max(1, x1 - x0), H / Math.max(1, y1 - y0)));
+    transform = d3.zoomIdentity.translate(W / 2 - k * (x0 + x1) / 2, H / 2 - k * (y0 + y1) / 2).scale(k);
+    d3.select(canvas).call(zoom.transform, transform);
+  }
+
+  function draw() {
+    const by = document.getElementById("colorby").value;
+    const colors = [...Array(9).keys()].map((i) => (i === 8 ? cssVar("--other") : seriesColor(i)));
+    const nb = selected ? new Set((neighborsAll[selected.id] || []).map(([id]) => id)) : null;
+    ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    ctx.translate(transform.x, transform.y); ctx.scale(transform.k, transform.k);
+    ctx.lineWidth = 0.6 / Math.sqrt(transform.k);
+    ctx.strokeStyle = cssVar("--axis");
+    ctx.globalAlpha = selected ? 0.12 : 0.5;
+    ctx.beginPath();
+    for (const l of links) { ctx.moveTo(l.source.x, l.source.y); ctx.lineTo(l.target.x, l.target.y); }
+    ctx.stroke();
+    if (selected) {
+      ctx.globalAlpha = 0.9; ctx.strokeStyle = cssVar("--text-secondary"); ctx.lineWidth = 1.2 / Math.sqrt(transform.k);
+      ctx.beginPath();
+      for (const l of links) if (l.source.id === selected.id || l.target.id === selected.id) { ctx.moveTo(l.source.x, l.source.y); ctx.lineTo(l.target.x, l.target.y); }
+      ctx.stroke();
+    }
+    const ring = cssVar("--surface-1");
+    for (const n of nodes) {
+      const dim = selected ? n !== selected && !nb.has(n.id) : outsideField(n.p);
+      ctx.globalAlpha = dim ? 0.15 : 1;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 2 * Math.PI);
+      ctx.fillStyle = colors[groupOf(n.p, by)]; ctx.fill();
+      const isMe = me && n.id === me.id;
+      ctx.lineWidth = (isMe ? 3 : 1) / transform.k;
+      ctx.strokeStyle = isMe || n === selected || n === hovered ? cssVar("--text-primary") : ring; ctx.stroke();
+    }
+    ctx.restore();
+    if (document.getElementById("labels").checked) {
+      // names in screen pixels; a name is drawn only where it does not overlap a name already drawn,
+      // in order: selected, hovered, co-authors of the selected person, then by number of papers
+      ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.font = "11px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      const isMe = (n) => me && n.id === me.id;
+      const cand = nodes.filter((n) => isMe(n) || n === selected || n === hovered ||
+        (nb ? nb.has(n.id) : n.p.k >= 2 && !outsideField(n.p)));
+      const rank = (n) => (isMe(n) ? 4e9 : n === selected ? 3e9 : n === hovered ? 2e9 : nb && nb.has(n.id) ? 1e9 + n.p.k : n.p.k);
+      cand.sort((a, b) => rank(b) - rank(a));
+      const placed = [];
+      for (const n of cand.slice(0, 1500)) {
+        const sx = transform.applyX(n.x), sy = transform.applyY(n.y) - n.r * transform.k - 3;
+        if (sx < -50 || sx > W + 50 || sy < 0 || sy > H + 20) continue;
+        const w = ctx.measureText(n.p.n).width, box = [sx - w / 2 - 2, sy - 13, sx + w / 2 + 2, sy + 1];
+        const forced = isMe(n) || n === selected || n === hovered;
+        if (!forced && placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
+        placed.push(box);
+        ctx.globalAlpha = 0.85; ctx.fillStyle = cssVar("--surface-1"); ctx.fillRect(box[0], box[1], box[2] - box[0], box[3] - box[1]);
+        ctx.globalAlpha = 1; ctx.fillStyle = cssVar("--text-primary"); ctx.fillText(n.p.n, sx, sy);
+        if (placed.length >= 160 && !forced) break;
+      }
+      ctx.restore();
+    }
+  }
+
+  function legend() {
+    const by = document.getElementById("colorby").value, el = document.getElementById("netlegend");
+    el.innerHTML = (by === "comm" ? '<span>The 7 largest groups of people who often write together:</span>' : "") +
+      legendItems(by).map(([i, lab, tip]) =>
+      `<span class="item"${tip ? ` title="${esc(tip)}" aria-label="${esc(tip)}"` : ""}><span class="swatch" style="background:${i === 8 ? cssVar("--other") : seriesColor(i)}"></span>${esc(lab)}</span>`).join("");
+  }
+
+  function showPanel(p) {
+    const nbrs = (neighborsAll[p.id] || []).slice().sort((a, b) => b[1] - a[1]);
+    const ps = (papersOf[p.id] || []).slice().sort((a, b) => (b.y || 0) - (a.y || 0));
+    const cats = Object.entries(p.cats).sort((a, b) => b[1] - a[1]);
+    document.getElementById("panel").innerHTML = `
+      <h3>${esc(p.n)}</h3>
+      <p class="small">${p.k} metascience paper${p.k === 1 ? "" : "s"}${p.y0 ? `, ${p.y0}–${p.y1}` : ""}
+      ${p.o ? `· <a href="${orcidLink(p.o)}" target="_blank" rel="noopener">ORCID</a>` : ""}
+      · <a href="people.html${location.search}#${encodeURIComponent(p.id)}">full profile</a></p>
+      <p class="small muted">${p.ins.map((i) => esc(instName[i] || i)).join(" · ")}</p>
+      <p class="small">${cats.map(([c, n]) => `<span class="swatch" style="background:${catColor(c)}"></span> ${esc(CAT_LABEL[c] || c)} (${n})`).join("<br>")}</p>
+      <h3>Co-authors (${nbrs.length})</h3>
+      <ul>${nbrs.slice(0, 40).map(([id, w]) => `<li><a href="#" data-id="${esc(id)}">${esc(byId[id] ? byId[id].n : id)}</a> <span class="muted">(${w})</span></li>`).join("")}</ul>
+      <h3>Papers</h3>
+      <ul>${ps.slice(0, 60).map((x) => `<li>${x.y || ""} · <a href="${doiLink(x)}" target="_blank" rel="noopener">${esc(x.t)}</a></li>`).join("")}</ul>`;
+    document.querySelectorAll("#panel a[data-id]").forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault(); select(a.dataset.id, true);
+    }));
+  }
+  function select(id, center) {
+    let n = nodes.find((x) => x.id === id);
+    if (!n && byId[id]) { document.getElementById("minp").value = 1; build(); n = nodes.find((x) => x.id === id); }
+    selected = n || null;
+    if (n) {
+      showPanel(n.p);
+      if (center && n.x != null) {
+        userMoved = true;
+        const k = Math.max(transform.k, 1.4);
+        d3.select(canvas).transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(W / 2 - n.x * k, H / 2 - n.y * k).scale(k));
+      }
+    }
+    draw();
+  }
+
+  const zoom = d3.zoom().scaleExtent([0.05, 8]).on("zoom", (e) => { if (e.sourceEvent) userMoved = true; transform = e.transform; draw(); });
+  d3.select(canvas).call(zoom).on("dblclick.zoom", null);
+  function nodeAt(ev) {
+    const [mx, my] = d3.pointer(ev, canvas); const [x, y] = transform.invert([mx, my]);
+    return sim ? sim.find(x, y, 12 / transform.k) : null;
+  }
+  canvas.addEventListener("mousemove", (ev) => {
+    const n = nodeAt(ev);
+    if (n !== hovered) { hovered = n; draw(); }
+    if (n) {
+      const p = n.p;
+      Tip.show(`<b>${esc(p.n)}</b><br>${p.k} paper${p.k === 1 ? "" : "s"} · ${(neighborsAll[p.id] || []).length} co-authors<br>
+        <span class="muted">${p.ins.slice(0, 2).map((i) => esc(instName[i] || i)).join(" · ")}</span><br>
+        <span class="muted">${esc(p.kw.slice(0, 5).join(", "))}</span>${commText(p.cm) ? `<br>${esc(commText(p.cm))}` : ""}`, ev);
+      canvas.style.cursor = "pointer";
+    } else { Tip.hide(); canvas.style.cursor = "grab"; }
+  });
+  canvas.addEventListener("mouseleave", () => { Tip.hide(); hovered = null; draw(); });
+  canvas.addEventListener("click", (ev) => { const n = nodeAt(ev); select(n ? n.id : null, false); });
+  nameSearch(document.getElementById("netsearch"), () => people, (p) => select(p.id, true));
+  document.getElementById("minp").addEventListener("change", () => { build(); });
+  document.getElementById("colorby").addEventListener("change", () => { legend(); draw(); });
+  document.getElementById("labels").addEventListener("change", draw);
+  window.addEventListener("resize", () => { size(); draw(); });
+  onThemeChange(() => { legend(); draw(); });
+  legend(); build();
+  if (meFocus) select(meFocus, false);
+}).catch((e) => failed(document.getElementById("panel"), e));
 </script>
 </body>
 </html>

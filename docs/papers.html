@@ -44,12 +44,14 @@
   .detail-grid li { margin: 3px 0; }
   .detail-grid li a.go { cursor: pointer; }
   .oa { font-size: 0.72rem; padding: 0 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-secondary); white-space: nowrap; }
-  #map { min-height: 420px; }
+  .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .multiples .m { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 0; }
+  .multiples .m h3 { font-size: 0.92rem; margin: 0; display: flex; align-items: center; gap: 6px; }
+  .multiples .m .sp { height: 150px; }
   @media (max-width: 700px) {
     .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; }
     .yr { flex-direction: column; gap: 4px; }
     table.data .hide-s { display: none; }
-    #map { min-height: 320px; }
   }
 </style>
 </head>
@@ -58,14 +60,12 @@
   <a class="brand" href="index.html" aria-label="Dutch Metascience Community, overview"><img class="logo-l" src="assets/logo-light.svg" alt="Dutch Metascience Community" width="157" height="40"><img class="logo-d" src="assets/logo-dark.svg" alt="" width="157" height="40"></a>
   <nav>
     <a href="index.html">Overview</a>
-    <a href="network.html">Who works with whom</a>
     <a href="people.html">People</a>
     <a href="papers.html" aria-current="page">Papers</a>
     <a href="themes.html">Themes</a>
     <a href="history.html">History</a>
-    <a href="places.html">Places</a>
     <a href="funding.html">Funding</a>
-    <a href="inferences.html">Inferences</a>
+    <a href="inferences.html">Working More Together</a>
     <a href="socials.html">Socials</a>
     <a href="about.html">About</a>
   </nav>
@@ -102,32 +102,32 @@
 
   <div class="grid tiles" id="tiles"></div>
 
-  <div class="grid two">
-    <section class="card">
-      <h2>Papers per year</h2>
-      <p class="sub">Papers in the results by publication year.</p>
-      <div id="years" class="chart" style="min-height:300px"></div>
-    </section>
-    <section class="card">
-      <h2>Themes</h2>
-      <p class="sub">Papers in the results per theme of the paper map. Click a bar to keep only that theme.</p>
-      <div id="themes" class="chart" style="min-height:300px"></div>
-    </section>
-  </div>
+  <section class="card" id="growth-card">
+    <h2>How the field grew</h2>
+    <p class="sub">All metascience papers on this site (not only the search results) with an author at a Dutch
+    institution per year, per 1,000 of all publications with an author at a Dutch institution in OpenAlex (same kinds of
+    work): whether the field grew faster than Dutch research as a whole. The last year is not complete yet.</p>
+    <div id="growthall" class="chart" style="min-height:280px"></div>
+    <h3 style="margin-top:18px">Per category</h3>
+    <p class="sub">By default each
+    category's share of that year's metascience papers on this site: how the mix of the field changes. Switch to "per
+    1,000 Dutch publications" (all publications with an author at a Dutch institution in OpenAlex, same kinds of work)
+    to see whether a category grew faster than Dutch research as a whole, or to the number of papers. Each panel has its
+    own vertical scale, so that small categories stay visible: compare the shape of the curves, not their height (the
+    number under each name gives the size). The last year is not complete yet.</p>
+    <div class="controls">
+      <div class="seg" id="mode"><button aria-pressed="true" data-v="share">Share of metascience papers</button><button aria-pressed="false" data-v="rate">Per 1,000 Dutch publications</button><button aria-pressed="false" data-v="count">Number of papers</button></div>
+      <label>From <select id="gfrom"><option>1990</option><option>2000</option><option selected>2005</option><option>2010</option></select></label>
+    </div>
+    <p class="small muted" id="growthunit" style="margin:4px 0 8px"></p>
+    <div class="multiples" id="growth"></div>
+  </section>
 
   <section class="card">
     <h2>Who, where and in which journals</h2>
     <p class="sub">The most frequent authors, institutions, journals and keywords among the results. Authors and
     institutions are those on this site (Dutch addresses). Click a name to narrow the search to it.</p>
     <div class="tops" id="tops"></div>
-  </section>
-
-  <section class="card">
-    <h2>Where the results lie on the paper map</h2>
-    <p class="sub">Every dot is a paper, placed by the similarity of its title and abstract (as on the
-    <a href="themes.html">Themes</a> page). The results are coloured; the other papers are grey. Click a dot to open
-    that paper.</p>
-    <div id="map" class="chart"></div>
   </section>
 
   <section class="card">
@@ -173,13 +173,13 @@
       from OpenAlex. The summary under each paper was written by the AI model that judged whether the paper is
       metascience; keywords and topics are from OpenAlex.</li>
       <li><b>Similar papers</b> have the most similar text fingerprint (title and abstract, the same fingerprints as the
-      paper map).</li>
+      <a href="index.html#map-card">map on the Overview</a>).</li>
       <li><b>Builds on</b> lists the papers on this site that a paper cites, and its most cited other references among
       the works that several papers on this site cite. <b>Built on by</b> lists the papers on this site that cite it.
       Reference lists come from OpenAlex and are missing for some papers.</li>
       <li><b>Open access</b> is as OpenAlex records it: free to read in any way, including a copy in a repository.</li>
       <li><b>Ongoing NWO projects</b> are projects that list the paper among their three most similar papers on the
-      <a href="inferences.html#projects">Inferences</a> page. <b>Shared on social media</b> counts posts with a
+      <a href="inferences.html#projects">Working More Together</a> page. <b>Shared on social media</b> counts posts with a
       metascience term on Bluesky or Mastodon by people on this site who work in the Netherlands now, that link to the
       paper (see <a href="socials.html">Socials</a>).</li>
       <li><b>BibTeX</b> lists at most 30 authors per paper, followed by "and others".</li>
@@ -281,7 +281,7 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
     current = sortList(results());
     writeHash();
     el("count").textContent = `${fmt(current.length)} of ${fmt(papers.length)} papers`;
-    drawTiles(); drawYears(); drawThemes(); drawTops(); drawMap(); drawTable();
+    drawTiles(); drawTops(); drawTable();
   }
   function drawTiles() {
     const n = current.length || 1;
@@ -296,23 +296,6 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
       [pct(current.filter((p) => p.co.length).length), "with co-authors abroad"],
       [pct(current.filter((p) => p.cb > 0).length), "cited by another paper on this site"],
     ].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
-  }
-  function drawYears() {
-    const c = {}; current.forEach((p) => { if (p.y) c[p.y] = (c[p.y] || 0) + 1; });
-    const ys = Object.keys(c).map(Number).sort((a, b) => a - b);
-    Plotly.react("years", [{ type: "bar", x: ys, y: ys.map((y) => c[y]), marker: { color: cssVar("--series-1") },
-      hovertemplate: "%{x}: %{y} papers<extra></extra>" }],
-      baseLayout({ bargap: 0.15, yaxis: Object.assign(baseLayout().yaxis, { title: "papers" }) }), PLOT_CONFIG);
-  }
-  function drawThemes() {
-    const c = {}; current.forEach((p) => { c[p.cl] = (c[p.cl] || 0) + 1; });
-    const ks = Object.keys(c).sort((a, b) => c[a] - c[b]);
-    const h = Math.max(300, ks.length * 22 + 60);
-    el("themes").style.minHeight = h + "px";
-    Plotly.react("themes", [{ type: "bar", orientation: "h", y: ks.map(themeName), x: ks.map((k) => c[k]), customdata: ks,
-      marker: { color: cssVar("--series-1") }, hovertemplate: "%{y}: %{x} papers<extra></extra>" }],
-      baseLayout({ height: h, margin: { l: 10, r: 20, t: 10, b: 40 }, yaxis: Object.assign(baseLayout().yaxis, { automargin: true, showgrid: false, tickfont: { size: 11, color: cssVar("--text-secondary") } }),
-        xaxis: Object.assign(baseLayout().xaxis, { title: "papers", showgrid: true }) }), PLOT_CONFIG);
   }
   function topList(title, counts, label, onPick, n = 10) {
     const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, n);
@@ -336,23 +319,6 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
     else if (f === "kw") { if (![...el("f-kw").options].some((o) => o.value === k)) el("f-kw").insertAdjacentHTML("beforeend", `<option value="${esc(k)}">${esc(k)}</option>`); el("f-kw").value = k; }
     update();
   });
-  let mapReady = false;
-  function drawMap() {
-    const hit = new Set(current.map((p) => p.id));
-    const rest = papers.filter((p) => !hit.has(p.id)), sel = papers.filter((p) => hit.has(p.id));
-    const tr = (ps, color, size, name) => ({ type: "scattergl", mode: "markers", name, x: ps.map((p) => p.x), y: ps.map((p) => p.yy),
-      customdata: ps.map((p) => p.id), text: ps.map((p) => `${esc(p.t.slice(0, 90))}${p.t.length > 90 ? "…" : ""} (${p.y})`),
-      marker: { color, size, opacity: 0.9 }, hovertemplate: "%{text}<extra></extra>" });
-    const all = current.length === papers.length;
-    Plotly.react("map", [tr(rest, cssVar("--other"), 4, "other papers"), tr(sel, all ? cssVar("--other") : cssVar("--series-1"), 5, "results")],
-      baseLayout({ showlegend: false, hovermode: "closest", dragmode: "zoom", margin: { l: 10, r: 10, t: 10, b: 10 },
-        xaxis: { visible: false }, yaxis: { visible: false, scaleanchor: "x" } }), MAP_CONFIG);
-    if (!mapReady) {
-      mapReady = true;
-      el("map").on("plotly_click", (ev) => { const id = ev.points[0] && ev.points[0].customdata; if (id) openPaper(id); });
-      el("themes").on("plotly_click", (ev) => { const k = ev.points[0] && ev.points[0].customdata; if (k != null) { el("f-theme").value = k; update(); } });
-    }
-  }
   const COLS = [["y", "Year", "num"], ["t", "Title", ""], ["v", "Journal", "hide-s"], ["cl", "Theme", "hide-s"],
     ["na", "Authors", "num hide-s"], ["c", "Citations", "num"], ["cb", "On site", "num"]];
   function row(p) {
@@ -399,7 +365,7 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
           ${X.nref[p.id] ? `<p class="small muted">${fmt(X.nref[p.id])} references in OpenAlex.</p>` : ""}</div>
         <div><h4>Built on by: papers on this site (${fmt(cb.length)})</h4><ul>${lim(cb, 8) || '<li class="muted">none found</li>'}</ul></div>
         ${proj || stm || sh ? `<div>${proj ? `<h4>Similar ongoing NWO projects</h4><ul>${proj}</ul>` : ""}
-          ${stm ? `<h4>Cited on the Inferences page</h4><ul>${stm}</ul>` : ""}
+          ${stm ? `<h4>Cited on the Working More Together page</h4><ul>${stm}</ul>` : ""}
           ${sh ? `<h4>Shared on social media</h4><p class="small" style="margin:0">${fmt(sh[0])} post${sh[0] === 1 ? "" : "s"} by ${fmt(sh[1])} ${sh[1] === 1 ? "person" : "people"} on this site.</p>` : ""}</div>` : ""}
       </div>`;
   }
@@ -527,6 +493,56 @@ Promise.all([load("papers"), load("people"), Me.ready]).then(([papers, people, m
   document.getElementById("cites").on("plotly_click", (d) => window.open(d.points[0].customdata, "_blank", "noopener"));
   if (START_HASH === "#cited") document.getElementById("cited").scrollIntoView();
 }).catch((e) => failed(document.getElementById("cites"), e));
+</script>
+<script>
+// ---- how the field grew (moved here from the Overview, 26 Nov 2026); all papers on the site, not the search results ----
+let mode = "share";
+Promise.all([load("meta"), load("papers"), load("publication_totals")]).then(([meta, papers, totals]) => {
+  const years = [];
+  for (let y = Math.max(meta.years[0], 1990); y <= meta.years[1]; y++) years.push(y);
+  const byCat = {}; CATEGORIES.forEach((c) => (byCat[c] = Object.fromEntries(years.map((y) => [y, 0]))));
+  papers.forEach((p) => { if (byCat[p.cat] && p.y in byCat[p.cat]) byCat[p.cat][p.y]++; });
+  const tot = Object.fromEntries(years.map((y) => [y, CATEGORIES.reduce((s, c) => s + byCat[c][y], 0)]));
+  // all publications with an author at a Dutch institution per year (fetch_publication_totals.py)
+  const allNL = Object.fromEntries(years.map((y) => [y, totals.n[y] || 0]));
+  const value = (c, y) => mode === "share" ? (tot[y] ? 100 * byCat[c][y] / tot[y] : 0)
+    : mode === "rate" ? (allNL[y] ? 1000 * byCat[c][y] / allNL[y] : 0) : byCat[c][y];
+  const unit = { share: ["%{y:.1f}%", "share of that year's metascience papers (%)"], rate: ["%{y:.2f} per 1,000", "metascience papers per 1,000 Dutch publications"],
+    count: ["%{y:.0f} papers", "papers"] };
+  // one small panel per category (Wilke: in a stack only the bottom layer and the total can be read); each panel has
+  // its own vertical scale (said in the caption), so that small categories stay readable
+  function drawGrowth() {
+    const from = +document.getElementById("gfrom").value, yrs = years.filter((y) => y >= from);
+    // main panel: the whole field per 1,000 Dutch publications, whatever the buttons below show (a share of the
+    // field's own papers would be 100% in every year)
+    Plotly.react("growthall", [{ x: yrs, y: yrs.map((y) => (allNL[y] ? 1000 * tot[y] / allNL[y] : 0)), customdata: yrs.map((y) => [tot[y], allNL[y]]),
+      type: "scatter", mode: "lines", fill: "tozeroy", line: { width: 2.5, color: cssVar("--accent") }, fillcolor: cssVar("--accent") + "33",
+      hovertemplate: "%{x}: %{y:.2f} per 1,000<br>(%{customdata[0]:,} of %{customdata[1]:,} publications)<extra></extra>" }],
+      baseLayout({ margin: { l: 56, r: 10, t: 10, b: 30 }, showlegend: false, height: 280,
+        xaxis: Object.assign(baseLayout().xaxis, { range: [yrs[0], yrs[yrs.length - 1]] }),
+        yaxis: Object.assign(baseLayout().yaxis, { rangemode: "tozero", title: "per 1,000 Dutch publications" }) }), PLOT_CONFIG);
+    document.getElementById("growthunit").textContent = `Vertical scale: ${unit[mode][1]}; each panel has its own scale.`;
+    const host = document.getElementById("growth"); host.innerHTML = "";
+    CATEGORIES.forEach((c) => {
+      const div = document.createElement("div"); div.className = "m";
+      const n = years.reduce((s, y) => s + byCat[c][y], 0);
+      div.innerHTML = `<h3><span class="swatch" style="background:${catColor(c)}"></span>${esc(CAT_LABEL[c])}</h3>
+        <div class="muted small">${fmt(n)} papers</div><div class="sp"></div>`;
+      host.appendChild(div);
+      Plotly.newPlot(div.querySelector(".sp"), [{ x: yrs, y: yrs.map((y) => value(c, y)), customdata: yrs.map((y) => byCat[c][y]),
+        type: "scatter", mode: "lines", fill: "tozeroy", line: { width: 2, color: catColor(c) }, fillcolor: catColor(c) + "40", name: CAT_LABEL[c],
+        hovertemplate: `%{x}: ${unit[mode][0]}${mode === "count" ? "" : " (papers: %{customdata})"}<extra></extra>` }],
+        baseLayout({ margin: { l: 34, r: 6, t: 6, b: 22 }, showlegend: false, height: 150,
+          xaxis: Object.assign(baseLayout().xaxis, { range: [yrs[0], yrs[yrs.length - 1]], nticks: 4 }),
+          yaxis: Object.assign(baseLayout().yaxis, { rangemode: "tozero", nticks: 4 }) }), PLOT_CONFIG);
+    });
+  }
+  document.getElementById("gfrom").addEventListener("change", drawGrowth);
+  document.querySelectorAll("#mode button").forEach((b) => b.addEventListener("click", () => {
+    mode = b.dataset.v; document.querySelectorAll("#mode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawGrowth();
+  }));
+  drawGrowth(); onThemeChange(drawGrowth);
+}).catch((e) => failed(document.getElementById("growth"), e));
 </script>
 </body>
 </html>
