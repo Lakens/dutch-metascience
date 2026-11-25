@@ -62,10 +62,9 @@
     <a href="index.html">Overview</a>
     <a href="people.html">People</a>
     <a href="papers.html" aria-current="page">Papers</a>
-    <a href="themes.html">Themes</a>
     <a href="history.html">History</a>
     <a href="funding.html">Funding</a>
-    <a href="inferences.html">Working More Together</a>
+    <a href="inferences.html">Working Together</a>
     <a href="socials.html">Socials</a>
     <a href="about.html">About</a>
   </nav>
@@ -179,7 +178,7 @@
       Reference lists come from OpenAlex and are missing for some papers.</li>
       <li><b>Open access</b> is as OpenAlex records it: free to read in any way, including a copy in a repository.</li>
       <li><b>Ongoing NWO projects</b> are projects that list the paper among their three most similar papers on the
-      <a href="inferences.html#projects">Working More Together</a> page. <b>Shared on social media</b> counts posts with a
+      <a href="inferences.html#projects">Working Together</a> page. <b>Shared on social media</b> counts posts with a
       metascience term on Bluesky or Mastodon by people on this site who work in the Netherlands now, that link to the
       paper (see <a href="socials.html">Socials</a>).</li>
       <li><b>BibTeX</b> lists at most 30 authors per paper, followed by "and others".</li>
@@ -365,7 +364,7 @@ Promise.all([load("papers"), load("people"), load("clusters"), load("institution
           ${X.nref[p.id] ? `<p class="small muted">${fmt(X.nref[p.id])} references in OpenAlex.</p>` : ""}</div>
         <div><h4>Built on by: papers on this site (${fmt(cb.length)})</h4><ul>${lim(cb, 8) || '<li class="muted">none found</li>'}</ul></div>
         ${proj || stm || sh ? `<div>${proj ? `<h4>Similar ongoing NWO projects</h4><ul>${proj}</ul>` : ""}
-          ${stm ? `<h4>Cited on the Working More Together page</h4><ul>${stm}</ul>` : ""}
+          ${stm ? `<h4>Cited on the Working Together page</h4><ul>${stm}</ul>` : ""}
           ${sh ? `<h4>Shared on social media</h4><p class="small" style="margin:0">${fmt(sh[0])} post${sh[0] === 1 ? "" : "s"} by ${fmt(sh[1])} ${sh[1] === 1 ? "person" : "people"} on this site.</p>` : ""}</div>` : ""}
       </div>`;
   }

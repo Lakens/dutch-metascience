@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Working More Together</title>
+<title>Working Together</title>
 <meta name="description" content="Working more together, from the Dutch metascience data: who could work together, which themes are rising, and which shared questions could become joint projects.">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
@@ -34,20 +34,29 @@
     <a href="index.html">Overview</a>
     <a href="people.html">People</a>
     <a href="papers.html">Papers</a>
-    <a href="themes.html">Themes</a>
     <a href="history.html">History</a>
     <a href="funding.html">Funding</a>
-    <a href="inferences.html" aria-current="page">Working More Together</a>
+    <a href="inferences.html" aria-current="page">Working Together</a>
     <a href="socials.html">Socials</a>
     <a href="about.html">About</a>
   </nav>
   <button id="theme-toggle" type="button">Dark mode</button>
 </header>
 <main>
-  <h1>Working More Together</h1>
-  <p class="lede">What the data suggest, beyond describing them: who could work together, which themes are rising,
+  <h1>Working Together</h1>
+  <p class="lede">The 20 themes of the field, and what the data suggest beyond describing them: who could work together, which themes are rising,
   and which shared questions could become joint projects. These are suggestions computed from titles and abstracts,
   not judgements about anyone's work; use them as a starting point for a conversation.</p>
+
+  <section class="card" id="themes">
+    <h2>The 20 themes</h2>
+    <p class="sub">Each paper's title and abstract were turned into a numeric fingerprint by a language model (bge-m3),
+    and papers with similar fingerprints were grouped into 20 clusters. The AI named and described each cluster from the
+    titles nearest its centre; the names were then revised after reading each cluster's typical title words, keywords
+    and a sample of its titles. Under each theme are the people with most papers in it. Click a theme to see its papers
+    on the map on the Overview.</p>
+    <div class="cards" id="cards"></div>
+  </section>
 
   <section class="card">
     <h2>Who could work together?</h2>
@@ -511,6 +520,29 @@ load("socials").then((S) => {
   }
   draw(); onThemeChange(draw);
 }).catch((e) => failed(document.getElementById("srchart"), e));
+</script>
+<script>
+// ---- the 20 themes (moved here from the former Themes page, 26 Nov 2026) ----
+Promise.all([load("papers"), load("clusters"), load("people"), Me.ready]).then(([papers, clusters, people, me]) => {
+  const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
+  document.getElementById("cards").innerHTML = clusters.slice().sort((a, b) => b.k - a.k).map((c) => {
+    const ps = papers.filter((p) => p.cl === c.id);
+    const cnt = {}; ps.forEach((p) => p.p.forEach((id) => { if (byPerson[id]) cnt[id] = (cnt[id] || 0) + 1; }));
+    const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([id]) => byPerson[id].n);
+    const ys = ps.map((p) => p.y).filter(Boolean).sort((a, b) => a - b);
+    const nMine = me ? ps.filter((p) => p.p.includes(me.id)).length : 0;
+    const youTag = me && me.field.includes(c.id) ? '<span class="you">your subfield</span>' : "";
+    return `<div class="c" data-id="${c.id}"><h3>${esc(c.name)}${youTag}</h3><p>${esc(c.desc)}</p>
+      ${nMine ? `<p class="small" style="margin-top:6px"><b>${nMine} of your papers</b></p>` : ""}
+      <p class="muted" style="margin-top:6px">${c.k} papers${ys.length ? `, median year ${ys[Math.floor(ys.length / 2)]}` : ""}</p>
+      <p style="margin-top:4px">${top.length ? "e.g. " + esc(top.join(", ")) : ""}</p></div>`;
+  }).join("");
+  // a click opens the map on the Overview, zoomed in on this theme (keeping a personal view in the address)
+  document.querySelectorAll("#cards .c").forEach((el) => el.addEventListener("click", () => {
+    const q = new URLSearchParams(location.search); q.set("cl", el.dataset.id);
+    location.href = `index.html?${q.toString()}#map-card`;
+  }));
+}).catch((e) => failed(document.getElementById("cards"), e));
 </script>
 </body>
 </html>

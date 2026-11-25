@@ -24,10 +24,9 @@
     <a href="index.html" aria-current="page">Overview</a>
     <a href="people.html">People</a>
     <a href="papers.html">Papers</a>
-    <a href="themes.html">Themes</a>
     <a href="history.html">History</a>
     <a href="funding.html">Funding</a>
-    <a href="inferences.html">Working More Together</a>
+    <a href="inferences.html">Working Together</a>
     <a href="socials.html">Socials</a>
     <a href="about.html">About</a>
   </nav>
@@ -49,7 +48,7 @@
     <h2>The map of the literature</h2>
     <p class="sub">Every dot is a metascience paper. Each paper's title and abstract were turned into a numeric
     fingerprint by a language model (bge-m3), and papers with similar fingerprints lie close together. The colours are
-    the 12 categories; the names on the map are the 20 clusters of similar papers (see <a href="themes.html">Themes</a>).
+    the 12 categories; the names on the map are the 20 clusters of similar papers (described on <a href="inferences.html#themes">Working Together</a>).
     Click a category to turn it grey.</p>
     <div class="controls">
       <input type="search" id="q" placeholder="Highlight titles containing…" aria-label="Highlight titles containing">
@@ -124,12 +123,6 @@
     <div class="multiples" id="mult"></div>
   </section>
 
-  <section class="card" id="keywords">
-    <h2>Rising and falling keywords</h2>
-    <p class="sub">The rank of each keyword among the most frequent keywords in each period (1 = most frequent).
-    The eight keywords that lead the most recent period are coloured; hover any line for its name.</p>
-    <div id="bump" class="chart" style="min-height:560px"></div>
-  </section>
 
   <div class="grid two">
     <section class="card">
@@ -147,10 +140,9 @@
       <ul class="small">
         <li><a href="people.html">People</a>: each person's categories, timeline, co-authors and papers.</li>
         <li><a href="papers.html">Papers</a>: every paper with filters and details, how the field grew, what got cited, and the landmark papers per category.</li>
-        <li><a href="themes.html">Themes</a>: the 20 clusters of similar papers, and which institution works on which category.</li>
         <li><a href="history.html">History</a>: a timeline per theme of historical events (Wikipedia) and the landmark papers that the papers on this site cite most.</li>
         <li><a href="funding.html">Funding</a>: NWO grants we could link to these researchers and the NWO projects we identified as metascience-related, with a timeline.</li>
-        <li><a href="inferences.html">Working More Together</a>: who could work together, rising themes, and shared questions for joint projects.</li>
+        <li><a href="inferences.html">Working Together</a>: the 20 themes, who could work together, rising themes, and shared questions for joint projects.</li>
       </ul>
     </section>
   </div>
@@ -185,7 +177,7 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
         <li><a href="papers.html${q}#cited">Papers</a>: your papers among all citations.</li>
         <li><a href="history.html${q}">History</a>: the timeline of your subfield, with the landmark papers you cite.</li>
         <li><a href="funding.html${q}">Funding</a>: your NWO grants.</li>
-        <li><a href="inferences.html${q}">Working More Together</a>: who you could work with.</li>
+        <li><a href="inferences.html${q}">Working Together</a>: who you could work with.</li>
       </ul>
       <p class="small muted">Use the bar at the top of each page to switch between highlighting you and your subfield, or to stop.</p>`;
   }
@@ -222,9 +214,10 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
 }).catch((e) => failed(document.getElementById("clusterheat"), e));
 </script>
 <script>
-// ---- the rise of terms and the keyword ranks (moved here from the former Over time page, 26 Nov 2026) ----
+// ---- the rise of terms (moved here from the former Over time page, 26 Nov 2026; the keyword ranks were removed the
+// same day, as Working Together shows rising keywords) ----
 let tmode = "share";
-Promise.all([load("terms"), load("keywords")]).then(([terms, kw]) => {
+load("terms").then((terms) => {
   function drawTerms() {
     const from = +document.getElementById("tfrom").value;
     const allYears = Object.keys(terms.totals).map(Number).filter((y) => y >= from).sort((a, b) => a - b);
@@ -251,30 +244,11 @@ Promise.all([load("terms"), load("keywords")]).then(([terms, kw]) => {
   }));
   document.getElementById("tfrom").addEventListener("change", drawTerms);
 
-  function drawBump() {
-    const periods = Object.keys(kw.periods);
-    const rank = {}; periods.forEach((p) => kw.periods[p].slice(0, 15).forEach(([k], i) => ((rank[k] = rank[k] || {})[p] = i + 1)));
-    const last = periods[periods.length - 1];
-    const leaders = kw.periods[last].slice(0, 8).map(([k]) => k);
-    const traces = Object.keys(rank).sort((a, b) => leaders.includes(a) - leaders.includes(b)).map((k) => {
-      const li = leaders.indexOf(k);
-      return { type: "scatter", mode: "lines+markers", name: k, x: periods, y: periods.map((p) => rank[k][p] ?? null),
-        connectgaps: false, line: { width: li >= 0 ? 2.5 : 1.5, color: li >= 0 ? seriesColor(li) : cssVar("--other") },
-        marker: { size: 8, color: li >= 0 ? seriesColor(li) : cssVar("--other"), line: { width: 2, color: cssVar("--surface-1") } },
-        hovertemplate: `<b>${esc(k)}</b><br>%{x}: rank %{y}<extra></extra>` };
-    });
-    const ann = leaders.map((k) => ({ x: last, y: rank[k][last], text: esc(k), xanchor: "left", xshift: 10, showarrow: false,
-      font: { size: 12, color: cssVar("--text-primary") } }));
-    Plotly.react("bump", traces, baseLayout({ showlegend: false, hovermode: "closest", annotations: ann, margin: { l: 40, r: 230, t: 10, b: 40 },
-      xaxis: Object.assign(baseLayout().xaxis, { showgrid: true }),
-      yaxis: Object.assign(baseLayout().yaxis, { title: "rank", dtick: 1, range: [15.5, 0.5] }) }), PLOT_CONFIG);
-  }
-  const all = () => { drawTerms(); drawBump(); };
-  all(); onThemeChange(all);
+  drawTerms(); onThemeChange(drawTerms);
 }).catch((e) => failed(document.getElementById("mult"), e));
 </script>
 <script>
-// ---- the map of the literature (moved here from the Themes page, 26 Nov 2026) ----
+// ---- the map of the literature (moved here from the former Themes page, 26 Nov 2026) ----
 const chosen = new Set(CATEGORIES);   // categories in colour on the map; all by default, a click turns one grey
 Promise.all([load("papers"), load("clusters"), load("people"), Me.ready]).then(([papers, clusters, people, me]) => {
   const byPerson = Object.fromEntries(people.map((p) => [p.id, p]));
@@ -434,7 +408,7 @@ Promise.all([load("papers"), load("clusters"), load("people"), Me.ready]).then((
   ["q", "cl"].forEach((id) => document.getElementById(id).addEventListener("input", drawMap));
   [y0s, y1s].forEach((s) => s.addEventListener("change", drawMap));
 
-  // a cluster in the address (index.html?cl=3#map-card, used by the cluster cards on the Themes page)
+  // a cluster in the address (index.html?cl=3#map-card, used by the theme cards on Working Together)
   const startCl = new URLSearchParams(location.search).get("cl");
   if (startCl && clusters.some((c) => String(c.id) === startCl)) document.getElementById("cl").value = startCl;
   drawMap(); onThemeChange(drawMap);
