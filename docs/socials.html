@@ -58,6 +58,34 @@
   <p class="lede" id="lede">What the people on this site who work in the Netherlands now post about metascience on Bluesky and Mastodon.</p>
 
   <section class="card">
+    <h2>Who interacts with whom</h2>
+    <p class="sub">A line joins two people when one mentioned (@name), reposted or replied to the other, in any of their
+    posts. Thicker lines mean more interactions. Orange lines join people who also wrote a paper together that is on this
+    site; grey lines join people without a joint paper on this site (they may have written other papers together).
+    Circles are larger for people with more metascience posts, and coloured by the platform the person uses. On Mastodon a reply always mentions the other person; on
+    Bluesky, replies are counted for metascience posts only. Scroll to zoom, drag to move, hover for details, click a
+    person to see who they interact with.</p>
+    <div class="controls">
+      <label>At least <select id="nmin"><option>2</option><option selected>3</option><option>5</option><option>10</option><option>25</option></select> interactions</label>
+      <div class="seg" id="nmode"><button aria-pressed="true" data-v="all">All pairs</button><button aria-pressed="false" data-v="noco">Only pairs without a joint paper on this site</button></div>
+      <label><input type="checkbox" id="nlabels" checked> names</label>
+      <input type="search" id="nsearch" placeholder="Find a person…" aria-label="Find a person in the network">
+      <span class="muted small" id="ncount"></span>
+    </div>
+    <div class="pl-legend"><span><span class="dot" style="background:var(--bluesky)"></span>on Bluesky</span><span><span class="dot" style="background:var(--mastodon)"></span>on Mastodon</span><span><span class="dot" style="background:linear-gradient(90deg,var(--bluesky) 50%,var(--mastodon) 50%)"></span>on both</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--series-2)"></span>also a joint paper on this site</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--other)"></span>no joint paper on this site</span></div>
+    <div class="split">
+      <div style="margin:0"><canvas class="net" id="net"></canvas></div>
+      <aside class="card panel" style="margin:0" id="npanel">
+        <h3>Click a person</h3>
+        <p class="muted small">The people they interact with light up in the network, and are listed here with the number
+        of mentions, reposts and replies between them.</p>
+      </aside>
+    </div>
+    <h3 style="margin-top:14px">Pairs who interact most without a joint paper on this site</h3>
+    <div class="tablewrap"><table class="data" id="pairs"></table></div>
+  </section>
+
+  <section class="card">
     <h2>Who posts most about metascience</h2>
     <p class="sub">The ten people with the most posts of their own that contain a metascience term, per platform. Reposts
     are not counted, and neither are posts whose only term is "peer review" or "impact factor", which many
@@ -127,37 +155,9 @@
       <div><h3>Papers on this site shared by several people</h3><ol class="papers" id="shared"></ol></div>
     </div>
   </section>
-
-  <section class="card">
-    <h2>Who interacts with whom</h2>
-    <p class="sub">A line joins two people when one mentioned (@name), reposted or replied to the other, in any of their
-    posts. Thicker lines mean more interactions. Orange lines join people who also wrote a paper together that is on this
-    site; grey lines join people without a joint paper on this site (they may have written other papers together).
-    Circles are larger for people with more metascience posts, and coloured by the platform the person uses. On Mastodon a reply always mentions the other person; on
-    Bluesky, replies are counted for metascience posts only. Scroll to zoom, drag to move, hover for details, click a
-    person to see who they interact with.</p>
-    <div class="controls">
-      <label>At least <select id="nmin"><option>2</option><option selected>3</option><option>5</option><option>10</option><option>25</option></select> interactions</label>
-      <div class="seg" id="nmode"><button aria-pressed="true" data-v="all">All pairs</button><button aria-pressed="false" data-v="noco">Only pairs without a joint paper on this site</button></div>
-      <label><input type="checkbox" id="nlabels" checked> names</label>
-      <input type="search" id="nsearch" placeholder="Find a person…" aria-label="Find a person in the network">
-      <span class="muted small" id="ncount"></span>
-    </div>
-    <div class="pl-legend"><span><span class="dot" style="background:var(--bluesky)"></span>on Bluesky</span><span><span class="dot" style="background:var(--mastodon)"></span>on Mastodon</span><span><span class="dot" style="background:linear-gradient(90deg,var(--bluesky) 50%,var(--mastodon) 50%)"></span>on both</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--series-2)"></span>also a joint paper on this site</span><span><span style="display:inline-block;width:18px;height:3px;background:var(--other)"></span>no joint paper on this site</span></div>
-    <div class="split">
-      <div style="margin:0"><canvas class="net" id="net"></canvas></div>
-      <aside class="card panel" style="margin:0" id="npanel">
-        <h3>Click a person</h3>
-        <p class="muted small">The people they interact with light up in the network, and are listed here with the number
-        of mentions, reposts and replies between them.</p>
-      </aside>
-    </div>
-    <h3 style="margin-top:14px">Pairs who interact most without a joint paper on this site</h3>
-    <div class="tablewrap"><table class="data" id="pairs"></table></div>
-  </section>
 </main>
 <footer>Data: public posts on Bluesky and Mastodon by the people on this site, downloaded in November 2026. See
-<a href="about.html#socials">About</a> for how accounts were found and how to be removed.</footer>
+<a href="https://github.com/Lakens/dutch-metascience-community#data-sources">the README</a> for how accounts were found, and <a href="about.html">About</a> for how to be removed.</footer>
 
 <script>
 Promise.all([load("socials")]).then(([S]) => {
@@ -172,7 +172,7 @@ Promise.all([load("socials")]).then(([S]) => {
     replies. ${fmt(S.n_meta_posts)} of these,
     by ${fmt(S.n_meta_people)} people, contain a metascience term (from a list based on the terms used to find the papers
     on this site). ${fmt(S.n_feed)} people regularly post about metascience. People who have left the Netherlands
-    are not included. <a href="about.html#socials">How this page was made</a>.`;
+    are not included. <a href="https://github.com/Lakens/dutch-metascience-community#data-sources">How this page was made</a>.`;
 
   // ---- top posters ----
   for (const kind of ["bluesky", "mastodon"]) {
