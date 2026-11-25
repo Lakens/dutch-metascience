@@ -11,10 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="assets/common.js"></script>
 <style>
-  .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-  .multiples .m { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px 0; }
-  .multiples .m h3 { font-size: 0.92rem; margin: 0; display: flex; align-items: center; gap: 6px; }
-  .multiples .m .sp { height: 150px; }
+  .split.solo { grid-template-columns: minmax(0, 1fr); }
 </style>
 </head>
 <body>
@@ -33,15 +30,28 @@
   <button id="theme-toggle" type="button">Dark mode</button>
 </header>
 <main>
-  <section class="card" style="border-left: 4px solid var(--accent); margin-top: 8px">
-    <p style="margin:0 0 8px">This website was built by Daniel Lakens for the symposium <b>Research Prioritization in
+  <h1>Metascience in the Netherlands</h1>
+  <p class="lede">Research on research: replication, research practices, open science, peer review, integrity,
+  statistical inference, research evaluation and science policy. This site maps metascience papers with at least
+  one author at a Dutch institution that we found in OpenAlex, as judged by a language model and checked by AI
+  reviewers. Some papers are missing, and some papers shown are not metascience. Everything is interactive:
+  hover for details, click legends to hide series, and follow the links to explore.</p>
+  <p class="lede">This website was built by Daniel Lakens for the symposium <b>Research Prioritization in
     Dutch Metascience</b> on 10 December. Its goal is to let attendees explore possible collaborations based on shared
     interests.</p>
-    <p class="small" style="margin:0; color: var(--text-secondary)">We rely on classifications by OpenAlex, metadata from
+  <p class="small" style="color: var(--text-secondary); max-width: 900px">We rely on classifications by OpenAlex, metadata from
     NWO, keywords and ORCID data provided by authors, and data cleaning by Claude Opus 5.5. I have performed some basic
     quality checks, but it was neither possible nor needed for the preparation of the symposium to validate all data by
     hand. The data are provided for inspiration, not scholarship, and will contain errors and incorrect
     classifications.</p>
+
+  <section class="card" id="find">
+    <h2>Find yourself</h2>
+    <p class="sub">Work on metascience in the Netherlands? Choose your name to see the whole site from your position: your
+    papers, co-authors, subfield, institution and grants are highlighted on every page. The choice is kept only in this
+    browser; nothing is sent anywhere. All data on this site are public, so you can also choose anyone else.</p>
+    <div class="controls"><input type="search" id="findme" placeholder="Type part of your name…" aria-label="Find yourself"></div>
+    <div id="mecard"></div>
   </section>
 
   <section class="card" id="map-card">
@@ -70,8 +80,11 @@
     <h2>Who works with whom</h2>
     <p class="sub">Every dot is an author at a Dutch institution of metascience papers on this site; a line means they
     wrote at least one paper together (papers with more than <span id="maxauth">30</span> authors are left out, so one
-    large project does not tie hundreds of people together). Scroll to zoom, drag to move, hover for details, click a
-    person to see their co-authors and papers.</p>
+    large project does not tie hundreds of people together). Scroll to zoom, drag to move, hover for details. Click a
+    person: their co-authors light up in the network, and their details and papers appear beside it. The colours show
+    groups of people who write together more than with others (Louvain method on the co-authorship links). They are
+    not formal groups and have no names; hover over a colour or a person to see the group's size and its two most
+    common themes.</p>
     <div class="controls">
       <label>At least <select id="minp"><option>1</option><option selected>2</option><option>3</option><option>5</option><option>10</option></select> papers</label>
       <label>Colour by <select id="colorby">
@@ -82,70 +95,31 @@
       <span class="muted small" id="netcount"></span>
     </div>
     <div class="legend" id="netlegend"></div>
-    <div class="split">
+    <!-- the network has the full width until a person is clicked; then their details appear beside it -->
+    <div class="split solo" id="netsplit">
       <div class="card" style="margin:0;padding:8px"><canvas class="net" id="net"></canvas></div>
-      <aside class="card panel" style="margin:0" id="panel">
-        <h3>Click a person</h3>
-        <p class="muted small">Their co-authors light up in the network, and their details and papers appear here.</p>
-        <p class="muted small">The colours show groups of people who write together more than with others (Louvain method
-        on the co-authorship links). They are not formal groups and have no names; hover over a colour or a person to see
-        the group's size and its two most common themes.</p>
-      </aside>
+      <aside class="card panel" style="margin:0" id="panel" hidden></aside>
     </div>
   </section>
 
-  <h1>Metascience in the Netherlands</h1>
-  <p class="lede">Research on research: replication, research practices, open science, peer review, integrity,
-  statistical inference, research evaluation and science policy. This site maps metascience papers with at least
-  one author at a Dutch institution that we found in OpenAlex, as judged by a language model and checked by AI
-  reviewers. Some papers are missing, and some papers shown are not metascience. Everything is interactive:
-  hover for details, click legends to hide series, and follow the links to explore.</p>
-
-  <section class="card" id="find">
-    <h2>Find yourself</h2>
-    <p class="sub">Work on metascience in the Netherlands? Choose your name to see the whole site from your position: your
-    papers, co-authors, subfield, institution and grants are highlighted on every page. The choice is kept only in this
-    browser; nothing is sent anywhere. All data on this site are public, so you can also choose anyone else.</p>
-    <div class="controls"><input type="search" id="findme" placeholder="Type part of your name…" aria-label="Find yourself"></div>
-    <div id="mecard"></div>
+  <section class="card">
+    <h2>Twenty themes, year by year</h2>
+    <p class="sub">The papers fall into 20 clusters of similar content (from their abstracts); the colour shows how
+    many papers each cluster had per year. The clusters are named on the <a href="#map-card">map</a> above.
+    <span id="cl-me"></span></p>
+    <div id="clusterheat" class="chart tall"></div>
   </section>
 
-  <section class="card" id="terms">
-    <h2>The rise of terms</h2>
-    <p class="sub">Papers on this site per year that use each term in their title or abstract, by default as a share of
-    that year's metascience papers. Each panel has its own vertical scale, so that rare terms stay visible: compare the
-    shape of the curves, not their height (the total under each term gives the size). Abstracts are missing for some
-    papers, so the counts are a lower bound. The last year is not complete yet.</p>
-    <div class="controls">
-      <div class="seg" id="tmode"><button aria-pressed="true" data-v="share">Share of that year's papers</button><button aria-pressed="false" data-v="count">Papers</button></div>
-      <label>From <select id="tfrom"><option>2000</option><option selected>2005</option><option>2010</option></select></label>
-    </div>
-    <div class="multiples" id="mult"></div>
+  <section style="margin-top:18px">
+    <h3>Explore</h3>
+    <ul class="small">
+      <li><a href="people.html">People</a>: each person's categories, timeline, co-authors and papers.</li>
+      <li><a href="papers.html">Papers</a>: every paper with filters and details, how the field grew, what got cited, and the landmark papers per category.</li>
+      <li><a href="history.html">History</a>: a timeline per theme of historical events (Wikipedia) and the landmark papers that the papers on this site cite most.</li>
+      <li><a href="funding.html">Funding</a>: NWO grants we could link to these researchers and the NWO projects we identified as metascience-related, with a timeline.</li>
+      <li><a href="inferences.html">Working Together</a>: the 20 themes, who could work together, rising themes, and shared questions for joint projects.</li>
+    </ul>
   </section>
-
-
-  <div class="grid two">
-    <section class="card">
-      <h2>Twenty themes, year by year</h2>
-      <p class="sub">The papers fall into 20 clusters of similar content (from their abstracts); the colour shows how
-      many papers each cluster had per year. The clusters are named on the <a href="#map-card">map at the top</a> of this page.
-      <span id="cl-me"></span></p>
-      <div id="clusterheat" class="chart tall"></div>
-    </section>
-    <section class="card">
-      <h2>Newcomers per year</h2>
-      <p class="sub">The number of authors at Dutch institutions whose first metascience paper on this site appeared in that year.</p>
-      <div id="newcomers" class="chart"></div>
-      <h3 style="margin-top:18px">Explore</h3>
-      <ul class="small">
-        <li><a href="people.html">People</a>: each person's categories, timeline, co-authors and papers.</li>
-        <li><a href="papers.html">Papers</a>: every paper with filters and details, how the field grew, what got cited, and the landmark papers per category.</li>
-        <li><a href="history.html">History</a>: a timeline per theme of historical events (Wikipedia) and the landmark papers that the papers on this site cite most.</li>
-        <li><a href="funding.html">Funding</a>: NWO grants we could link to these researchers and the NWO projects we identified as metascience-related, with a timeline.</li>
-        <li><a href="inferences.html">Working Together</a>: the 20 themes, who could work together, rising themes, and shared questions for joint projects.</li>
-      </ul>
-    </section>
-  </div>
 </main>
 <footer>Data: <a href="https://openalex.org">OpenAlex</a> (CC0) and <a href="https://www.crossref.org">Crossref</a>.
 Theme labels are AI judgements and can be wrong; see <a href="about.html">About</a>.</footer>
@@ -202,50 +176,9 @@ Promise.all([load("meta"), load("papers"), load("people"), load("clusters"), loa
     }], baseLayout({ margin: { l: 10, r: 10, t: 10, b: 40 }, yaxis: Object.assign(baseLayout().yaxis, { autorange: "reversed" }) }), PLOT_CONFIG);
   }
 
-  function drawNewcomers() {
-    const c = {}; people.forEach((p) => { if (p.y0 && p.y0 >= 2000) c[p.y0] = (c[p.y0] || 0) + 1; });
-    const xs = Object.keys(c).map(Number).sort((a, b) => a - b);
-    Plotly.react("newcomers", [{ type: "bar", x: xs, y: xs.map((x) => c[x]), marker: { color: cssVar("--series-1") },
-      hovertemplate: "%{x}: %{y} new authors<extra></extra>" }],
-      baseLayout({ bargap: 0.15, yaxis: Object.assign(baseLayout().yaxis, { title: "authors with a first paper" }) }), PLOT_CONFIG);
-  }
-  const all = () => { drawClusters(); drawNewcomers(); };
+  const all = () => { drawClusters(); };
   all(); onThemeChange(all);
 }).catch((e) => failed(document.getElementById("clusterheat"), e));
-</script>
-<script>
-// ---- the rise of terms (moved here from the former Over time page, 26 Nov 2026; the keyword ranks were removed the
-// same day, as Working Together shows rising keywords) ----
-let tmode = "share";
-load("terms").then((terms) => {
-  function drawTerms() {
-    const from = +document.getElementById("tfrom").value;
-    const allYears = Object.keys(terms.totals).map(Number).filter((y) => y >= from).sort((a, b) => a - b);
-    const names = Object.keys(terms.terms).sort((a, b) =>
-      Object.values(terms.terms[b]).reduce((s, x) => s + x, 0) - Object.values(terms.terms[a]).reduce((s, x) => s + x, 0));
-    const el = document.getElementById("mult"); el.innerHTML = "";
-    names.forEach((t) => {
-      const total = Object.values(terms.terms[t]).reduce((s, x) => s + x, 0);
-      const first = Object.keys(terms.terms[t]).map(Number).sort((a, b) => a - b)[0];
-      const div = document.createElement("div"); div.className = "m";
-      div.innerHTML = `<h3>${esc(t)}</h3><div class="muted small">${fmt(total)} papers${first ? ` · first in ${first}` : ""}</div><div class="sp"></div>`;
-      el.appendChild(div);
-      const y = allYears.map((yr) => { const n = terms.terms[t][yr] || 0; return tmode === "share" ? (terms.totals[yr] ? 100 * n / terms.totals[yr] : 0) : n; });
-      Plotly.newPlot(div.querySelector(".sp"), [{ x: allYears, y, type: "scatter", mode: "lines", fill: "tozeroy",
-        line: { color: cssVar("--series-1"), width: 2 }, fillcolor: cssVar("--seq-1"),
-        hovertemplate: `%{x}: %{y:${tmode === "share" ? ".1f" : ".0f"}}${tmode === "share" ? "%" : " papers"}<extra></extra>` }],
-        baseLayout({ margin: { l: 34, r: 6, t: 4, b: 22 }, showlegend: false, height: 140,
-          xaxis: Object.assign(baseLayout().xaxis, { range: [allYears[0], allYears[allYears.length - 1]], nticks: 4 }),
-          yaxis: Object.assign(baseLayout().yaxis, { nticks: 3, rangemode: "tozero" }) }), PLOT_CONFIG);
-    });
-  }
-  document.querySelectorAll("#tmode button").forEach((b) => b.addEventListener("click", () => {
-    tmode = b.dataset.v; document.querySelectorAll("#tmode button").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawTerms();
-  }));
-  document.getElementById("tfrom").addEventListener("change", drawTerms);
-
-  drawTerms(); onThemeChange(drawTerms);
-}).catch((e) => failed(document.getElementById("mult"), e));
 </script>
 <script>
 // ---- the map of the literature (moved here from the former Themes page, 26 Nov 2026) ----
@@ -593,6 +526,9 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
     let n = nodes.find((x) => x.id === id);
     if (!n && byId[id]) { document.getElementById("minp").value = 1; build(); n = nodes.find((x) => x.id === id); }
     selected = n || null;
+    // the details box is shown only while a person is selected; the canvas is measured again after the change
+    const panel = document.getElementById("panel");
+    if (panel.hidden === !!n) { panel.hidden = !n; document.getElementById("netsplit").classList.toggle("solo", !n); size(); }
     if (n) {
       showPanel(n.p);
       if (center && n.x != null) {
@@ -631,7 +567,7 @@ Promise.all([load("people"), load("edges"), load("papers"), load("institutions")
   onThemeChange(() => { legend(); draw(); });
   legend(); build();
   if (meFocus) select(meFocus, false);
-}).catch((e) => failed(document.getElementById("panel"), e));
+}).catch((e) => failed(document.getElementById("netsplit"), e));
 </script>
 </body>
 </html>

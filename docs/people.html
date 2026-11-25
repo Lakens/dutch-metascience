@@ -28,11 +28,14 @@
 </header>
 <main>
   <h1>People</h1>
-  <p class="lede">Pick anyone who wrote a metascience paper on this site at a Dutch institution.</p>
+  <p class="lede">Pick anyone who wrote a metascience paper on this site at a Dutch institution: type a name, or click
+  a row in "Who works on what".</p>
   <div class="controls">
     <input type="search" id="search" placeholder="Type part of a name…" aria-label="Find a person">
   </div>
 
+  <!-- shown only once a person is chosen (by name, by a click, by the address, or "Find yourself" on the Overview) -->
+  <div id="person" hidden>
   <section class="card" id="profile"><p class="loading">Loading…</p></section>
 
   <div class="grid two">
@@ -55,6 +58,7 @@
     from the title and abstract; they can be wrong.</p>
     <div class="tablewrap"><table class="data" id="ptable"></table></div>
   </section>
+  </div>
 
   <section class="card">
     <h2>Who works on what</h2>
@@ -64,6 +68,12 @@
       <label>Show <select id="heatn"><option>30</option><option selected>50</option><option>80</option></select> people</label>
     </div>
     <div id="heat" class="chart" style="min-height:900px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Newcomers per year</h2>
+    <p class="sub">The number of authors at Dutch institutions whose first metascience paper on this site appeared in that year.</p>
+    <div id="newcomers" class="chart"></div>
   </section>
 </main>
 <footer>Data: OpenAlex (CC0). Corrections are welcome; see <a href="about.html">About</a>.</footer>
@@ -80,8 +90,13 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
   window.addEventListener("hashchange", fromHash);
 
   function fromHash() {
+    // no default person: only a name in the address, or the reader's own choice under "Find yourself"
     const id = decodeURIComponent(location.hash.slice(1));
-    show(byId[id] || (me && byId[me.id]) || people[0]);
+    const p = byId[id] || (me && byId[me.id]) || null;
+    const box = document.getElementById("person");
+    if (!p) { box.hidden = true; current = null; return; }
+    box.hidden = false;   // before drawing, so the charts get their full width
+    show(p);
   }
 
   function show(p) {
@@ -190,9 +205,17 @@ Promise.all([load("people"), load("papers"), load("edges"), load("institutions")
     el.on("plotly_click", (d) => { location.hash = encodeURIComponent(d.points[0].customdata); window.scrollTo({ top: 0, behavior: "smooth" }); });
   }
   document.getElementById("heatn").addEventListener("change", drawHeat);
-  fromHash(); drawHeat();
-  onThemeChange(() => { if (current) show(current); drawHeat(); });
-}).catch((e) => failed(document.getElementById("profile"), e));
+  // newcomers per year (moved here from the Overview, 26 Nov 2026)
+  function drawNewcomers() {
+    const c = {}; people.forEach((p) => { if (p.y0 && p.y0 >= 2000) c[p.y0] = (c[p.y0] || 0) + 1; });
+    const xs = Object.keys(c).map(Number).sort((a, b) => a - b);
+    Plotly.react("newcomers", [{ type: "bar", x: xs, y: xs.map((x) => c[x]), marker: { color: cssVar("--series-1") },
+      hovertemplate: "%{x}: %{y} new authors<extra></extra>" }],
+      baseLayout({ bargap: 0.15, yaxis: Object.assign(baseLayout().yaxis, { title: "authors with a first paper" }) }), PLOT_CONFIG);
+  }
+  fromHash(); drawHeat(); drawNewcomers();
+  onThemeChange(() => { if (current) show(current); drawHeat(); drawNewcomers(); });
+}).catch((e) => failed(document.getElementById("heat"), e));
 </script>
 </body>
 </html>
